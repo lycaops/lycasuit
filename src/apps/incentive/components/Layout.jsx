@@ -9,7 +9,6 @@ import {
   BookOpen,
   Globe,
   Calculator as CalcIcon,
-  Users,
   LogOut,
   User as UserIcon,
   Home,
@@ -33,10 +32,6 @@ export default function Layout({ children }) {
     { to: '/statement', label: t('nav_statement'), icon: FileText },
     { to: '/scheme', label: t('nav_scheme'), icon: BookOpen },
   ];
-
-  if (user?.role === 'admin') {
-    navItems.push({ to: '/users', label: t('nav_users'), icon: Users });
-  }
 
   const roleLabel =
     user?.role === 'admin'

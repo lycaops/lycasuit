@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useCustomAuth } from '@assistance/lib/customAuth';
 import {
-  LayoutDashboard, PlusCircle, ListChecks, Users, Clock, CheckCircle,
+  LayoutDashboard, PlusCircle, ListChecks, Clock, CheckCircle,
   User, LogOut, Menu, X, Home, ChevronLeft, ChevronRight } from
 'lucide-react';
 import NotificationBar from '@assistance/components/NotificationBar';
@@ -23,7 +23,6 @@ const NAV_ITEMS = {
   { label: 'allTickets', path: '/all-tickets', icon: ListChecks },
   { label: 'pendingCases', path: '/pending-cases', icon: Clock },
   { label: 'completedCases', path: '/completed-cases', icon: CheckCircle },
-  { label: 'staffManagement', path: '/staff-management', icon: Users },
   { label: 'profile', path: '/profile', icon: User }]
 
 };

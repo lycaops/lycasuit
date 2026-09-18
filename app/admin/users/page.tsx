@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import { requirePlatformAdmin } from "@/lib/auth"
-import { HomeHeader } from "@/components/home/home-header"
+import { HomeSidebar } from "@/components/home/home-sidebar"
 import { PlatformUsersTable } from "@/components/admin/platform-users-table"
 
 export const metadata = { title: "Users & tool access — Lyca Suite" }
@@ -20,9 +20,10 @@ export default async function AdminUsersPage() {
 
   return (
     <main className="min-h-dvh bg-[#f4f7fb]">
-      <HomeHeader backToHome user={{ full_name: me.full_name, email: me.email, role: me.role }} />
-
-      <div className="mx-auto max-w-7xl px-6 py-8">
+      <div className="flex min-h-dvh flex-col lg:flex-row">
+        <HomeSidebar user={me} tools={tools ?? []} activeAdmin />
+        <div className="min-w-0 flex-1">
+          <div className="mx-auto max-w-7xl px-6 py-8">
         <header className="mb-6">
           <h1 className="text-2xl font-semibold tracking-tight text-[#21264E]">
             Users &amp; tool access
@@ -34,13 +35,16 @@ export default async function AdminUsersPage() {
           </p>
         </header>
 
-        <PlatformUsersTable
+            <PlatformUsersTable
           users={users ?? []}
           roles={roles ?? []}
           tools={tools ?? []}
           access={access ?? []}
           branches={branches ?? []}
-        />
+              currentUserId={me.id}
+            />
+          </div>
+        </div>
       </div>
     </main>
   )
