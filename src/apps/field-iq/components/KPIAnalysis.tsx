@@ -342,7 +342,7 @@ export default function KPIAnalysis({ branch, zone, region }: KPIAnalysisProps) 
   }
 
   return (
-    <div className="p-4 md:p-6 bg-gradient-to-br from-[#fff7f2] to-white min-h-[calc(100vh-120px)]">
+    <div className="p-4 md:p-6 bg-[#f4f7fb] min-h-[calc(100vh-120px)]">
       {/* Year filter */}
       <div className="mb-6 flex items-center gap-2 md:gap-4">
         <Calendar size={20} className="text-[#21264E]" />

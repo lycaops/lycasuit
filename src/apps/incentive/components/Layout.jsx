@@ -70,7 +70,7 @@ export default function Layout({ children }) {
         <nav className="flex-1 px-3 py-4 space-y-1">
           <button
             onClick={() => { window.location.href = '/home'; }}
-            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-white/70 hover:bg-white/10 hover:text-white transition-colors"
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/60 hover:bg-white/10 hover:text-white transition ${sidebarCollapsed ? 'justify-center' : ''}`}
           >
             <Home className="w-4 h-4" />
             {showSidebarLabels && 'Back to Home'}
@@ -82,10 +82,10 @@ export default function Layout({ children }) {
               <button
                 key={item.to}
                 onClick={() => navigate(item.to)}
-                className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${sidebarCollapsed ? 'justify-center' : ''} ${
                   active
                     ? 'bg-white/15 text-white'
-                    : 'text-white/70 hover:bg-white/10 hover:text-white'
+                    : 'text-white/60 hover:bg-white/10 hover:text-white'
                 }`}
               >
                 <Icon className="w-4 h-4" />

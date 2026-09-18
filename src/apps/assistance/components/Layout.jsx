@@ -80,11 +80,9 @@ export default function Layout({ children }) {
         <a
           href="/home"
           onClick={() => setMobileNavOpen(false)}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-white/70 hover:bg-white/10 hover:text-white transition-all"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/60 hover:bg-white/10 hover:text-white transition"
         >
-          <span className="w-6 h-6 rounded-md bg-transparent border border-white flex items-center justify-center flex-shrink-0">
-            <Home className="w-4 h-4 text-[#08dc7d]" />
-          </span>
+          <Home className="w-5 h-5 flex-shrink-0" />
           {showSidebarLabels && 'Back to Home'}
         </a>
         {navItems.map((item) => {
@@ -95,15 +93,12 @@ export default function Layout({ children }) {
             key={item.path}
             to={item.path}
             onClick={() => setMobileNavOpen(false)}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
             active ?
-            'bg-accent text-white rounded-none border-b-4 border-[#08dc7d]' :
-            'text-white/70 hover:bg-white/10 hover:text-white'}`
+            'bg-white/15 text-white' :
+            'text-white/60 hover:bg-white/10 hover:text-white'}`
             }>
-            
-              <span className="w-6 h-6 rounded-md bg-transparent border border-white flex items-center justify-center flex-shrink-0">
-                <Icon className="w-4 h-4 text-[#08dc7d]" />
-              </span>
+              <Icon className="w-5 h-5 flex-shrink-0" />
               {showSidebarLabels && t(item.label)}
             </Link>);
 
@@ -116,7 +111,7 @@ export default function Layout({ children }) {
         </div>}
         <button
         onClick={handleLogout}
-        className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-white/60 hover:bg-red-500/20 hover:text-red-300 transition-all w-full">
+        className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/60 hover:bg-white/10 hover:text-white transition w-full">
         
           <LogOut className="w-4 h-4 flex-shrink-0" />
           {showSidebarLabels && t('logout')}

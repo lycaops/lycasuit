@@ -684,7 +684,7 @@ export default function ISDM({ user, branch, zone, region }: ISDMProps) {
   const yearDifference = gaComparisonTotals.current - gaComparisonTotals.pastYear;
 
   return (
-    <div className="p-4 md:p-6 bg-gradient-to-br from-[#fff7f2] to-white min-h-[calc(100vh-120px)]">
+    <div className="p-4 md:p-6 bg-[#f4f7fb] min-h-[calc(100vh-120px)]">
       {/* Current Month Header */}
       <div className="mb-6">
         <div className="flex items-center justify-between">
