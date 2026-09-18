@@ -3,7 +3,7 @@ import { requirePlatformAdmin } from "@/lib/auth"
 import { HomeHeader } from "@/components/home/home-header"
 import { PlatformUsersTable } from "@/components/admin/platform-users-table"
 
-export const metadata = { title: "Users & tool access — Lyca Suite" }
+export const metadata = { title: "User Management — Lyca Suite" }
 
 export default async function AdminUsersPage() {
   const me = await requirePlatformAdmin()
@@ -25,12 +25,10 @@ export default async function AdminUsersPage() {
       <div className="mx-auto max-w-7xl px-6 py-8">
         <header className="mb-6">
           <h1 className="text-2xl font-semibold tracking-tight text-[#21264E]">
-            Users &amp; tool access
+            User Management
           </h1>
           <p className="mt-1 text-sm text-[#21264E]/70">
-            One account per person, valid across Field IQ, Contracts, Incentive Statements and
-            Market Assistance. The role set here is translated automatically into each tool&apos;s own
-            role vocabulary.
+            Manage users, app access, roles, branch assignments, and security settings for every tool.
           </p>
         </header>
 

@@ -81,6 +81,8 @@ export async function createPlatformUser(input: {
 export async function updatePlatformUser(
   userId: string,
   patch: {
+    email?: string
+    username?: string | null
     fullName?: string
     role?: string
     branches?: string[]
@@ -99,6 +101,8 @@ export async function updatePlatformUser(
   const { error } = await supabase
     .from("app_users")
     .update({
+      ...(patch.email !== undefined ? { email: patch.email.trim().toLowerCase() } : {}),
+      ...(patch.username !== undefined ? { username: patch.username?.trim() || null } : {}),
       ...(patch.fullName !== undefined ? { full_name: patch.fullName } : {}),
       ...(patch.role !== undefined ? { role: patch.role } : {}),
       ...(patch.branches !== undefined ? { branches: patch.branches } : {}),
@@ -123,6 +127,27 @@ export async function updatePlatformUser(
       ban_duration: patch.isActive ? "none" : "876000h",
     })
   }
+
+  if (patch.email !== undefined) {
+    const admin = createAdminClient()
+    const { error: authError } = await admin.auth.admin.updateUserById(userId, {
+      email: patch.email.trim().toLowerCase(),
+      email_confirm: true,
+    })
+    if (authError) return { ok: false, error: authError.message }
+  }
+
+  revalidatePath("/admin/users")
+  return { ok: true }
+}
+
+export async function deletePlatformUser(userId: string): Promise<ActionResult> {
+  const current = await requirePlatformAdmin()
+  if (current.id === userId) return { ok: false, error: "You cannot delete your own account." }
+
+  const admin = createAdminClient()
+  const { error } = await admin.auth.admin.deleteUser(userId)
+  if (error) return { ok: false, error: error.message }
 
   revalidatePath("/admin/users")
   return { ok: true }

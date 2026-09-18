@@ -34,9 +34,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import type { AppUser } from "@/lib/types"
+const PLATFORM_ADMIN_ROLES = ["SUPER-ADMIN", "HS-ADMIN", "PM-ADMIN", "CS-ADMIN", "COUNTRY-MANAGER", "UK-ADMIN"]
 
-export function AppSidebar({ user }: { user: AppUser }) {
+interface SidebarUser {
+  full_name: string
+  email: string
+  role: string
+  branch: string | null
+  zone: string | null
+}
+
+export function AppSidebar({ user }: { user: SidebarUser }) {
   const pathname = usePathname()
   const { t, language, setLanguage } = useI18n()
   const { state } = useSidebar()
@@ -53,10 +61,10 @@ export function AppSidebar({ user }: { user: AppUser }) {
       show: true,
     },
     {
-      href: "/tools/contracts/users",
-      label: t("users"),
+      href: "/admin/users",
+      label: "User Management",
       icon: Users,
-      show: user.role === "ADMIN",
+      show: PLATFORM_ADMIN_ROLES.includes(user.role),
     },
     {
       href: "/tools/contracts/profile",

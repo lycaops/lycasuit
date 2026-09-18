@@ -34,10 +34,6 @@ export default function Layout({ children }) {
     { to: '/scheme', label: t('nav_scheme'), icon: BookOpen },
   ];
 
-  if (user?.role === 'admin') {
-    navItems.push({ to: '/users', label: t('nav_users'), icon: Users });
-  }
-
   const roleLabel =
     user?.role === 'admin'
       ? 'Admin'

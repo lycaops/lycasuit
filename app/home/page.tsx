@@ -38,7 +38,7 @@ export default async function HomePage() {
           {admin && (
             <Link href="/admin/users" className="mb-4 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-white/70 transition hover:bg-white/10 hover:text-white">
               <Users className="h-4 w-4" />
-              Users &amp; tool access
+              User Management
             </Link>
           )}
           <p className="truncate text-sm font-medium">{user.full_name}</p>

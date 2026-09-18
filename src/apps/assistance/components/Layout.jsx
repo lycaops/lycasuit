@@ -23,7 +23,6 @@ const NAV_ITEMS = {
   { label: 'allTickets', path: '/all-tickets', icon: ListChecks },
   { label: 'pendingCases', path: '/pending-cases', icon: Clock },
   { label: 'completedCases', path: '/completed-cases', icon: CheckCircle },
-  { label: 'staffManagement', path: '/staff-management', icon: Users },
   { label: 'profile', path: '/profile', icon: User }]
 
 };

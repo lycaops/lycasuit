@@ -1,25 +1,14 @@
 "use client"
 
 import { useMemo, useState, useTransition } from "react"
-import { Check, Loader2, Search, ShieldCheck, ShieldOff } from "lucide-react"
-import { setToolAccess, updatePlatformUser } from "@/app/admin/users/actions"
+import { useRouter } from "next/navigation"
+import { Check, Loader2, Pencil, Plus, Search, ShieldCheck, ShieldOff, Trash2 } from "lucide-react"
+import { toast } from "sonner"
+import { deletePlatformUser, setToolAccess, updatePlatformUser } from "@/app/admin/users/actions"
+import { Button } from "@/components/ui/button"
+import { PlatformUserForm, type PlatformBranch, type PlatformRole, type PlatformTool, type PlatformUserRow } from "@/components/admin/platform-user-form"
 
-interface Row {
-  id: string
-  email: string
-  full_name: string
-  role: string
-  is_active: boolean
-  branches: string[] | null
-  branch: string | null
-  zone: string | null
-  designation: string | null
-  territory: string | null
-}
-interface RoleRow { code: string; label: string; rank: number }
-interface ToolRow { key: string; name: string; accent_color: string | null }
 interface AccessRow { user_id: string; tool_key: string; can_access: boolean }
-interface BranchRow { code: string; name: string }
 
 export function PlatformUsersTable({
   users,
@@ -28,15 +17,18 @@ export function PlatformUsersTable({
   access,
   branches,
 }: {
-  users: Row[]
-  roles: RoleRow[]
-  tools: ToolRow[]
+  users: PlatformUserRow[]
+  roles: PlatformRole[]
+  tools: PlatformTool[]
   access: AccessRow[]
-  branches: BranchRow[]
+  branches: PlatformBranch[]
 }) {
+  const router = useRouter()
   const [query, setQuery] = useState("")
   const [pending, startTransition] = useTransition()
   const [busyId, setBusyId] = useState<string | null>(null)
+  const [editing, setEditing] = useState<PlatformUserRow | null>(null)
+  const [formOpen, setFormOpen] = useState(false)
 
   const accessMap = useMemo(() => {
     const m = new Map<string, Set<string>>()
@@ -60,36 +52,57 @@ export function PlatformUsersTable({
     )
   }, [users, query])
 
-  function toggleTool(user: Row, toolKey: string) {
+  function toggleTool(user: PlatformUserRow, toolKey: string) {
     const current = new Set(accessMap.get(user.id) ?? [])
     if (current.has(toolKey)) current.delete(toolKey)
     else current.add(toolKey)
     setBusyId(user.id)
     startTransition(async () => {
-      await setToolAccess(user.id, Array.from(current))
+      const result = await setToolAccess(user.id, Array.from(current) as string[])
+      if (!result.ok) toast.error(result.error)
+      else router.refresh()
       setBusyId(null)
     })
   }
 
-  function changeRole(user: Row, role: string) {
+  function changeRole(user: PlatformUserRow, role: string) {
     setBusyId(user.id)
     startTransition(async () => {
-      await updatePlatformUser(user.id, { role })
+      const result = await updatePlatformUser(user.id, { role })
+      if (!result.ok) toast.error(result.error)
+      else router.refresh()
       setBusyId(null)
     })
   }
 
-  function toggleActive(user: Row) {
+  function toggleActive(user: PlatformUserRow) {
     setBusyId(user.id)
     startTransition(async () => {
-      await updatePlatformUser(user.id, { isActive: !user.is_active })
+      const result = await updatePlatformUser(user.id, { isActive: !user.is_active })
+      if (!result.ok) toast.error(result.error)
+      else router.refresh()
+      setBusyId(null)
+    })
+  }
+
+  function removeUser(user: PlatformUserRow) {
+    if (!window.confirm(`Delete ${user.full_name}? This removes the login from every tool.`)) return
+    setBusyId(user.id)
+    startTransition(async () => {
+      const result = await deletePlatformUser(user.id)
+      if (!result.ok) toast.error(result.error)
+      else {
+        toast.success("User deleted")
+        router.refresh()
+      }
       setBusyId(null)
     })
   }
 
   return (
-    <div className="rounded-xl border border-[#21264E]/10 bg-white shadow-sm">
-      <div className="flex items-center gap-3 border-b border-[#21264E]/10 px-5 py-3">
+    <>
+      <div className="rounded-xl border border-[#21264E]/10 bg-white shadow-sm">
+      <div className="flex flex-wrap items-center gap-3 border-b border-[#21264E]/10 px-5 py-3">
         <Search className="h-4 w-4 text-[#21264E]/40" />
         <input
           value={query}
@@ -99,6 +112,9 @@ export function PlatformUsersTable({
         />
         <span className="shrink-0 text-xs text-[#21264E]/50">{filtered.length} users</span>
         {pending && <Loader2 className="h-4 w-4 animate-spin text-[#245BC1]" />}
+        <Button size="sm" className="ml-auto" onClick={() => { setEditing(null); setFormOpen(true) }}>
+          <Plus className="mr-1.5 h-4 w-4" /> Add user
+        </Button>
       </div>
 
       <div className="overflow-x-auto">
@@ -114,6 +130,7 @@ export function PlatformUsersTable({
                 </th>
               ))}
               <th className="px-3 py-3 text-center font-medium">Status</th>
+              <th className="px-3 py-3 text-right font-medium">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -190,12 +207,31 @@ export function PlatformUsersTable({
                       {u.is_active ? "Active" : "Disabled"}
                     </button>
                   </td>
+                  <td className="px-3 py-3 text-right">
+                    <div className="flex justify-end gap-1">
+                      <Button variant="ghost" size="icon" title="Edit user" onClick={() => { setEditing(u); setFormOpen(true) }} disabled={busy}>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" title="Delete user" onClick={() => removeUser(u)} disabled={busy}>
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
+                  </td>
                 </tr>
               )
             })}
           </tbody>
         </table>
       </div>
-    </div>
+      </div>
+      <PlatformUserForm
+        user={editing}
+        roles={roles}
+        tools={tools}
+        branches={branches}
+        open={formOpen}
+        onOpenChange={(open) => { setFormOpen(open); if (!open) setEditing(null) }}
+      />
+    </>
   )
 }

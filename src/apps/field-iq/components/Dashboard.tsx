@@ -890,17 +890,6 @@ export default function Dashboard() {
               {(!sidebarCollapsed || mobileMenuOpen) && 'Data Import'}
             </button>
           )}
-          {user?.role === 'HS-ADMIN' && (
-            <button
-              onClick={() => { setView(VIEWS.USERS); setMobileMenuOpen(false); }}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
-                view === VIEWS.USERS ? 'bg-white/15 text-white' : 'text-white/60 hover:bg-white/10 hover:text-white'
-              }`}
-            >
-              <Users size={20} />
-              {(!sidebarCollapsed || mobileMenuOpen) && 'User Management'}
-            </button>
-          )}
         </nav>
 
         {/* User */}

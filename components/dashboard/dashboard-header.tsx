@@ -7,9 +7,16 @@ import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useI18n } from "@/lib/i18n/i18n-context"
-import type { AppUser } from "@/lib/types"
 
-export function DashboardHeader({ user }: { user: AppUser }) {
+interface DashboardUser {
+  full_name: string
+  email: string
+  role: string
+  branch: string | null
+  zone: string | null
+}
+
+export function DashboardHeader({ user }: { user: DashboardUser }) {
   const { t } = useI18n()
   
   return (
