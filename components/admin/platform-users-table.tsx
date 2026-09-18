@@ -16,12 +16,14 @@ export function PlatformUsersTable({
   tools,
   access,
   branches,
+  zones,
 }: {
   users: PlatformUserRow[]
   roles: PlatformRole[]
   tools: PlatformTool[]
   access: AccessRow[]
   branches: PlatformBranch[]
+  zones: { code: string; name: string; branch_id: string; branches?: { code: string } | null }[]
 }) {
   const router = useRouter()
   const [query, setQuery] = useState("")
@@ -229,6 +231,7 @@ export function PlatformUsersTable({
         roles={roles}
         tools={tools}
         branches={branches}
+        zones={zones}
         open={formOpen}
         onOpenChange={(open) => { setFormOpen(open); if (!open) setEditing(null) }}
       />
