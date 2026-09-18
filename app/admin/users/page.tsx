@@ -19,7 +19,7 @@ export default async function AdminUsersPage() {
     ])
 
   return (
-    <main className="min-h-dvh bg-[#FFF7F2]">
+    <main className="min-h-dvh bg-[#f4f7fb]">
       <HomeHeader backToHome user={{ full_name: me.full_name, email: me.email, role: me.role }} />
 
       <div className="mx-auto max-w-7xl px-6 py-8">

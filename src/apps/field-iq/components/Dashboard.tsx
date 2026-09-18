@@ -774,7 +774,7 @@ export default function Dashboard() {
      'bg-[#08DC7D]';
 
   return (
-    <div className="flex h-screen bg-[#fff7f2] overflow-hidden relative">
+    <div className="flex h-screen bg-[#f4f7fb] overflow-hidden relative">
       {/* Mobile Sidebar Overlay */}
       {mobileMenuOpen && (
         <div 

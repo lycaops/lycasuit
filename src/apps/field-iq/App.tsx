@@ -8,7 +8,7 @@ function AppContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#fff7f2]">
+      <div className="min-h-screen flex items-center justify-center bg-[#f4f7fb]">
         <div className="text-center">
           <img
             src="https://cms-assets.ldsvcplatform.com/IT/s3fs-public/inline-images/logo_new1.png"

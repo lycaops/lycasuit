@@ -4,7 +4,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useCustomAuth } from '@assistance/lib/customAuth';
 import {
   LayoutDashboard, PlusCircle, ListChecks, Users, Clock, CheckCircle,
-  User, LogOut, Menu, X, Home } from
+  User, LogOut, Menu, X, Home, ChevronLeft, ChevronRight } from
 'lucide-react';
 import NotificationBar from '@assistance/components/NotificationBar';
 import LanguageSwitcher from '@assistance/components/LanguageSwitcher';
@@ -34,6 +34,7 @@ export default function Layout({ children }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const navItems = isAdmin ? NAV_ITEMS.admin : NAV_ITEMS.standard;
 
@@ -47,21 +48,23 @@ export default function Layout({ children }) {
     return location.pathname.startsWith(path);
   };
 
+  const showSidebarLabels = !sidebarCollapsed || mobileNavOpen;
+
   const SidebarContent = () =>
   <div className="flex flex-col h-full">
-      <div className="px-5 py-5 border-b border-white/10">
+      <div className={`px-4 py-4 border-b border-white/10 flex items-center gap-3 ${sidebarCollapsed && !mobileNavOpen ? 'justify-center' : 'justify-start'}`}>
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-white">
             <img src={logo} alt="Lyca Ops" className="w-9 h-9 object-contain" />
           </div>
-          <div className="min-w-0">
+          {showSidebarLabels && <div className="min-w-0">
             <p className="text-white font-bold text-sm leading-tight truncate">LMAC - Lyca Ops</p>
             <p className="text-accent text-xs leading-tight">{t('marketAssistanceCenter')}</p>
-          </div>
+          </div>}
         </div>
       </div>
 
-      <div className="px-4 py-4 border-b border-white/10">
+      {showSidebarLabels && <div className="px-4 py-4 border-b border-white/10">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-[#245bc1] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
             {currentUser?.full_name?.charAt(0)?.toUpperCase() || 'U'}
@@ -71,7 +74,7 @@ export default function Layout({ children }) {
             <p className="text-white/50 text-xs truncate">{currentUser?.role} · {currentUser?.territory}</p>
           </div>
         </div>
-      </div>
+      </div>}
 
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
         <a
@@ -82,7 +85,7 @@ export default function Layout({ children }) {
           <span className="w-6 h-6 rounded-md bg-transparent border border-white flex items-center justify-center flex-shrink-0">
             <Home className="w-4 h-4 text-[#08dc7d]" />
           </span>
-          Back to Home
+          {showSidebarLabels && 'Back to Home'}
         </a>
         {navItems.map((item) => {
         const Icon = item.icon;
@@ -101,22 +104,30 @@ export default function Layout({ children }) {
               <span className="w-6 h-6 rounded-md bg-transparent border border-white flex items-center justify-center flex-shrink-0">
                 <Icon className="w-4 h-4 text-[#08dc7d]" />
               </span>
-              {t(item.label)}
+              {showSidebarLabels && t(item.label)}
             </Link>);
 
       })}
       </nav>
 
       <div className="px-3 pb-4">
-        <div className="px-3 py-3 mb-2 border-t border-white/10">
+        {showSidebarLabels && <div className="px-3 py-3 mb-2 border-t border-white/10">
           <LanguageSwitcher compact />
-        </div>
+        </div>}
         <button
         onClick={handleLogout}
         className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-white/60 hover:bg-red-500/20 hover:text-red-300 transition-all w-full">
         
           <LogOut className="w-4 h-4 flex-shrink-0" />
-          {t('logout')}
+          {showSidebarLabels && t('logout')}
+        </button>
+        <button
+          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+          className="hidden lg:flex w-full items-center justify-center gap-2 px-3 py-2.5 mt-1 text-sm text-white/60 hover:bg-white/10 hover:text-white transition-all"
+          title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          {sidebarCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
         </button>
       </div>
     </div>;
@@ -124,7 +135,7 @@ export default function Layout({ children }) {
   return (
     <div className="min-h-screen bg-background">
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex fixed inset-y-0 left-0 w-64 bg-foreground flex-col z-30">
+      <aside className={`hidden lg:flex fixed inset-y-0 left-0 bg-foreground flex-col z-30 transition-all duration-300 ${sidebarCollapsed ? 'w-[72px]' : 'w-64'}`}>
         <SidebarContent />
       </aside>
 
@@ -161,7 +172,7 @@ export default function Layout({ children }) {
       }
 
       {/* Main Content */}
-      <main className="lg:ml-64 pt-14 lg:pt-0 min-h-screen">
+      <main className={`pt-14 lg:pt-0 min-h-screen transition-[margin] duration-300 ${sidebarCollapsed ? 'lg:ml-[72px]' : 'lg:ml-64'}`}>
         <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
           <div className="flex justify-end mb-4">
             <NotificationBar />

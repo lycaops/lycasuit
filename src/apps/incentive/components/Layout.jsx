@@ -13,6 +13,8 @@ import {
   LogOut,
   User as UserIcon,
   Home,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 
 const LOGO_URL = '/logo.png';
@@ -22,6 +24,8 @@ export default function Layout({ children }) {
   const { user, profile, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
+  const showSidebarLabels = !sidebarCollapsed;
 
   const navItems = [
     { to: '/', label: t('nav_dashboard'), icon: LayoutDashboard },
@@ -50,17 +54,17 @@ export default function Layout({ children }) {
       : '';
 
   return (
-    <div className="min-h-screen bg-slate-50 flex">
+    <div className="min-h-screen bg-[#f4f7fb] flex">
       <aside
-        className="sticky top-0 h-screen w-64 shrink-0 hidden md:flex flex-col"
+        className={`sticky top-0 h-screen shrink-0 hidden md:flex flex-col transition-all duration-300 ${sidebarCollapsed ? 'w-[72px]' : 'w-64'}`}
         style={{ backgroundColor: '#21264e' }}
       >
-        <div className="px-6 py-6 border-b border-white/10">
+        <div className={`px-4 py-4 border-b border-white/10 flex items-center ${sidebarCollapsed ? 'justify-center' : 'justify-start'}`}>
           <img
             src="/logo.png"
             alt="Logo"
             crossOrigin="anonymous"
-            className="h-8"
+            className={sidebarCollapsed ? 'h-8 w-8 object-contain' : 'h-8'}
           />
         </div>
         <nav className="flex-1 px-3 py-4 space-y-1">
@@ -69,7 +73,7 @@ export default function Layout({ children }) {
             className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-white/70 hover:bg-white/10 hover:text-white transition-colors"
           >
             <Home className="w-4 h-4" />
-            Back to Home
+            {showSidebarLabels && 'Back to Home'}
           </button>
           {navItems.map((item) => {
             const active = location.pathname === item.to;
@@ -85,19 +89,27 @@ export default function Layout({ children }) {
                 }`}
               >
                 <Icon className="w-4 h-4" />
-                {item.label}
+                {showSidebarLabels && item.label}
               </button>
             );
           })}
         </nav>
         <div className="px-3 py-4 border-t border-white/10">
-          <div className="px-4 py-1 text-xs text-white/50">{t('appSubtitle')}</div>
-          {profile?.branch_name && (
+          {showSidebarLabels && <div className="px-4 py-1 text-xs text-white/50">{t('appSubtitle')}</div>}
+          {showSidebarLabels && profile?.branch_name && (
             <div className="px-4 py-1 text-[11px] text-white/50 truncate">
               {scopeLabel}
             </div>
           )}
         </div>
+        <button
+          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+          className="hidden md:flex p-2.5 text-white/40 hover:text-white border-t border-white/10 items-center justify-center"
+          title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          {sidebarCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+        </button>
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0">
