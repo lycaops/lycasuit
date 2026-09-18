@@ -13,8 +13,11 @@ import {
   LogOut,
   User as UserIcon,
   Home,
+<<<<<<< HEAD
   ChevronLeft,
   ChevronRight,
+=======
+>>>>>>> f317c96915d48c67afd478597b5842f471e6372c
 } from 'lucide-react';
 
 const LOGO_URL = '/logo.png';
@@ -24,7 +27,10 @@ export default function Layout({ children }) {
   const { user, profile, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+<<<<<<< HEAD
   const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
+=======
+>>>>>>> f317c96915d48c67afd478597b5842f471e6372c
 
   const navItems = [
     { to: '/', label: t('nav_dashboard'), icon: LayoutDashboard },
@@ -53,26 +59,46 @@ export default function Layout({ children }) {
       : '';
 
   return (
+<<<<<<< HEAD
     <div className="min-h-screen bg-[#fff7f2] flex">
       <aside
         className={`sticky top-0 h-screen shrink-0 hidden md:flex flex-col transition-all duration-300 ${sidebarCollapsed ? 'w-[72px]' : 'w-64'}`}
         style={{ backgroundColor: '#21264e' }}
       >
         <div className={`px-4 py-4 border-b border-white/10 ${sidebarCollapsed ? 'flex justify-center' : ''}`}>
+=======
+    <div className="min-h-screen bg-slate-50 flex">
+      <aside
+        className="sticky top-0 h-screen w-64 shrink-0 hidden md:flex flex-col"
+        style={{ backgroundColor: '#21264e' }}
+      >
+        <div className="px-6 py-6 border-b border-white/10">
+>>>>>>> f317c96915d48c67afd478597b5842f471e6372c
           <img
             src="/logo.png"
             alt="Logo"
             crossOrigin="anonymous"
+<<<<<<< HEAD
             className={`h-8 ${sidebarCollapsed ? 'w-8 object-contain' : 'w-auto'}`}
+=======
+            className="h-8"
+>>>>>>> f317c96915d48c67afd478597b5842f471e6372c
           />
         </div>
         <nav className="flex-1 px-3 py-4 space-y-1">
           <button
             onClick={() => { window.location.href = '/home'; }}
+<<<<<<< HEAD
             className={`w-full flex items-center gap-3 ${sidebarCollapsed ? 'justify-center px-3' : 'px-4'} py-2.5 rounded-lg text-sm font-medium text-white/70 hover:bg-white/10 hover:text-white transition-colors`}
           >
             <Home className="w-4 h-4" />
             {!sidebarCollapsed && 'Back to Home'}
+=======
+            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-white/70 hover:bg-white/10 hover:text-white transition-colors"
+          >
+            <Home className="w-4 h-4" />
+            Back to Home
+>>>>>>> f317c96915d48c67afd478597b5842f471e6372c
           </button>
           {navItems.map((item) => {
             const active = location.pathname === item.to;
@@ -81,26 +107,40 @@ export default function Layout({ children }) {
               <button
                 key={item.to}
                 onClick={() => navigate(item.to)}
+<<<<<<< HEAD
                 className={`w-full flex items-center gap-3 ${sidebarCollapsed ? 'justify-center px-3' : 'px-4'} py-2.5 rounded-lg text-sm font-medium transition-colors ${
+=======
+                className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+>>>>>>> f317c96915d48c67afd478597b5842f471e6372c
                   active
                     ? 'bg-white/15 text-white'
                     : 'text-white/70 hover:bg-white/10 hover:text-white'
                 }`}
               >
                 <Icon className="w-4 h-4" />
+<<<<<<< HEAD
                 {!sidebarCollapsed && item.label}
+=======
+                {item.label}
+>>>>>>> f317c96915d48c67afd478597b5842f471e6372c
               </button>
             );
           })}
         </nav>
         <div className="px-3 py-4 border-t border-white/10">
+<<<<<<< HEAD
           {!sidebarCollapsed && <div className="px-4 py-1 text-xs text-white/50">{t('appSubtitle')}</div>}
           {!sidebarCollapsed && profile?.branch_name && (
+=======
+          <div className="px-4 py-1 text-xs text-white/50">{t('appSubtitle')}</div>
+          {profile?.branch_name && (
+>>>>>>> f317c96915d48c67afd478597b5842f471e6372c
             <div className="px-4 py-1 text-[11px] text-white/50 truncate">
               {scopeLabel}
             </div>
           )}
         </div>
+<<<<<<< HEAD
         <button
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
           className="flex items-center justify-center border-t border-white/10 p-2.5 text-white/40 hover:text-white"
@@ -108,6 +148,8 @@ export default function Layout({ children }) {
         >
           {sidebarCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
         </button>
+=======
+>>>>>>> f317c96915d48c67afd478597b5842f471e6372c
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0">

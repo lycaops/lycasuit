@@ -4,7 +4,11 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useCustomAuth } from '@assistance/lib/customAuth';
 import {
   LayoutDashboard, PlusCircle, ListChecks, Users, Clock, CheckCircle,
+<<<<<<< HEAD
   User, LogOut, Menu, X, Home, ChevronLeft, ChevronRight } from
+=======
+  User, LogOut, Menu, X, Home } from
+>>>>>>> f317c96915d48c67afd478597b5842f471e6372c
 'lucide-react';
 import NotificationBar from '@assistance/components/NotificationBar';
 import LanguageSwitcher from '@assistance/components/LanguageSwitcher';
@@ -34,7 +38,10 @@ export default function Layout({ children }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+<<<<<<< HEAD
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+=======
+>>>>>>> f317c96915d48c67afd478597b5842f471e6372c
 
   const navItems = isAdmin ? NAV_ITEMS.admin : NAV_ITEMS.standard;
 
@@ -55,7 +62,11 @@ export default function Layout({ children }) {
           <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-white">
             <img src={logo} alt="Lyca Ops" className="w-9 h-9 object-contain" />
           </div>
+<<<<<<< HEAD
           <div className={`min-w-0 ${sidebarCollapsed && !mobileNavOpen ? 'hidden' : ''}`}>
+=======
+          <div className="min-w-0">
+>>>>>>> f317c96915d48c67afd478597b5842f471e6372c
             <p className="text-white font-bold text-sm leading-tight truncate">LMAC - Lyca Ops</p>
             <p className="text-accent text-xs leading-tight">{t('marketAssistanceCenter')}</p>
           </div>
@@ -67,7 +78,11 @@ export default function Layout({ children }) {
           <div className="w-10 h-10 rounded-full bg-[#245bc1] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
             {currentUser?.full_name?.charAt(0)?.toUpperCase() || 'U'}
           </div>
+<<<<<<< HEAD
           <div className={`min-w-0 flex-1 ${sidebarCollapsed && !mobileNavOpen ? 'hidden' : ''}`}>
+=======
+          <div className="min-w-0 flex-1">
+>>>>>>> f317c96915d48c67afd478597b5842f471e6372c
             <p className="text-white text-sm font-medium truncate">{currentUser?.full_name}</p>
             <p className="text-white/50 text-xs truncate">{currentUser?.role} · {currentUser?.territory}</p>
           </div>
@@ -78,7 +93,11 @@ export default function Layout({ children }) {
         <a
           href="/home"
           onClick={() => setMobileNavOpen(false)}
+<<<<<<< HEAD
             className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-white/70 hover:bg-white/10 hover:text-white transition-all ${sidebarCollapsed && !mobileNavOpen ? 'justify-center' : ''}`}
+=======
+          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-white/70 hover:bg-white/10 hover:text-white transition-all"
+>>>>>>> f317c96915d48c67afd478597b5842f471e6372c
         >
           <span className="w-6 h-6 rounded-md bg-transparent border border-white flex items-center justify-center flex-shrink-0">
             <Home className="w-4 h-4 text-[#08dc7d]" />
@@ -93,7 +112,11 @@ export default function Layout({ children }) {
             key={item.path}
             to={item.path}
             onClick={() => setMobileNavOpen(false)}
+<<<<<<< HEAD
             className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${sidebarCollapsed && !mobileNavOpen ? 'justify-center' : ''} ${
+=======
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+>>>>>>> f317c96915d48c67afd478597b5842f471e6372c
             active ?
             'bg-accent text-white rounded-none border-b-4 border-[#08dc7d]' :
             'text-white/70 hover:bg-white/10 hover:text-white'}`
@@ -102,7 +125,11 @@ export default function Layout({ children }) {
               <span className="w-6 h-6 rounded-md bg-transparent border border-white flex items-center justify-center flex-shrink-0">
                 <Icon className="w-4 h-4 text-[#08dc7d]" />
               </span>
+<<<<<<< HEAD
               {(!sidebarCollapsed || mobileNavOpen) && t(item.label)}
+=======
+              {t(item.label)}
+>>>>>>> f317c96915d48c67afd478597b5842f471e6372c
             </Link>);
 
       })}
@@ -117,6 +144,7 @@ export default function Layout({ children }) {
         className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-white/60 hover:bg-red-500/20 hover:text-red-300 transition-all w-full">
         
           <LogOut className="w-4 h-4 flex-shrink-0" />
+<<<<<<< HEAD
           {(!sidebarCollapsed || mobileNavOpen) && t('logout')}
         </button>
       </div>
@@ -127,12 +155,21 @@ export default function Layout({ children }) {
       >
         {sidebarCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
       </button>
+=======
+          {t('logout')}
+        </button>
+      </div>
+>>>>>>> f317c96915d48c67afd478597b5842f471e6372c
     </div>;
 
   return (
     <div className="min-h-screen bg-background">
       {/* Desktop Sidebar */}
+<<<<<<< HEAD
       <aside className={`hidden lg:flex fixed inset-y-0 left-0 bg-foreground flex-col z-30 transition-all duration-300 ${sidebarCollapsed ? 'w-[72px]' : 'w-64'}`}>
+=======
+      <aside className="hidden lg:flex fixed inset-y-0 left-0 w-64 bg-foreground flex-col z-30">
+>>>>>>> f317c96915d48c67afd478597b5842f471e6372c
         <SidebarContent />
       </aside>
 
@@ -169,7 +206,11 @@ export default function Layout({ children }) {
       }
 
       {/* Main Content */}
+<<<<<<< HEAD
       <main className={`pt-14 lg:pt-0 min-h-screen transition-[margin] duration-300 ${sidebarCollapsed ? 'lg:ml-[72px]' : 'lg:ml-64'}`}>
+=======
+      <main className="lg:ml-64 pt-14 lg:pt-0 min-h-screen">
+>>>>>>> f317c96915d48c67afd478597b5842f471e6372c
         <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
           <div className="flex justify-end mb-4">
             <NotificationBar />
