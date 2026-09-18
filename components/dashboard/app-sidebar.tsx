@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   FileText,
   PlusSquare,
+  Users,
   UserCircle,
   Languages,
   Check,
@@ -50,6 +51,12 @@ export function AppSidebar({ user }: { user: AppUser }) {
       label: t("newContract"),
       icon: PlusSquare,
       show: true,
+    },
+    {
+      href: "/tools/contracts/users",
+      label: t("users"),
+      icon: Users,
+      show: user.role === "ADMIN",
     },
     {
       href: "/tools/contracts/profile",

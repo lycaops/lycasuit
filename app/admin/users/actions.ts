@@ -128,18 +128,6 @@ export async function updatePlatformUser(
   return { ok: true }
 }
 
-export async function deletePlatformUser(userId: string): Promise<ActionResult> {
-  const adminUser = await requirePlatformAdmin()
-  if (adminUser.id === userId) return { ok: false, error: "You cannot remove your own account." }
-
-  const admin = createAdminClient()
-  const { error } = await admin.auth.admin.deleteUser(userId)
-  if (error) return { ok: false, error: error.message }
-
-  revalidatePath("/admin/users")
-  return { ok: true }
-}
-
 export async function setToolAccess(userId: string, tools: string[]): Promise<ActionResult> {
   await requirePlatformAdmin()
   const result = await setToolAccessFor(userId, tools)
