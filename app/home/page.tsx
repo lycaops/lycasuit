@@ -22,7 +22,7 @@ export default async function HomePage() {
       <aside className="flex w-full shrink-0 flex-col bg-[#21264e] px-5 py-6 text-white lg:min-h-dvh lg:w-72 lg:px-6">
         <div className="flex items-center justify-between lg:block">
           <img src="/logo.png" alt="Lyca Suite" className="h-9 w-auto" />
-          <p className="mt-2 hidden text-xs uppercase tracking-[0.2em] text-white/45 lg:block">Universal Service 2006</p>
+          <p className="mt-2 hidden text-xs uppercase tracking-[0.2em] text-white/45 lg:block">Lyca Ops</p>
         </div>
         <nav className="mt-8 flex gap-2 overflow-x-auto lg:flex-col">
           <Link href="/home" className="flex shrink-0 items-center gap-3 rounded-lg bg-white/10 px-3 py-2.5 text-sm font-medium text-white">
@@ -35,6 +35,12 @@ export default async function HomePage() {
           })}
         </nav>
         <div className="mt-auto border-t border-white/10 pt-5">
+          {admin && (
+            <Link href="/admin/users" className="mb-4 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-white/70 transition hover:bg-white/10 hover:text-white">
+              <Users className="h-4 w-4" />
+              Users &amp; tool access
+            </Link>
+          )}
           <p className="truncate text-sm font-medium">{user.full_name}</p>
           <p className="mt-1 truncate text-xs text-white/45">{user.role}</p>
           <HomeHeader user={{ full_name: user.full_name, email: user.email, role: user.role }} sidebarMode />
@@ -99,21 +105,6 @@ export default async function HomePage() {
           </div>
         )}
 
-        {admin && (
-          <section className="mt-10">
-            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-[#21264E]/60">
-              Administration
-            </h2>
-            <Link
-              href="/admin/users"
-              className="inline-flex items-center gap-3 rounded-lg border border-[#21264E]/10 bg-white px-5 py-4 text-sm font-medium text-[#21264E] shadow-sm transition hover:shadow-md"
-            >
-              <Users className="h-4 w-4 text-[#46286E]" />
-              Users &amp; tool access
-              <ArrowRight className="h-4 w-4 text-[#21264E]/40" />
-            </Link>
-          </section>
-        )}
         </div>
       </div>
     </main>

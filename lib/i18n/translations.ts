@@ -10,7 +10,7 @@ export const translations = {
     profileSettings: "Profile Settings",
     workspace: "Workspace",
     contractManager: "Contract Manager",
-    universalService: "Universal Service 2006",
+    universalService: "Lyca Ops",
     
     // Header
     signOut: "Sign out",

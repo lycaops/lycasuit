@@ -4,7 +4,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useCustomAuth } from '@assistance/lib/customAuth';
 import {
   LayoutDashboard, PlusCircle, ListChecks, Users, Clock, CheckCircle,
-  User, LogOut, Menu, X } from
+  User, LogOut, Menu, X, Home } from
 'lucide-react';
 import NotificationBar from '@assistance/components/NotificationBar';
 import LanguageSwitcher from '@assistance/components/LanguageSwitcher';
@@ -74,6 +74,16 @@ export default function Layout({ children }) {
       </div>
 
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        <a
+          href="/home"
+          onClick={() => setMobileNavOpen(false)}
+          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-white/70 hover:bg-white/10 hover:text-white transition-all"
+        >
+          <span className="w-6 h-6 rounded-md bg-transparent border border-white flex items-center justify-center flex-shrink-0">
+            <Home className="w-4 h-4 text-[#08dc7d]" />
+          </span>
+          Back to Home
+        </a>
         {navItems.map((item) => {
         const Icon = item.icon;
         const active = isActive(item.path);

@@ -13,7 +13,7 @@ import CoverageView from '@fieldiq/components/CoverageView';
 import RetailerPerformanceReport from '@fieldiq/components/RetailerPerformanceReport';
 import PlanActivationReport from '@fieldiq/components/PlanActivationReport';
 import {
-  LayoutDashboard, Upload, LogOut, Search, User, Building2, Shield, FileDown, ChevronLeft, ChevronRight, Users, TrendingUp, Globe, Menu, X, Trophy, Activity, BarChart2,
+  LayoutDashboard, Upload, LogOut, Search, User, Building2, Shield, FileDown, ChevronLeft, ChevronRight, Users, TrendingUp, Globe, Menu, X, Trophy, Activity, BarChart2, Home,
 } from 'lucide-react';
 import { generatePDF } from '@fieldiq/utils/pdfExport';
 import { ALL_BRANCHES, BRANCH_TO_ZONES, normalizeBranch, NORTH_REGION, SOUTH_REGION } from '@fieldiq/data/mockData';
@@ -818,6 +818,13 @@ export default function Dashboard() {
 
         {/* Nav */}
         <nav className="flex-1 p-3 space-y-1">
+          <button
+            onClick={() => { window.location.href = '/home'; setMobileMenuOpen(false); }}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition text-white/60 hover:bg-white/10 hover:text-white"
+          >
+            <Home size={20} />
+            {(!sidebarCollapsed || mobileMenuOpen) && 'Back to Home'}
+          </button>
           <button
             onClick={() => { setView(VIEWS.DASHBOARD); setMobileMenuOpen(false); }}
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
