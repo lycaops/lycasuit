@@ -25,10 +25,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-<<<<<<< HEAD
-  SidebarTrigger,
-=======
->>>>>>> f317c96915d48c67afd478597b5842f471e6372c
   useSidebar,
 } from "@/components/ui/sidebar"
 import { useI18n } from "@/lib/i18n/i18n-context"
@@ -89,12 +85,6 @@ export function AppSidebar({ user }: { user: AppUser }) {
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
-<<<<<<< HEAD
-          <SidebarMenuItem>
-            <SidebarTrigger className="w-full justify-start text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-foreground group-data-[collapsible=icon]:justify-center" />
-          </SidebarMenuItem>
-=======
->>>>>>> f317c96915d48c67afd478597b5842f471e6372c
         </SidebarMenu>
       </SidebarHeader>
 
