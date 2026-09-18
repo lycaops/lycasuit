@@ -57,6 +57,9 @@ export interface PlatformZone {
   branches?: { code: string } | null
 }
 
+const NORTH_BRANCHES = ["LMIT-HS-BOLOGNA", "LMIT-HS-MILAN", "LMIT-HS-PADOVA", "LMIT-HS-TORINO"]
+const SOUTH_BRANCHES = ["LMIT-HS-BARI", "LMIT-HS-NAPLES", "LMIT-HS-PALERMO", "LMIT-HS-ROME"]
+
 type FormValues = {
   fullName: string
   email: string
@@ -119,7 +122,7 @@ export function PlatformUserForm({
             role: user.role,
             branches: user.role === "ASM"
               ? user.branches?.slice(0, 1) ?? (user.branch ? [user.branch] : [])
-              : user.role === "ZONE-MANAGER"
+              : user.role === "ZONE-MANAGER" || user.role === "RSM"
                 ? user.branch ? [user.branch] : []
                 : branches.map((branch) => branch.code),
             zone: user.zone ?? "",
@@ -140,13 +143,32 @@ export function PlatformUserForm({
     setValues((current) => ({
       ...current,
       role,
-      branches: role === "ZONE-MANAGER"
+      branches: role === "ZONE-MANAGER" || role === "RSM"
         ? current.branches.slice(0, 1)
         : role === "ASM"
           ? current.branches.slice(0, 1)
           : branches.map((branch) => branch.code),
       zone: role === "ZONE-MANAGER" ? current.zone : "",
     }))
+  }
+
+  function selectBranches(codes: string[]) {
+    setField("branches", codes.filter((code) => branches.some((branch) => branch.code === code)))
+  }
+
+  function toggleRegionalBranch(code: string) {
+    const north = NORTH_BRANCHES.includes(code)
+    setValues((current) => {
+      const currentIsNorth = current.branches.some((branch) => NORTH_BRANCHES.includes(branch))
+      const currentIsSouth = current.branches.some((branch) => SOUTH_BRANCHES.includes(branch))
+      if ((north && currentIsSouth) || (!north && currentIsNorth)) return { ...current, branches: [code] }
+      return {
+        ...current,
+        branches: current.branches.includes(code)
+          ? current.branches.filter((branch) => branch !== code)
+          : [...current.branches, code],
+      }
+    })
   }
 
   function submit(event: React.FormEvent) {
@@ -161,6 +183,10 @@ export function PlatformUserForm({
     }
     if (values.role === "ASM" && values.branches.length !== 1) {
       toast.error("Area Managers can only have one branch.")
+      return
+    }
+    if (values.role === "RSM" && values.branches.length === 0) {
+      toast.error("Regional Sales Managers must be assigned to North or South branches.")
       return
     }
     if (values.role === "ZONE-MANAGER" && !values.zone.trim()) {
@@ -246,18 +272,30 @@ export function PlatformUserForm({
           {values.role === "ZONE-MANAGER" ? (
           <div className="space-y-3 rounded-2xl border border-gray-100 bg-gray-50 p-4">
             <div className="flex items-center justify-between">
-              <Label className="font-semibold text-brand-navy">Assigned zone</Label>
-              <span className="text-xs text-gray-400">{values.zone ? "1 selected" : "Required"}</span>
+              <Label className="font-semibold text-brand-navy">Branch and zone assignment</Label>
+              <span className="text-xs text-gray-400">{values.zone ? "1 zone selected" : "Select branch first"}</span>
             </div>
-            <div className="grid gap-1 sm:grid-cols-2 lg:grid-cols-3">
-              {zones.map((zone) => (
-                <label key={zone.code} className={`flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-xs transition ${values.zone === zone.code ? "border border-gray-100 bg-white font-semibold text-brand-navy shadow-sm" : "text-gray-500 hover:bg-gray-100"}`}>
-                  <input type="radio" name="assigned-zone" checked={values.zone === zone.code} onChange={() => setValues((current) => ({ ...current, zone: zone.code, branches: zone.branches?.code ? [zone.branches.code] : current.branches }))} className="h-3.5 w-3.5 border-gray-300 text-[#245bc1] focus:ring-[#245bc1]" />
-                  {zone.name}
+            <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-4">
+              {branches.map((branch) => (
+                <label key={branch.code} className={`flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-xs transition ${values.branches[0] === branch.code ? "border border-gray-100 bg-white font-semibold text-brand-navy shadow-sm" : "text-gray-500 hover:bg-gray-100"}`}>
+                  <input type="radio" name="zone-branch" checked={values.branches[0] === branch.code} onChange={() => setValues((current) => ({ ...current, branches: [branch.code], zone: "" }))} className="h-3.5 w-3.5 border-gray-300 text-[#245bc1] focus:ring-[#245bc1]" />
+                  {branch.name || branch.code.replace("LMIT-HS-", "")}
                 </label>
               ))}
             </div>
-          </div>
+            {values.branches[0] && <div className="border-t border-gray-200 pt-3">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[#21264E]/70">Select zone</p>
+              <div className="grid gap-1 sm:grid-cols-2 lg:grid-cols-3">
+                {zones.filter((zone) => zone.branches?.code === values.branches[0]).map((zone) => (
+                  <label key={zone.code} className={`flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-xs transition ${values.zone === zone.code ? "border border-gray-100 bg-white font-semibold text-brand-navy shadow-sm" : "text-gray-500 hover:bg-gray-100"}`}>
+                    <input type="radio" name="assigned-zone" checked={values.zone === zone.code} onChange={() => setField("zone", zone.code)} className="h-3.5 w-3.5 border-gray-300 text-[#245bc1] focus:ring-[#245bc1]" />
+                    {zone.name}
+                  </label>
+                ))}
+              </div>
+            </div>}
+            {!values.branches[0] && <p className="text-xs text-gray-500">Choose a branch to load its available zones.</p>}
+            </div>
           ) : values.role === "ASM" ? <div className="space-y-3 rounded-2xl border border-gray-100 bg-gray-50 p-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <Label className="font-semibold text-brand-navy">Assigned branches</Label>
@@ -269,6 +307,22 @@ export function PlatformUserForm({
               {branches.map((branch) => (
                 <label key={branch.code} className="flex items-center gap-2 text-sm text-brand-navy">
                   <input type="radio" name="assigned-branch" checked={values.branches.includes(branch.code)} onChange={() => setField("branches", [branch.code])} className="h-3.5 w-3.5 border-gray-300 text-[#245bc1] focus:ring-[#245bc1]" />
+                  <span className="truncate">{branch.name || branch.code.replace("LMIT-HS-", "")}</span>
+                </label>
+              ))}
+            </div>
+          </div> : values.role === "RSM" ? <div className="space-y-3 rounded-2xl border border-gray-100 bg-gray-50 p-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <Label className="font-semibold text-brand-navy">Regional branch access</Label>
+              <div className="flex flex-wrap gap-2">
+                <button type="button" onClick={() => selectBranches(NORTH_BRANCHES)} className="rounded-lg bg-[#006AE0]/10 px-2.5 py-1.5 text-[10px] font-medium text-[#006AE0] transition hover:bg-[#006AE0]/20">North Region</button>
+                <button type="button" onClick={() => selectBranches(SOUTH_BRANCHES)} className="rounded-lg bg-[#08DC7D]/10 px-2.5 py-1.5 text-[10px] font-medium text-[#08dc7d] transition hover:bg-[#08DC7D]/20">South Region</button>
+              </div>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {branches.filter((branch) => NORTH_BRANCHES.includes(branch.code) || SOUTH_BRANCHES.includes(branch.code)).map((branch) => (
+                <label key={branch.code} className="flex items-center gap-2 text-sm text-brand-navy">
+                  <input type="checkbox" checked={values.branches.includes(branch.code)} onChange={() => toggleRegionalBranch(branch.code)} className="h-3.5 w-3.5 rounded border-gray-300 text-[#245bc1] focus:ring-[#245bc1]" />
                   <span className="truncate">{branch.name || branch.code.replace("LMIT-HS-", "")}</span>
                 </label>
               ))}
