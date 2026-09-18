@@ -12,6 +12,7 @@ import {
   Languages,
   Check,
   ChevronUp,
+  Home,
 } from "lucide-react"
 import {
   Sidebar,
@@ -42,6 +43,7 @@ export function AppSidebar({ user }: { user: AppUser }) {
   const isCollapsed = state === "collapsed"
 
   const nav = [
+    { href: "/home", label: "Back to Home", icon: Home, show: true },
     { href: "/tools/contracts", label: t("overview"), icon: LayoutDashboard, show: true },
     { href: "/tools/contracts/contracts", label: t("contracts"), icon: FileText, show: true },
     {
