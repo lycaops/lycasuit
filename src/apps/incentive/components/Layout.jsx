@@ -7,7 +7,6 @@ import {
   LayoutDashboard,
   FileText,
   BookOpen,
-  Globe,
   Calculator as CalcIcon,
   LogOut,
   User as UserIcon,
@@ -113,31 +112,16 @@ export default function Layout({ children }) {
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-8 shrink-0">
-          <div className="flex items-center gap-3">
-            <button onClick={() => setMobileNavOpen(true)} aria-label="Open navigation" className="md:hidden rounded-lg p-1.5 text-[#21264e] hover:bg-slate-100">
-              <Menu className="h-5 w-5" />
-            </button>
-            <img src="/logo_b.webp" alt="Logo" crossOrigin="anonymous" className="h-8 w-auto md:hidden" />
-            <h1 className="text-lg font-semibold text-slate-800">{t('appTitle')}</h1>
+        <header className="h-14 bg-[#21264e] md:h-16 md:bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-8 shrink-0">
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white p-0.5 md:hidden">
+              <img src="/logo.png" alt="Logo" crossOrigin="anonymous" className="h-full w-full object-contain" />
+            </div>
+            <h1 className="text-sm font-bold text-white md:text-lg md:text-slate-800">{t('appTitle')}</h1>
           </div>
           <div className="flex items-center gap-3">
-            <Globe className="w-4 h-4 text-slate-400" />
-            <button
-              onClick={() => setLang('en')}
-              className={`px-3 py-1.5 text-sm rounded-md font-medium transition-colors ${
-                lang === 'en' ? 'bg-[#21264e] text-white' : 'text-slate-600 hover:bg-slate-100'
-              }`}
-            >
-              EN
-            </button>
-            <button
-              onClick={() => setLang('it')}
-              className={`px-3 py-1.5 text-sm rounded-md font-medium transition-colors ${
-                lang === 'it' ? 'bg-[#21264e] text-white' : 'text-slate-600 hover:bg-slate-100'
-              }`}
-            >
-              IT
+            <button onClick={() => setMobileNavOpen(true)} aria-label="Open navigation" className="rounded-lg p-1.5 text-white hover:bg-white/10 md:hidden">
+              <Menu className="h-5 w-5" />
             </button>
             <div className="hidden md:flex items-center gap-2 pl-2 ml-1 border-l border-slate-200">
               <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-semibold" style={{ backgroundColor: '#006AE0' }}>

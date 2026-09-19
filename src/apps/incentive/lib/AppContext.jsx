@@ -65,12 +65,25 @@ export function toDisplayRow(snakeRow) {
 
 const AppContext = globalThis.__APP_CONTEXT__ || (globalThis.__APP_CONTEXT__ = createContext(null));
 
+const SELECTED_RETAILER_STORAGE_KEY = 'incentive-selected-retailer';
+
+function getStoredSelectedRetailer() {
+  if (typeof window === 'undefined') return null;
+
+  try {
+    const stored = window.sessionStorage.getItem(SELECTED_RETAILER_STORAGE_KEY);
+    return stored ? JSON.parse(stored) : null;
+  } catch {
+    return null;
+  }
+}
+
 export function AppProvider({ children }) {
   const [lang, setLang] = useState('en');
   const [scheme, setScheme] = useState('special');
   const [records, setRecords] = useState([]);
   const [headers, setHeaders] = useState([]);
-  const [selectedRetailer, setSelectedRetailer] = useState(null);
+  const [selectedRetailer, setSelectedRetailer] = useState(getStoredSelectedRetailer);
   const [loadingRecords, setLoadingRecords] = useState(false);
   const [recordsError, setRecordsError] = useState(null);
   const [months, setMonths] = useState([]);
@@ -150,6 +163,19 @@ export function AppProvider({ children }) {
       setLoadingRecords(false);
     }
   }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    try {
+      if (selectedRetailer) {
+        window.sessionStorage.setItem(SELECTED_RETAILER_STORAGE_KEY, JSON.stringify(selectedRetailer));
+      } else {
+        window.sessionStorage.removeItem(SELECTED_RETAILER_STORAGE_KEY);
+      }
+    } catch {
+    }
+  }, [selectedRetailer]);
 
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
