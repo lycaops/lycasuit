@@ -9,7 +9,6 @@ import {
 import NotificationBar from '@assistance/components/NotificationBar';
 import LanguageSwitcher from '@assistance/components/LanguageSwitcher';
 import { useLanguage } from '@assistance/lib/LanguageContext';
-import logo from '@assistance/Public/logo.svg';
 
 const NAV_ITEMS = {
   standard: [
@@ -54,7 +53,7 @@ export default function Layout({ children }) {
       <div className={`px-4 py-4 border-b border-white/10 flex items-center gap-3 ${sidebarCollapsed && !mobileNavOpen ? 'justify-center' : 'justify-start'}`}>
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-white">
-            <img src={logo} alt="Lyca Ops" className="w-9 h-9 object-contain" />
+            <img src="/lmac.png" alt="Lyca Market Assistance Center" className="w-9 h-9 object-contain" />
           </div>
           {showSidebarLabels && <div className="min-w-0">
             <p className="text-white font-bold text-sm leading-tight truncate">LMAC - Lyca Ops</p>
@@ -137,7 +136,7 @@ export default function Layout({ children }) {
       <header className="lg:hidden fixed top-0 inset-x-0 bg-foreground z-30 px-4 h-14 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center p-0.5">
-            <img src={logo} alt="Lyca Ops" className="w-full h-full object-contain" />
+            <img src="/lmac.png" alt="Lyca Market Assistance Center" className="w-full h-full object-contain" />
           </div>
           <span className="text-white font-bold text-sm">{t('marketAssistanceCenter')}</span>
         </div>

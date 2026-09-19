@@ -11,6 +11,13 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   LifeBuoy,
 }
 
+const LOGOS: Record<string, string> = {
+  field_iq: "/fiq.png",
+  contracts: "/rcm.png",
+  incentive: "/statement.png",
+  assistance: "/lmac.png",
+}
+
 export default async function HomePage() {
   const user = await requirePlatformUser()
   const tools = await getMyTools()
@@ -87,11 +94,12 @@ export default async function HomePage() {
                     style={{ backgroundColor: accent }}
                   />
                   <div>
-                    <span
-                      className="inline-flex h-11 w-11 items-center justify-center rounded-lg"
-                      style={{ backgroundColor: `${accent}1A`, color: accent }}
-                    >
-                      <Icon className="h-5 w-5" />
+                    <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white">
+                      {LOGOS[tool.key] ? (
+                        <img src={LOGOS[tool.key]} alt="" className="h-11 w-11 object-contain" />
+                      ) : (
+                        <Icon className="h-5 w-5" style={{ color: accent }} />
+                      )}
                     </span>
                     <h2 className="mt-4 text-lg font-semibold text-[#21264E]">{tool.name}</h2>
                     <p className="mt-2 text-sm leading-relaxed text-[#21264E]/70">{tool.description}</p>
