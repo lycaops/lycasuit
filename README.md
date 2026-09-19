@@ -1,4 +1,4 @@
-# Lyca Suite
+# LycaOps
 
 Four previously separate applications merged into **one Next.js app on one Supabase
 project**, so a person has **one account and one password** for everything.

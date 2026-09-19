@@ -2,7 +2,7 @@ import type { ReactNode } from "react"
 import { requireTool } from "@/lib/auth"
 import { MobileToolNav } from "@/components/dashboard/mobile-tool-nav"
 
-export const metadata = { title: "Lyca Market Assistance — Lyca Suite" }
+export const metadata = { title: "Lyca Market Assistance — LycaOps" }
 
 export default async function AssistanceLayout({ children }: { children: ReactNode }) {
   const user = await requireTool("assistance")

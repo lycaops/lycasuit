@@ -56,7 +56,7 @@ export default function Layout({ children }) {
             <img src="/lmac.png" alt="Lyca Market Assistance Center" className="w-9 h-9 object-contain" />
           </div>
           {showSidebarLabels && <div className="min-w-0">
-            <p className="text-white font-bold text-sm leading-tight truncate">LMAC - Lyca Ops</p>
+            <p className="text-white font-bold text-sm leading-tight truncate">LMAC - LycaOps</p>
             <p className="text-accent text-xs leading-tight">{t('marketAssistanceCenter')}</p>
           </div>}
         </div>

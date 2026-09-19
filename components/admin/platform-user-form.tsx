@@ -235,7 +235,7 @@ export function PlatformUserForm({
               {editing ? "Edit user" : "Add user"}
             </h2>
             <p className="text-muted-foreground text-sm">
-              {editing ? "Update identity, assignments, permissions, and security settings." : "Create one account for the selected Lyca Suite tools."}
+              {editing ? "Update identity, assignments, permissions, and security settings." : "Create one account for the selected LycaOps tools."}
             </p>
           </div>
         ) : (
@@ -245,7 +245,7 @@ export function PlatformUserForm({
               {editing ? "Edit user" : "Add user"}
             </DialogTitle>
             <DialogDescription>
-              {editing ? "Update identity, assignments, permissions, and security settings." : "Create one account for the selected Lyca Suite tools."}
+              {editing ? "Update identity, assignments, permissions, and security settings." : "Create one account for the selected LycaOps tools."}
             </DialogDescription>
           </DialogHeader>
         )}

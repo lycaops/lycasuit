@@ -3,7 +3,7 @@ import { requirePlatformAdmin } from "@/lib/auth"
 import { HomeHeader } from "@/components/home/home-header"
 import { PlatformUsersTable } from "@/components/admin/platform-users-table"
 
-export const metadata = { title: "User Management — Lyca Suite" }
+export const metadata = { title: "User Management — LycaOps" }
 
 export default async function AdminUsersPage() {
   const me = await requirePlatformAdmin()

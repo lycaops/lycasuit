@@ -77,7 +77,7 @@ export default function Login() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-48 h-48 mb-0">
-            <img src={logo} alt="Lyca Ops" className="w-full h-full object-contain" />
+            <img src={logo} alt="LycaOps" className="w-full h-full object-contain" />
           </div>
           <p className="text-sm text-foreground/60 mt-0">{t('marketAssistanceCenter')}</p>
         </div>

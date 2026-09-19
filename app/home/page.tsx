@@ -29,8 +29,8 @@ export default async function HomePage() {
     <main className="min-h-dvh bg-[#f4f7fb] pb-16 lg:flex lg:pb-0">
       <aside className="hidden w-72 shrink-0 flex-col overflow-y-auto bg-[#21264e] px-6 py-6 text-white lg:sticky lg:top-0 lg:flex lg:h-dvh lg:max-h-dvh">
         <div className="flex items-center justify-between lg:block">
-          <img src="/logo.png" alt="Lyca Suite" className="h-9 w-auto" />
-          <p className="mt-2 hidden text-xs uppercase tracking-[0.2em] text-white/45 lg:block">Lyca Ops</p>
+          <img src="/logo.png" alt="LycaOps" className="h-9 w-auto" />
+          <p className="mt-2 hidden text-xs uppercase tracking-[0.2em] text-white/45 lg:block">LycaOps</p>
         </div>
         <nav className="mt-8 flex gap-2 overflow-x-auto lg:flex-col">
           <Link href="/home" className="flex shrink-0 items-center gap-3 rounded-lg bg-white/10 px-3 py-2.5 text-sm font-medium text-white">
@@ -59,7 +59,7 @@ export default async function HomePage() {
         <div className="border-b border-[#21264e]/10 bg-white">
           <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
             <div>
-              <p className="text-sm font-medium text-[#245BC1]">Lyca Suite workspace</p>
+              <p className="text-sm font-medium text-[#245BC1]">LycaOps workspace</p>
               <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#21264E]">Welcome back, {firstName}</h1>
             </div>
           </div>
@@ -118,8 +118,8 @@ export default async function HomePage() {
               })}
             </div>
             <p className="mt-8 text-center text-xs font-semibold tracking-wide">
-              <span className="text-[#21264E]">Powered by Lyca </span>
-              <span className="text-[#08DC7D]">Ops</span>
+              <span className="text-[#21264E]">Powered by </span>
+              <span className="text-[#08DC7D]">LycaOps</span>
             </p>
           </>
         )}

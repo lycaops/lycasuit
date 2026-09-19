@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-sans-family", displa
 const jetbrains = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono-family", display: "swap" })
 
 export const metadata: Metadata = {
-  title: "Lyca Suite — Universal Service 2006",
+  title: "LycaOps — Universal Service 2006",
   description:
     "Field IQ, Retailer Contracts, Incentive Statements and Market Assistance for Lycamobile Italy, behind a single login.",
   icons: {

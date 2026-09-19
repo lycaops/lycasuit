@@ -2,7 +2,7 @@ import type { ReactNode } from "react"
 import { requireTool } from "@/lib/auth"
 import { MobileToolNav } from "@/components/dashboard/mobile-tool-nav"
 
-export const metadata = { title: "Field IQ — Lyca Suite" }
+export const metadata = { title: "Field IQ — LycaOps" }
 
 export default async function FieldIqLayout({ children }: { children: ReactNode }) {
   const user = await requireTool("field_iq")

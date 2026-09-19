@@ -7,9 +7,9 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
         <img src="/h2.svg" alt="" aria-hidden="true" className="absolute -right-36 -top-8 h-96 w-96 opacity-20" />
         <img src="/h1.svg" alt="" aria-hidden="true" className="absolute -bottom-40 -left-28 h-[28rem] w-[28rem] opacity-[.15]" />
         <div className="relative">
-          <img src="/logo.png" alt="Lyca Suite" className="h-10 w-auto" />
+          <img src="/logo.png" alt="LycaOps" className="h-10 w-auto" />
           <div className="mt-24 max-w-md">
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#61c7d0]">Lyca Suite</p>
+            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#61c7d0]">LycaOps</p>
             <h2 className="mt-5 text-4xl font-semibold leading-tight text-white xl:text-5xl">Your work, clearly in view.</h2>
             <p className="mt-6 text-base leading-7 text-white/65">One secure place for contracts, incentives, assistance, and field intelligence.</p>
           </div>
@@ -22,7 +22,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
       <div className="flex w-full items-center justify-center px-5 py-10 sm:px-8 lg:w-[55%] xl:w-1/2">
         <div className="w-full max-w-md">
           <div className="mb-8 flex items-center justify-center lg:hidden">
-            <img src="/logo_b.webp" alt="Lyca Suite" className="h-9 w-auto" />
+            <img src="/logo_b.webp" alt="LycaOps" className="h-9 w-auto" />
           </div>
           {children}
         </div>

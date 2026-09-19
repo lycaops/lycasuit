@@ -22,8 +22,8 @@ export function HomeSidebar({
   return (
     <aside className="hidden w-72 shrink-0 flex-col overflow-y-auto bg-[#21264e] px-6 py-6 text-white lg:flex lg:h-dvh lg:max-h-dvh lg:sticky lg:top-0">
       <div>
-        <img src="/logo.png" alt="Lyca Suite" className="h-9 w-auto" />
-        <p className="mt-2 text-xs uppercase tracking-[0.2em] text-white/45">Lyca Ops</p>
+        <img src="/logo.png" alt="LycaOps" className="h-9 w-auto" />
+        <p className="mt-2 text-xs uppercase tracking-[0.2em] text-white/45">LycaOps</p>
       </div>
 
       <nav className="mt-8 flex flex-col gap-1">

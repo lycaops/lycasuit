@@ -22,7 +22,7 @@ export default async function NewPlatformUserPage() {
     <div className="flex flex-col gap-6 pb-10">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight text-[#21264E]">Add User</h1>
-        <p className="mt-1 text-sm text-[#21264E]/70">Create a user account and assign access across Lyca Suite.</p>
+        <p className="mt-1 text-sm text-[#21264E]/70">Create a user account and assign access across LycaOps.</p>
       </div>
       <PlatformUserForm
         user={null}

@@ -9,7 +9,7 @@ export default function LoginPage() {
           <LogIn className="h-6 w-6" aria-hidden="true" />
         </div>
         <h1 className="text-3xl font-semibold tracking-tight text-[#182039]">Welcome back</h1>
-        <p className="mt-2 text-[#68738b]">Log in to your Lyca Suite account</p>
+        <p className="mt-2 text-[#68738b]">Log in to your LycaOps account</p>
       </div>
       <LoginForm />
     </div>
