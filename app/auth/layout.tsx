@@ -21,7 +21,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
       </div>
       <div className="flex w-full items-center justify-center px-5 py-10 sm:px-8 lg:w-[55%] xl:w-1/2">
         <div className="w-full max-w-md">
-          <div className="mb-8 flex items-center justify-center rounded-2xl bg-white/80 p-3 shadow-sm ring-1 ring-slate-200/80 lg:hidden">
+          <div className="mb-8 flex items-center justify-center lg:hidden">
             <img src="/logo_b.webp" alt="Lyca Suite" className="h-9 w-auto" />
           </div>
           {children}

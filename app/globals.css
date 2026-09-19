@@ -13,6 +13,12 @@
    ================================================= */
 
 :root {
+  --font-size-body: 1rem;
+  --line-height-body: 1.5;
+  --font-size-label: 0.875rem;
+  --line-height-label: 1.25rem;
+  --font-size-caption: 0.75rem;
+  --line-height-caption: 1rem;
   --background: #f4f7fb;
   --foreground: #21264e;
 
@@ -156,5 +162,13 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-size: var(--font-size-body);
+    line-height: var(--line-height-body);
+  }
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
   }
 }
