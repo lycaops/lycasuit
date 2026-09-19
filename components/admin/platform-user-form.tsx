@@ -228,15 +228,27 @@ export function PlatformUserForm({
 
   const content = (
       <div className={page ? "rounded-2xl border border-[#21264E]/10 bg-white p-6 shadow-sm" : ""}>
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-brand-navy">
-            {editing ? <Pencil className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
-            {editing ? "Edit user" : "Add user"}
-          </DialogTitle>
-          <DialogDescription>
-            {editing ? "Update identity, assignments, permissions, and security settings." : "Create one account for the selected Lyca Suite tools."}
-          </DialogDescription>
-        </DialogHeader>
+        {page ? (
+          <div className="flex flex-col gap-2 text-left">
+            <h2 className="flex items-center gap-2 text-lg font-semibold text-brand-navy">
+              {editing ? <Pencil className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
+              {editing ? "Edit user" : "Add user"}
+            </h2>
+            <p className="text-muted-foreground text-sm">
+              {editing ? "Update identity, assignments, permissions, and security settings." : "Create one account for the selected Lyca Suite tools."}
+            </p>
+          </div>
+        ) : (
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-brand-navy">
+              {editing ? <Pencil className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
+              {editing ? "Edit user" : "Add user"}
+            </DialogTitle>
+            <DialogDescription>
+              {editing ? "Update identity, assignments, permissions, and security settings." : "Create one account for the selected Lyca Suite tools."}
+            </DialogDescription>
+          </DialogHeader>
+        )}
 
         <form onSubmit={submit} className="space-y-5">
           <div className="grid gap-4 md:grid-cols-2">
