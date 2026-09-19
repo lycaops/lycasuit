@@ -95,8 +95,7 @@ export default async function HomePage() {
                   />
                   <div className="flex items-start justify-between gap-4">
                     <div className="pt-1">
-                      <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#21264E]/40">Lyca workspace</span>
-                      <h2 className="mt-2 text-xl font-semibold leading-tight tracking-tight text-[#21264E] sm:text-2xl">{tool.name}</h2>
+                      <h2 className="text-xl font-semibold leading-tight tracking-tight text-[#21264E] sm:text-2xl">{tool.name}</h2>
                     </div>
                     <div className="flex h-[78px] w-[92px] shrink-0 items-center justify-center p-1 sm:h-[94px] sm:w-[112px]">
                       {LOGOS[tool.key] ? (
@@ -117,6 +116,10 @@ export default async function HomePage() {
               )
             })}
           </div>
+          <p className="mt-8 text-center text-xs font-semibold tracking-wide">
+            <span className="text-[#21264E]">Powered by Lyca </span>
+            <span className="text-[#08DC7D]">Ops</span>
+          </p>
         )}
 
         </div>

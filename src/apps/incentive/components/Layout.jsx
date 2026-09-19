@@ -114,9 +114,7 @@ export default function Layout({ children }) {
       <div className="flex-1 flex flex-col min-w-0">
         <header className="h-14 bg-[#21264e] md:h-16 md:bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-8 shrink-0">
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-auto items-center justify-center rounded-lg bg-white px-1.5 md:hidden">
-              <img src="/logo_b.webp" alt="Lycamobile" crossOrigin="anonymous" className="h-full w-auto object-contain" />
-            </div>
+            <img src="/logo.png" alt="Lycamobile" crossOrigin="anonymous" className="h-8 w-auto object-contain md:hidden" />
             <h1 className="text-sm font-bold text-white md:text-lg md:text-slate-800">{t('appTitle')}</h1>
           </div>
           <div className="flex items-center gap-3">
