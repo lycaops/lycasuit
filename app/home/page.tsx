@@ -78,16 +78,17 @@ export default async function HomePage() {
             </p>
           </div>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 sm:gap-5 lg:gap-6">
-            {tools.map((tool) => {
-              const Icon = ICONS[tool.icon ?? ""] ?? LayoutGrid
-              const accent = tool.accent_color ?? "#245BC1"
-              return (
-                <Link
-                  key={tool.key}
-                  href={tool.route}
-                  className="group relative flex min-h-[245px] flex-col overflow-hidden rounded-[1.75rem] bg-white p-5 shadow-[0_10px_30px_rgba(33,38,78,0.07)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_18px_36px_rgba(33,38,78,0.13)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#245BC1] sm:min-h-[270px] sm:p-6"
-                >
+          <>
+            <div className="grid gap-4 sm:grid-cols-2 sm:gap-5 lg:gap-6">
+              {tools.map((tool) => {
+                const Icon = ICONS[tool.icon ?? ""] ?? LayoutGrid
+                const accent = tool.accent_color ?? "#245BC1"
+                return (
+                  <Link
+                    key={tool.key}
+                    href={tool.route}
+                    className="group relative flex min-h-[245px] flex-col overflow-hidden rounded-[1.75rem] bg-white p-5 shadow-[0_10px_30px_rgba(33,38,78,0.07)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_18px_36px_rgba(33,38,78,0.13)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#245BC1] sm:min-h-[270px] sm:p-6"
+                  >
                   <span
                     aria-hidden
                     className="absolute right-0 top-0 h-1.5 w-24 rounded-bl-full"
@@ -112,14 +113,15 @@ export default async function HomePage() {
                       <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
                     </span>
                   </div>
-                </Link>
-              )
-            })}
-          </div>
-          <p className="mt-8 text-center text-xs font-semibold tracking-wide">
-            <span className="text-[#21264E]">Powered by Lyca </span>
-            <span className="text-[#08DC7D]">Ops</span>
-          </p>
+                  </Link>
+                )
+              })}
+            </div>
+            <p className="mt-8 text-center text-xs font-semibold tracking-wide">
+              <span className="text-[#21264E]">Powered by Lyca </span>
+              <span className="text-[#08DC7D]">Ops</span>
+            </p>
+          </>
         )}
 
         </div>
