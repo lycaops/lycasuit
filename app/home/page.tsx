@@ -27,7 +27,7 @@ export default async function HomePage() {
 
   return (
     <main className="min-h-dvh bg-[#f4f7fb] pb-16 lg:flex lg:pb-0">
-      <aside className="hidden w-72 shrink-0 flex-col bg-[#21264e] px-6 py-6 text-white lg:flex lg:min-h-dvh">
+      <aside className="hidden w-72 shrink-0 flex-col overflow-y-auto bg-[#21264e] px-6 py-6 text-white lg:sticky lg:top-0 lg:flex lg:h-dvh lg:max-h-dvh">
         <div className="flex items-center justify-between lg:block">
           <img src="/logo.png" alt="Lyca Suite" className="h-9 w-auto" />
           <p className="mt-2 hidden text-xs uppercase tracking-[0.2em] text-white/45 lg:block">Lyca Ops</p>
