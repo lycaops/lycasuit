@@ -8,9 +8,15 @@ export default async function NewPlatformUserPage() {
   const [{ data: roles }, { data: tools }, { data: branches }, { data: zones }] = await Promise.all([
     supabase.from("app_roles").select("code, label, rank").order("rank"),
     supabase.from("app_tools").select("key, name, accent_color").order("sort_order"),
-    supabase.from("branches").select("code, name").eq("is_active", true).order("code"),
-    supabase.from("zones").select("code, name, branch_id, branches(code)").eq("is_active", true).order("name"),
+    supabase.from("branches").select("id, code, name").eq("is_active", true).order("code"),
+    supabase.from("zones").select("code, name, branch_id").eq("is_active", true).order("name"),
   ])
+
+  const branchCodeById = new Map((branches ?? []).map((branch) => [branch.id, branch.code]))
+  const normalizedZones = (zones ?? []).map((zone) => ({
+    ...zone,
+    branches: branchCodeById.get(zone.branch_id) ? { code: branchCodeById.get(zone.branch_id) } : null,
+  }))
 
   return (
     <div className="flex flex-col gap-6 pb-10">
@@ -23,7 +29,7 @@ export default async function NewPlatformUserPage() {
         roles={roles ?? []}
         tools={tools ?? []}
         branches={branches ?? []}
-        zones={zones ?? []}
+        zones={normalizedZones}
         open
         page
         onOpenChange={() => {}}
