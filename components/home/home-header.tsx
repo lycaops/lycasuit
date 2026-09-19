@@ -63,19 +63,19 @@ export function HomeHeader({ user, backToHome = false, sidebarMode = false }: Pr
         </div>
       </div>
       {sidebarMode && (
-        <div className="border-t border-white/10 px-6 pt-4">
-          <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-white/50">
+        <div className="flex items-center justify-between border-t border-white/10 px-6 pt-3">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-white/50">
             <Languages className="h-3.5 w-3.5" />
             {t("language")}
           </div>
-          <div className="flex gap-2">
+          <div className="flex rounded-md border border-white/15 bg-white/5 p-0.5">
             {(["en", "it"] as const).map((option) => (
               <button
                 key={option}
                 type="button"
                 onClick={() => setLanguage(option)}
                 aria-pressed={language === option}
-                className={`flex-1 rounded-md px-3 py-1.5 text-xs font-semibold transition ${language === option ? "bg-white text-[#21264e]" : "bg-white/10 text-white/70 hover:bg-white/15 hover:text-white"}`}
+                className={`rounded px-2 py-0.5 text-[10px] font-bold transition ${language === option ? "bg-white text-[#21264e]" : "text-white/60 hover:text-white"}`}
               >
                 {option === "en" ? "EN" : "IT"}
               </button>
