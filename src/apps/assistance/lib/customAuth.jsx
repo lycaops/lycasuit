@@ -23,15 +23,62 @@ export function CustomAuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      try {
-        setCurrentUser(JSON.parse(stored));
-      } catch {
-        localStorage.removeItem(STORAGE_KEY);
+    let active = true;
+
+    const restoreSession = async () => {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        try {
+          if (active) setCurrentUser(JSON.parse(stored));
+        } catch {
+          localStorage.removeItem(STORAGE_KEY);
+        }
       }
-    }
-    setLoading(false);
+
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!active) return;
+
+      if (!session?.user) {
+        localStorage.removeItem(STORAGE_KEY);
+        setCurrentUser(null);
+        setLoading(false);
+        return;
+      }
+
+      const { data: staffRow, error } = await supabase
+        .from('staff')
+        .select('id, full_name, role, designation, corporate_email, territory, mobile_number, is_active')
+        .eq('id', session.user.id)
+        .maybeSingle();
+
+      if (error || !staffRow || !staffRow.is_active) {
+        localStorage.removeItem(STORAGE_KEY);
+        setCurrentUser(null);
+        setLoading(false);
+        return;
+      }
+
+      const sessionUser = {
+        id: staffRow.id,
+        full_name: staffRow.full_name,
+        role: staffRow.role,
+        designation: staffRow.designation,
+        corporate_email: staffRow.corporate_email,
+        territory: staffRow.territory,
+        mobile_number: staffRow.mobile_number,
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(sessionUser));
+      setCurrentUser(sessionUser);
+      setLoading(false);
+    };
+
+    restoreSession().catch(() => {
+      if (active) setLoading(false);
+    });
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   // Step 1 of the login flow — checks the email against active staff accounts.
