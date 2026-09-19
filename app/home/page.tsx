@@ -78,7 +78,7 @@ export default async function HomePage() {
             </p>
           </div>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 sm:gap-5">
+          <div className="grid gap-4 sm:grid-cols-2 sm:gap-5 lg:gap-6">
             {tools.map((tool) => {
               const Icon = ICONS[tool.icon ?? ""] ?? LayoutGrid
               const accent = tool.accent_color ?? "#245BC1"
@@ -86,33 +86,34 @@ export default async function HomePage() {
                 <Link
                   key={tool.key}
                   href={tool.route}
-                  className="group relative flex min-h-[172px] items-stretch gap-4 overflow-hidden rounded-2xl border border-[#21264E]/10 bg-white p-4 shadow-[0_8px_24px_rgba(33,38,78,0.06)] transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_32px_rgba(33,38,78,0.12)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#245BC1] sm:min-h-[196px] sm:gap-5 sm:p-5"
+                  className="group relative flex min-h-[238px] flex-col overflow-hidden rounded-[1.5rem] bg-[#21264E] p-5 text-white shadow-[0_12px_28px_rgba(33,38,78,0.16)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(33,38,78,0.24)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#245BC1] sm:min-h-[260px] sm:p-6"
                 >
                   <span
                     aria-hidden
-                    className="absolute inset-y-0 left-0 w-1"
+                    className="absolute inset-x-0 top-0 h-1.5"
                     style={{ backgroundColor: accent }}
                   />
-                  <div
-                    className="flex w-[76px] shrink-0 items-center justify-center rounded-xl border border-[#21264E]/[0.08] bg-[#f7f9fc] p-2 sm:w-[92px] sm:p-3"
-                    style={{ boxShadow: `inset 0 3px 0 ${accent}22` }}
-                  >
-                      {LOGOS[tool.key] ? (
-                        <img src={LOGOS[tool.key]} alt="" className="h-14 w-full object-contain sm:h-16" />
-                      ) : (
-                        <Icon className="h-8 w-8" style={{ color: accent }} />
-                      )}
-                  </div>
-                  <div className="flex min-w-0 flex-1 flex-col justify-between py-0.5">
-                    <div>
-                      <div className="flex items-start justify-between gap-2">
-                        <h2 className="text-base font-semibold leading-tight text-[#21264E] sm:text-lg">{tool.name}</h2>
-                        <ArrowRight className="mt-0.5 h-4 w-4 shrink-0 text-[#21264E]/35 transition group-hover:translate-x-0.5 group-hover:text-[#245BC1]" />
-                      </div>
-                      <p className="mt-2 text-sm leading-relaxed text-[#21264E]/65">{tool.description}</p>
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="pt-1">
+                      <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/45">Lyca workspace</span>
+                      <h2 className="mt-2 text-xl font-semibold leading-tight tracking-tight sm:text-2xl">{tool.name}</h2>
                     </div>
-                    <span className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.12em]" style={{ color: accent }}>
-                      Open tool
+                    <div
+                      className="flex h-[72px] w-[72px] shrink-0 items-center justify-center rounded-2xl bg-white p-2 shadow-lg sm:h-[84px] sm:w-[84px] sm:p-3"
+                      style={{ boxShadow: `0 10px 24px ${accent}44` }}
+                    >
+                      {LOGOS[tool.key] ? (
+                        <img src={LOGOS[tool.key]} alt="" className="h-full w-full object-contain" />
+                      ) : (
+                        <Icon className="h-9 w-9" style={{ color: accent }} />
+                      )}
+                    </div>
+                  </div>
+                  <p className="mt-6 max-w-sm text-sm leading-relaxed text-white/65 sm:mt-7">{tool.description}</p>
+                  <div className="mt-auto flex items-center justify-between border-t border-white/15 pt-4">
+                    <span className="text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: accent }}>Open tool</span>
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full border border-white/20 transition group-hover:border-white/60" style={{ backgroundColor: `${accent}22` }}>
+                      <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
                     </span>
                   </div>
                 </Link>
