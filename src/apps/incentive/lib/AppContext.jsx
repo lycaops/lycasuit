@@ -79,7 +79,11 @@ function getStoredSelectedRetailer() {
 }
 
 export function AppProvider({ children }) {
-  const [lang, setLang] = useState('en');
+  const [lang, setLang] = useState(() => {
+    if (typeof window === 'undefined') return 'en';
+    const stored = window.localStorage.getItem('language');
+    return stored === 'it' ? 'it' : 'en';
+  });
   const [scheme, setScheme] = useState('special');
   const [records, setRecords] = useState([]);
   const [headers, setHeaders] = useState([]);
@@ -90,6 +94,10 @@ export function AppProvider({ children }) {
   const [filterOptions, setFilterOptions] = useState({ branches: [], zones: [] });
 
   const t = useCallback((key) => translate(lang, key), [lang]);
+
+  useEffect(() => {
+    window.localStorage.setItem('language', lang);
+  }, [lang]);
 
   const loadMonths = useCallback(async () => {
     const { data, error } = await supabase.rpc('get_incentive_months');

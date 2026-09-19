@@ -100,6 +100,15 @@ export default function Layout({ children }) {
               {scopeLabel}
             </div>
           )}
+          {showSidebarLabels && (
+            <div className="mt-3 border-t border-white/10 px-4 pt-3">
+              <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-white/50">Language</div>
+              <div className="flex gap-2">
+                <button onClick={() => setLang('en')} className={`flex-1 rounded-lg px-2 py-1.5 text-xs font-medium ${lang === 'en' ? 'bg-white text-[#21264e]' : 'bg-white/10 text-white/70 hover:bg-white/15'}`}>EN</button>
+                <button onClick={() => setLang('it')} className={`flex-1 rounded-lg px-2 py-1.5 text-xs font-medium ${lang === 'it' ? 'bg-white text-[#21264e]' : 'bg-white/10 text-white/70 hover:bg-white/15'}`}>IT</button>
+              </div>
+            </div>
+          )}
         </div>
         <button
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}

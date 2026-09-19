@@ -1,7 +1,7 @@
 'use client';
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 
-const STORAGE_KEY = 'lmac_language';
+const STORAGE_KEY = 'language';
 
 const pageTextTranslations = {
   'Welcome back': 'Bentornato',
@@ -207,7 +207,10 @@ const translations = {
 const LanguageContext = createContext(null);
 
 export function LanguageProvider({ children }) {
-  const [language, setLanguage] = useState(() => localStorage.getItem(STORAGE_KEY) || 'en');
+  const [language, setLanguage] = useState(() => {
+    const stored = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('lmac_language');
+    return stored === 'it' ? 'it' : 'en';
+  });
   const originalText = useRef(new WeakMap());
   const originalAttributes = useRef(new WeakMap());
 
