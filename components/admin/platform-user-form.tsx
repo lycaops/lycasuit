@@ -4,14 +4,7 @@ import { useEffect, useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { createPlatformUser, updatePlatformUser } from "@/app/admin/users/actions"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -96,6 +89,7 @@ export function PlatformUserForm({
   zones,
   open,
   onOpenChange,
+  page = false,
 }: {
   user: PlatformUserRow | null
   roles: PlatformRole[]
@@ -104,6 +98,7 @@ export function PlatformUserForm({
   zones: PlatformZone[]
   open: boolean
   onOpenChange: (open: boolean) => void
+  page?: boolean
 }) {
   const router = useRouter()
   const [values, setValues] = useState<FormValues>(emptyForm)
@@ -122,7 +117,7 @@ export function PlatformUserForm({
             role: user.role,
             branches: user.role === "ASM"
               ? user.branches?.slice(0, 1) ?? (user.branch ? [user.branch] : [])
-              : user.role === "ZONE-MANAGER" || user.role === "RSM"
+              : user.role === "ZONE-MANAGER" || user.role === "FSE" || user.role === "RSM"
                 ? user.branch ? [user.branch] : []
                 : branches.map((branch) => branch.code),
             zone: user.zone ?? "",
@@ -143,12 +138,12 @@ export function PlatformUserForm({
     setValues((current) => ({
       ...current,
       role,
-      branches: role === "ZONE-MANAGER" || role === "RSM"
+      branches: role === "ZONE-MANAGER" || role === "FSE" || role === "RSM"
         ? current.branches.slice(0, 1)
         : role === "ASM"
           ? current.branches.slice(0, 1)
           : branches.map((branch) => branch.code),
-      zone: role === "ZONE-MANAGER" ? current.zone : "",
+      zone: role === "ZONE-MANAGER" || role === "FSE" ? current.zone : "",
     }))
   }
 
@@ -189,8 +184,8 @@ export function PlatformUserForm({
       toast.error("Regional Sales Managers must be assigned to North or South branches.")
       return
     }
-    if (values.role === "ZONE-MANAGER" && !values.zone.trim()) {
-      toast.error("Select a zone for Zone Managers.")
+    if ((values.role === "ZONE-MANAGER" || values.role === "FSE") && !values.zone.trim()) {
+      toast.error("Select a branch and zone for this role.")
       return
     }
 
@@ -225,14 +220,14 @@ export function PlatformUserForm({
         return
       }
       toast.success(editing ? "User updated" : "User created")
-      onOpenChange(false)
+      if (page) router.push("/admin/users")
+      else onOpenChange(false)
       router.refresh()
     })
   }
 
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-3xl">
+  const content = (
+      <div className={page ? "rounded-2xl border border-[#21264E]/10 bg-white p-6 shadow-sm" : ""}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-brand-navy">
             {editing ? <Pencil className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
@@ -269,7 +264,7 @@ export function PlatformUserForm({
             </div>
           </div>
 
-          {values.role === "ZONE-MANAGER" ? (
+          {values.role === "ZONE-MANAGER" || values.role === "FSE" ? (
           <div className="space-y-3 rounded-2xl border border-gray-100 bg-gray-50 p-4">
             <div className="flex items-center justify-between">
               <Label className="font-semibold text-brand-navy">Branch and zone assignment</Label>
@@ -354,7 +349,14 @@ export function PlatformUserForm({
             <Button type="submit" disabled={pending}>{pending && <Spinner className="mr-2 h-4 w-4" />}{editing ? "Save changes" : "Create user"}</Button>
           </DialogFooter>
         </form>
-      </DialogContent>
+      </div>
+  )
+
+  if (page) return <div className="mx-auto w-full max-w-4xl">{content}</div>
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-3xl">{content}</DialogContent>
     </Dialog>
   )
 }

@@ -9,7 +9,6 @@ import {
   BookOpen,
   Globe,
   Calculator as CalcIcon,
-  Users,
   LogOut,
   User as UserIcon,
   Home,
@@ -153,37 +152,7 @@ export default function Layout({ children }) {
           </div>
         </header>
 
-        <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 flex items-stretch justify-around border-t border-slate-200 bg-white/95 px-2 pt-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] shadow-[0_-4px_16px_rgba(33,38,78,0.08)] backdrop-blur">
-          {navItems.map((item) => {
-            const active = location.pathname === item.to;
-            const Icon = item.icon;
-            return (
-              <button
-                key={item.to}
-                onClick={() => navigate(item.to)}
-                title={item.label}
-                aria-label={item.label}
-                className={`flex min-w-0 flex-1 flex-col items-center gap-1 rounded-lg px-2 py-1.5 text-[10px] font-medium transition-colors ${
-                  active ? 'bg-[#21264e] text-white' : 'text-slate-500 hover:bg-slate-100'
-                }`}
-              >
-                <Icon className="h-5 w-5" />
-                <span className="truncate max-w-full">{item.label}</span>
-              </button>
-            );
-          })}
-          <button
-            onClick={() => logout(true)}
-            title="Logout"
-            aria-label="Logout"
-            className="flex min-w-0 flex-1 flex-col items-center gap-1 rounded-lg px-2 py-1.5 text-[10px] font-medium text-red-600 hover:bg-red-50"
-          >
-            <LogOut className="h-5 w-5" />
-            <span>Logout</span>
-          </button>
-        </nav>
-
-        <main className="flex-1 overflow-auto pb-20 md:pb-0">{children}</main>
+        <main className="flex-1 overflow-auto">{children}</main>
       </div>
     </div>
   );

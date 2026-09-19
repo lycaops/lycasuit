@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { Check, Loader2, Pencil, Plus, Search, ShieldCheck, ShieldOff, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 import { deletePlatformUser, setToolAccess, updatePlatformUser } from "@/app/admin/users/actions"
@@ -114,8 +115,10 @@ export function PlatformUsersTable({
         />
         <span className="shrink-0 text-xs text-[#21264E]/50">{filtered.length} users</span>
         {pending && <Loader2 className="h-4 w-4 animate-spin text-[#245BC1]" />}
-        <Button size="sm" className="ml-auto" onClick={() => { setEditing(null); setFormOpen(true) }}>
+        <Button size="sm" className="ml-auto" asChild>
+          <Link href="/admin/users/new">
           <Plus className="mr-1.5 h-4 w-4" /> Add user
+          </Link>
         </Button>
       </div>
 

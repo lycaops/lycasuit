@@ -3,6 +3,7 @@ import { requireTool, requireUser } from "@/lib/auth"
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/dashboard/app-sidebar"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
+import { MobileToolNav } from "@/components/dashboard/mobile-tool-nav"
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
   await requireTool("contracts")
@@ -15,6 +16,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
         <DashboardHeader user={user} />
         <div className="flex flex-1 flex-col gap-6 p-4 md:p-6 lg:p-8">{children}</div>
       </SidebarInset>
+      <MobileToolNav />
     </SidebarProvider>
   )
 }
