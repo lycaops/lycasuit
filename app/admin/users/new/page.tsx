@@ -32,7 +32,6 @@ export default async function NewPlatformUserPage() {
         zones={normalizedZones}
         open
         page
-        onOpenChange={() => {}}
       />
     </div>
   )

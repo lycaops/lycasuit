@@ -97,7 +97,7 @@ export function PlatformUserForm({
   branches: PlatformBranch[]
   zones: PlatformZone[]
   open: boolean
-  onOpenChange: (open: boolean) => void
+  onOpenChange?: (open: boolean) => void
   page?: boolean
 }) {
   const router = useRouter()
@@ -357,7 +357,7 @@ export function PlatformUserForm({
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={pending}>Cancel</Button>
+            <Button type="button" variant="outline" onClick={() => onOpenChange?.(false)} disabled={pending}>Cancel</Button>
             <Button type="submit" disabled={pending}>{pending && <Spinner className="mr-2 h-4 w-4" />}{editing ? "Save changes" : "Create user"}</Button>
           </DialogFooter>
         </form>
