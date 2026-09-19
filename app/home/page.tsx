@@ -2,6 +2,7 @@ import Link from "next/link"
 import { BarChart3, FileSignature, Receipt, LifeBuoy, LayoutGrid, Users, ArrowRight, Home } from "lucide-react"
 import { getMyTools, isPlatformAdmin, requirePlatformUser } from "@/lib/auth"
 import { HomeHeader } from "@/components/home/home-header"
+import { MobileToolNav } from "@/components/dashboard/mobile-tool-nav"
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   BarChart3,
@@ -18,8 +19,8 @@ export default async function HomePage() {
   const firstName = user.full_name?.split(" ")[0] ?? "there"
 
   return (
-    <main className="min-h-dvh bg-[#f4f7fb] lg:flex">
-      <aside className="flex w-full shrink-0 flex-col bg-[#21264e] px-5 py-6 text-white lg:min-h-dvh lg:w-72 lg:px-6">
+    <main className="min-h-dvh bg-[#f4f7fb] pb-16 lg:flex lg:pb-0">
+      <aside className="hidden w-72 shrink-0 flex-col bg-[#21264e] px-6 py-6 text-white lg:flex lg:min-h-dvh">
         <div className="flex items-center justify-between lg:block">
           <img src="/logo.png" alt="Lyca Suite" className="h-9 w-auto" />
           <p className="mt-2 hidden text-xs uppercase tracking-[0.2em] text-white/45 lg:block">Lyca Ops</p>
@@ -107,6 +108,7 @@ export default async function HomePage() {
 
         </div>
       </div>
+      <MobileToolNav />
     </main>
   )
 }

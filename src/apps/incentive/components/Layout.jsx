@@ -12,6 +12,8 @@ import {
   LogOut,
   User as UserIcon,
   Home,
+  Menu,
+  X,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
@@ -24,6 +26,7 @@ export default function Layout({ children }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = React.useState(false);
   const showSidebarLabels = !sidebarCollapsed;
 
   const navItems = [
@@ -47,6 +50,8 @@ export default function Layout({ children }) {
     : profile?.branch_name
       ? `Branch: ${profile.branch_name}`
       : '';
+
+  const closeMobileNav = () => setMobileNavOpen(false);
 
   return (
     <div className="min-h-screen bg-[#f4f7fb] flex">
@@ -76,7 +81,7 @@ export default function Layout({ children }) {
             return (
               <button
                 key={item.to}
-                onClick={() => navigate(item.to)}
+                onClick={() => { navigate(item.to); closeMobileNav(); }}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${sidebarCollapsed ? 'justify-center' : ''} ${
                   active
                     ? 'bg-white/15 text-white'
@@ -110,6 +115,9 @@ export default function Layout({ children }) {
       <div className="flex-1 flex flex-col min-w-0">
         <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-8 shrink-0">
           <div className="flex items-center gap-3">
+            <button onClick={() => setMobileNavOpen(true)} aria-label="Open navigation" className="md:hidden rounded-lg p-1.5 text-[#21264e] hover:bg-slate-100">
+              <Menu className="h-5 w-5" />
+            </button>
             <img src="/logo_b.webp" alt="Logo" crossOrigin="anonymous" className="h-8 w-auto md:hidden" />
             <h1 className="text-lg font-semibold text-slate-800">{t('appTitle')}</h1>
           </div>
@@ -151,6 +159,35 @@ export default function Layout({ children }) {
             </div>
           </div>
         </header>
+
+        {mobileNavOpen && (
+          <div className="fixed inset-0 z-[80] flex md:hidden">
+            <div className="absolute inset-0 bg-black/50" onClick={closeMobileNav} />
+            <aside className="relative flex w-72 max-w-[82%] flex-col bg-[#21264e] text-white shadow-2xl">
+              <button onClick={closeMobileNav} aria-label="Close navigation" className="absolute right-3 top-3 z-10 rounded-lg p-1.5 text-white/60 hover:bg-white/10 hover:text-white">
+                <X className="h-5 w-5" />
+              </button>
+              <div className="flex items-center gap-3 border-b border-white/10 px-4 py-4">
+                <img src="/logo.png" alt="Logo" className="h-9 w-9 object-contain" />
+                <div>
+                  <p className="text-sm font-bold text-white">Retailer Statement</p>
+                  <p className="text-xs text-white/50">LycaMobile Italy</p>
+                </div>
+              </div>
+              <nav className="flex-1 space-y-1 px-3 py-4">
+                <button onClick={() => { window.location.href = '/home'; }} className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-white/60 hover:bg-white/10 hover:text-white"><Home className="h-5 w-5" />Back to Home</button>
+                {navItems.map((item) => { const Icon = item.icon; return <button key={item.to} onClick={() => { navigate(item.to); closeMobileNav(); }} className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium ${location.pathname === item.to ? 'bg-white/15 text-white' : 'text-white/60 hover:bg-white/10 hover:text-white'}`}><Icon className="h-5 w-5" />{item.label}</button> })}
+              </nav>
+              <div className="border-t border-white/10 px-4 py-4">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-white/45">Language</p>
+                <div className="flex gap-2">
+                  <button onClick={() => setLang('en')} className={`flex-1 rounded-lg px-3 py-2 text-sm font-medium ${lang === 'en' ? 'bg-white text-[#21264e]' : 'bg-white/10 text-white/70'}`}>EN</button>
+                  <button onClick={() => setLang('it')} className={`flex-1 rounded-lg px-3 py-2 text-sm font-medium ${lang === 'it' ? 'bg-white text-[#21264e]' : 'bg-white/10 text-white/70'}`}>IT</button>
+                </div>
+              </div>
+            </aside>
+          </div>
+        )}
 
         <main className="flex-1 overflow-auto">{children}</main>
       </div>
