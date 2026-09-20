@@ -197,8 +197,10 @@ export default function TicketDetails() {
 
       {/* Ticket Header */}
       <Card className="border-0 shadow-lg rounded-2xl py-0 overflow-hidden">
-        <div className="bg-foreground p-5 sm:p-6">
-          <div className="flex items-start justify-between flex-wrap gap-3">
+        <div className="relative overflow-hidden bg-foreground p-5 sm:p-6">
+          <img src="/h2.svg" alt="" aria-hidden="true" className="pointer-events-none absolute -right-28 -top-8 h-72 w-72 opacity-20" />
+          <img src="/h1.svg" alt="" aria-hidden="true" className="pointer-events-none absolute -right-24 top-28 h-64 w-64 opacity-[.15]" />
+          <div className="relative z-10 flex items-start justify-between flex-wrap gap-3">
             <div>
               <p className="text-accent text-xs font-mono font-semibold mb-1">{ticket.ticket_number}</p>
               <h1 className="text-xl sm:text-2xl font-bold text-white">{ticket.subject}</h1>
