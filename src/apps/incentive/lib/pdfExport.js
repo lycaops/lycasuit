@@ -18,12 +18,49 @@ function waitForImages(container) {
   );
 }
 
+function addCanvasToPdf(pdf, canvas, pageWidth, margin, usableHeight, firstPage) {
+  const imageWidth = pageWidth - margin * 2;
+  const pageSliceHeight = Math.max(1, Math.floor((canvas.width * usableHeight) / imageWidth));
+  let offsetY = 0;
+  let first = firstPage;
+
+  while (offsetY < canvas.height) {
+    const sliceHeight = Math.min(pageSliceHeight, canvas.height - offsetY);
+    const slice = document.createElement("canvas");
+    slice.width = canvas.width;
+    slice.height = sliceHeight;
+    const context = slice.getContext("2d");
+    if (!context) throw new Error("Could not prepare a PDF page");
+
+    context.fillStyle = "#ffffff";
+    context.fillRect(0, 0, slice.width, slice.height);
+    context.drawImage(
+      canvas,
+      0,
+      offsetY,
+      canvas.width,
+      sliceHeight,
+      0,
+      0,
+      slice.width,
+      slice.height,
+    );
+
+    if (!first) pdf.addPage();
+    first = false;
+    const sliceHeightMm = (slice.height * imageWidth) / slice.width;
+    pdf.addImage(slice.toDataURL("image/jpeg", 0.92), "JPEG", margin, margin, imageWidth, sliceHeightMm);
+    offsetY += sliceHeight;
+  }
+
+  return first;
+}
+
 export async function exportStatementPDF(container, retailerId, lang) {
   const pdf = new jsPDF("p", "mm", "a4");
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
   const margin = 8;
-  const imgWidth = pageWidth - margin * 2;
   const usableHeight = pageHeight - margin * 2;
 
   const sections = Array.from(container.querySelectorAll("[data-pdf-section]"));
@@ -36,40 +73,16 @@ export async function exportStatementPDF(container, retailerId, lang) {
   let first = true;
   for (const section of sections) {
     const captureOptions = {
-      scale: 2,
+      scale: Math.min(2, 30000 / Math.max(section.scrollWidth, section.scrollHeight, 1)),
       backgroundColor: "#ffffff",
       useCORS: true,
       allowTaint: false,
       logging: false,
       windowWidth: Math.max(DESKTOP_WIDTH, document.documentElement.clientWidth),
     };
-    let canvas;
-    try {
-      canvas = await html2canvas(section, { ...captureOptions, foreignObjectRendering: true });
-    } catch (foreignObjectError) {
-      console.warn("Native statement capture failed; retrying canvas capture", foreignObjectError);
-      canvas = await html2canvas(section, captureOptions);
-    }
-    const imgData = canvas.toDataURL("image/jpeg", 0.8);
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-    if (!first) pdf.addPage();
-    first = false;
-
-    if (imgHeight <= usableHeight) {
-      pdf.addImage(imgData, "JPEG", margin, margin, imgWidth, imgHeight);
-    } else {
-      let heightLeft = imgHeight;
-      let position = margin;
-      pdf.addImage(imgData, "JPEG", margin, position, imgWidth, imgHeight);
-      heightLeft -= usableHeight;
-      while (heightLeft > 0) {
-        pdf.addPage();
-        position = margin - (imgHeight - heightLeft);
-        pdf.addImage(imgData, "JPEG", margin, position, imgWidth, imgHeight);
-        heightLeft -= usableHeight;
-      }
-    }
+    const canvas = await html2canvas(section, captureOptions);
+    if (!canvas.width || !canvas.height) throw new Error("Statement section rendered empty");
+    first = addCanvasToPdf(pdf, canvas, pageWidth, margin, usableHeight, first);
   }
 
   // Page numbers
