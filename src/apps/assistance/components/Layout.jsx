@@ -38,7 +38,7 @@ export default function Layout({ children }) {
 
   const handleLogout = async () => {
     await logout();
-    window.location.assign('/tools/assistance/login');
+    window.location.assign('/auth/login');
   };
 
   const isActive = (path) => {
