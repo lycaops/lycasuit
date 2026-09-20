@@ -76,7 +76,6 @@ export function DashboardContent({ user, counts, recentRows }: DashboardContentP
             </Link>
           </Button>
         </div>
-        <FileSignatureMark />
       </section>
 
       <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -124,10 +123,6 @@ export function DashboardContent({ user, counts, recentRows }: DashboardContentP
       </section>
     </div>
   )
-}
-
-function FileSignatureMark() {
-  return <div aria-hidden="true" className="absolute -bottom-14 -right-8 hidden h-56 w-56 rotate-12 rounded-[3rem] border-[18px] border-[#245bc1]/40 sm:block" />
 }
 
 function StatusBadge({ status, t }: { status: Contract["status"]; t: any }) {

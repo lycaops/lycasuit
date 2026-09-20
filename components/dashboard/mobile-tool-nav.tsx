@@ -16,7 +16,7 @@ export function MobileToolNav() {
   const pathname = usePathname()
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-[70] box-border flex h-[calc(4rem+env(safe-area-inset-bottom))] items-center justify-around border-t border-[#21264e]/10 bg-white/95 px-2 pb-[calc(env(safe-area-inset-bottom)+0.25rem)] shadow-[0_-4px_18px_rgba(33,38,78,0.12)] backdrop-blur md:hidden">
+    <nav className="fixed inset-x-0 bottom-0 z-40 box-border flex h-[calc(4rem+env(safe-area-inset-bottom))] items-center justify-around border-t border-[#21264e]/10 bg-white/95 px-2 pb-[calc(env(safe-area-inset-bottom)+0.25rem)] shadow-[0_-4px_18px_rgba(33,38,78,0.12)] backdrop-blur md:hidden">
       {items.map((item) => {
         const Icon = item.icon
         const active = pathname === item.href || pathname.startsWith(`${item.href}/`)
