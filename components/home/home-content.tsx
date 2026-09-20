@@ -79,7 +79,9 @@ export function HomeContent({
         </div>
       </aside>
 
-      <div className="min-w-0 flex-1">
+      <div className="relative min-w-0 flex-1 overflow-hidden">
+        <img src="/h2.svg" alt="" aria-hidden="true" className="pointer-events-none absolute -right-20 top-24 h-48 w-48 opacity-[.08] lg:hidden" />
+        <img src="/h1.svg" alt="" aria-hidden="true" className="pointer-events-none absolute -bottom-16 -left-20 h-56 w-56 opacity-[.08] lg:hidden" />
         <div className="border-b border-[#21264e]/10 bg-white">
           <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
             <div>
@@ -110,7 +112,7 @@ export function HomeContent({
                       <span aria-hidden className="absolute right-0 top-0 h-1.5 w-24 rounded-bl-full" style={{ backgroundColor: accent }} />
                       <div className="flex items-start justify-between gap-4">
                         <div className="pt-1"><h2 className="text-xl font-semibold leading-tight tracking-tight text-[#21264E] sm:text-2xl">{TOOL_LABELS[tool.key] ? t(TOOL_LABELS[tool.key]) : tool.name}</h2></div>
-                        <div className="flex h-[78px] w-[92px] shrink-0 items-center justify-center p-1 sm:h-[94px] sm:w-[112px]">{LOGOS[tool.key] ? <img src={LOGOS[tool.key] as string} alt="" className="h-full w-full object-contain" /> : <Icon className="h-9 w-9" style={{ color: accent }} />}</div>
+                        <div className="flex h-[78px] w-[92px] shrink-0 items-center justify-center p-1 sm:h-[94px] sm:w-[112px]">{LOGOS[tool.key] ? <img src={LOGOS[tool.key] as string} alt={`${tool.name} icon`} className="block h-full w-full object-contain" /> : <Icon className="block h-9 w-9" style={{ color: accent }} />}</div>
                       </div>
                       <p className="mt-7 max-w-sm text-sm leading-relaxed text-[#21264E]/65 sm:mt-8">{tool.description}</p>
                       <div className="mt-auto flex items-center justify-between border-t border-[#21264E]/10 pt-4"><span className="text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: accent }}>{t("openTool")}</span><span className="flex h-9 w-9 items-center justify-center rounded-full transition group-hover:translate-x-0.5" style={{ backgroundColor: `${accent}18`, color: accent }}><ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" /></span></div>
