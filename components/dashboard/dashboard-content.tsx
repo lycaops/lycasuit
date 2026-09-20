@@ -7,14 +7,8 @@ import {
   FilePlus2,
   FileText,
   Store,
+  ArrowUpRight,
 } from "lucide-react"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { useI18n } from "@/lib/i18n/i18n-context"
@@ -65,89 +59,73 @@ export function DashboardContent({ user, counts, recentRows }: DashboardContentP
   ]
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          {t("welcomeBack")}, {user.full_name.split(" ")[0]}
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          {t("dashboardOverview")}
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {summary.map((s) => (
-          <Card key={s.key}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                {t(s.key as any)}
-              </CardTitle>
-              <div
-                className={`flex h-8 w-8 items-center justify-center rounded-lg ${s.tone}`}
-              >
-                <s.icon className="h-4 w-4" aria-hidden="true" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-semibold tabular-nums">{s.value}</div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div>
-            <CardTitle>{t("recentContracts")}</CardTitle>
-            <CardDescription>
-              {t("dashboardOverview")}
-            </CardDescription>
-          </div>
-          <Button asChild size="sm">
+    <div className="flex flex-col gap-5">
+      <section className="relative overflow-hidden rounded-2xl bg-[#21264e] px-5 py-6 text-white shadow-[0_16px_40px_rgba(33,38,78,0.16)] sm:px-7 sm:py-7">
+        <div className="relative z-10 max-w-2xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#08dc7d]">Retailer contracts</p>
+          <h1 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
+            {t("welcomeBack")}, {user.full_name.split(" ")[0]}
+          </h1>
+          <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/65">Create, review, and manage retailer contracts from one focused workspace.</p>
+          <Button asChild className="mt-5 bg-[#08dc7d] text-[#21264e] hover:bg-[#35e991]">
             <Link href="/tools/contracts/contracts/new">
-              <FilePlus2 className="mr-1.5 h-4 w-4" aria-hidden="true" />
-              {t("newContract")}
+              <FilePlus2 className="mr-2 h-4 w-4" aria-hidden="true" />
+              Create a new contract
             </Link>
           </Button>
-        </CardHeader>
-        <CardContent>
+        </div>
+        <FileSignatureMark />
+      </section>
+
+      <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {summary.map((s) => (
+          <div key={s.key} className="rounded-xl border border-[#21264e]/10 bg-white p-4 shadow-sm">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs font-medium text-muted-foreground">{t(s.key as any)}</span>
+              <s.icon className="h-4 w-4 text-[#245bc1]" aria-hidden="true" />
+            </div>
+            <div className="mt-2 text-2xl font-semibold tabular-nums text-[#21264e]">{s.value}</div>
+          </div>
+        ))}
+      </section>
+
+      <section className="rounded-2xl border border-[#21264e]/10 bg-white shadow-sm">
+        <div className="flex items-center justify-between gap-4 border-b border-[#21264e]/10 px-5 py-4 sm:px-6">
+          <div>
+            <h2 className="font-semibold text-[#21264e]">{t("recentContracts")}</h2>
+            <p className="mt-1 text-xs text-muted-foreground">Your latest retailer activity</p>
+          </div>
+          <Button asChild variant="ghost" size="sm" className="text-[#245bc1]">
+            <Link href="/tools/contracts/contracts">View all<ArrowUpRight className="ml-1 h-4 w-4" /></Link>
+          </Button>
+        </div>
+        <div className="px-5 sm:px-6">
           {recentRows.length === 0 ? (
-            <div className="flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed py-10 text-center">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
-                <FileText className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
-              </div>
-              <p className="text-sm text-muted-foreground">
-                No contracts yet. Create your first retailer contract.
-              </p>
-              <Button asChild size="sm" variant="outline">
-                <Link href="/tools/contracts/contracts/new">Create contract</Link>
-              </Button>
+            <div className="flex flex-col items-center justify-center gap-3 py-10 text-center">
+              <FileText className="h-8 w-8 text-muted-foreground/50" aria-hidden="true" />
+              <p className="text-sm text-muted-foreground">No contracts yet. Start with your first retailer contract.</p>
             </div>
           ) : (
-            <ul className="flex flex-col divide-y">
+            <ul className="divide-y divide-[#21264e]/10">
               {recentRows.map((r) => (
-                <li key={r.id} className="flex items-center justify-between gap-4 py-3">
-                  <div className="flex min-w-0 flex-col">
-                    <Link
-                      href={`/tools/contracts/contracts/${r.id}`}
-                      className="truncate text-sm font-medium hover:underline"
-                    >
-                      {r.company_name}
-                    </Link>
-                    <span className="truncate text-xs text-muted-foreground">
-                      {r.shop_name} · {r.city}
-                      {r.zone ? ` · ${r.zone}` : ""}
-                    </span>
-                  </div>
+                <li key={r.id} className="flex items-center justify-between gap-3 py-3">
+                  <Link href={`/tools/contracts/contracts/${r.id}`} className="min-w-0">
+                    <span className="block truncate text-sm font-medium text-[#21264e]">{r.company_name}</span>
+                    <span className="block truncate text-xs text-muted-foreground">{r.shop_name} · {r.city}{r.zone ? ` · ${r.zone}` : ""}</span>
+                  </Link>
                   <StatusBadge status={r.status} t={t} />
                 </li>
               ))}
             </ul>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </section>
     </div>
   )
+}
+
+function FileSignatureMark() {
+  return <div aria-hidden="true" className="absolute -bottom-14 -right-8 hidden h-56 w-56 rotate-12 rounded-[3rem] border-[18px] border-[#245bc1]/40 sm:block" />
 }
 
 function StatusBadge({ status, t }: { status: Contract["status"]; t: any }) {

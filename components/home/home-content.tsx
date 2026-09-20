@@ -50,7 +50,7 @@ export function HomeContent({
   const firstName = user.full_name?.split(" ")[0] ?? "there"
 
   return (
-    <main className="min-h-dvh bg-[#f4f7fb] pb-16 lg:flex lg:pb-0">
+    <main className="min-h-dvh bg-[#f4f7fb] pb-16 lg:flex lg:h-dvh lg:overflow-hidden lg:pb-0">
       <div className="h-14 shrink-0 lg:hidden" />
       <header className="fixed inset-x-0 top-0 z-40 flex h-[calc(3.5rem+env(safe-area-inset-top))] items-center justify-center bg-[#21264e] px-4 pt-[env(safe-area-inset-top)] lg:hidden">
         <img src="/lops_w.svg" alt="LycaOps" className="h-7 w-auto" />
@@ -85,14 +85,14 @@ export function HomeContent({
 
       <div className="min-w-0 flex-1">
         <div className="border-b border-[#21264e]/10 bg-white">
-          <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+          <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
             <div>
               <p className="text-sm font-medium text-[#245BC1]">{t("workspaceTitle")}</p>
               <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#21264E]">{t("welcomeBack")}, {firstName}</h1>
             </div>
           </div>
         </div>
-        <div className="mx-auto max-w-6xl px-6 py-10">
+        <div className="mx-auto max-w-6xl px-6 py-6">
           <header className="mb-5">
             <p className="text-sm font-bold text-[#21264E]">Empowering Our Teams</p>
             <p className="mt-1 max-w-2xl text-sm leading-relaxed text-[#21264E]/70">LycaOps brings your essential tools together in one place. Stay on top of incentives, manage contracts with ease, monitor performance in real time, and request assistance whenever you need it, so you can focus on growing your retailer network.</p>

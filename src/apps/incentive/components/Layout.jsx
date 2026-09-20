@@ -159,7 +159,6 @@ export default function Layout({ children }) {
                 <img src="/statement.png" alt="Incentive Statement" className="h-8 w-8 object-contain" />
                 <div>
                   <p className="text-sm font-bold text-white">Incentive Statement</p>
-                  <p className="text-xs text-white/50">LycaMobile Italy</p>
                 </div>
               </div>
               <nav className="flex-1 space-y-1 px-3 py-4">

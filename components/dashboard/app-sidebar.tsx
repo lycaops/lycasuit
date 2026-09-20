@@ -113,15 +113,6 @@ export function AppSidebar({ user }: { user: SidebarUser }) {
       <SidebarFooter className="border-white/10 bg-[#21264e]">
         <SidebarMenu>
           <SidebarMenuItem>
-            <div className="flex items-center gap-2 px-3 py-3 text-white/70" aria-label="Language">
-              <Languages className="h-4 w-4 shrink-0" aria-hidden="true" />
-              <div className="flex items-center rounded-lg border border-white/20 p-0.5">
-                <button type="button" onClick={() => setLanguage("en")} aria-pressed={language === "en"} className={`rounded-md px-2 py-1 text-[11px] font-semibold ${language === "en" ? "bg-white text-[#21264e]" : ""}`}>EN</button>
-                <button type="button" onClick={() => setLanguage("it")} aria-pressed={language === "it"} className={`rounded-md px-2 py-1 text-[11px] font-semibold ${language === "it" ? "bg-white text-[#21264e]" : ""}`}>IT</button>
-              </div>
-            </div>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
             <SidebarMenuButton size="lg" className="pointer-events-none group-data-[collapsible=icon]:!p-0 group-data-[collapsible=icon]:justify-center">
               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#ffc8b2] text-[11px] font-semibold text-[#21264e]">
                 {user.full_name
@@ -141,6 +132,15 @@ export function AppSidebar({ user }: { user: SidebarUser }) {
                 </span>
               </div>
             </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <div className="flex items-center gap-2 px-3 py-3 text-white/70 group-data-[collapsible=icon]:hidden" aria-label="Language">
+              <Languages className="h-4 w-4 shrink-0" aria-hidden="true" />
+              <div className="flex items-center rounded-lg border border-white/20 p-0.5">
+                <button type="button" onClick={() => setLanguage("en")} aria-pressed={language === "en"} className={`rounded-md px-2 py-1 text-[11px] font-semibold ${language === "en" ? "bg-white text-[#21264e]" : ""}`}>EN</button>
+                <button type="button" onClick={() => setLanguage("it")} aria-pressed={language === "it"} className={`rounded-md px-2 py-1 text-[11px] font-semibold ${language === "it" ? "bg-white text-[#21264e]" : ""}`}>IT</button>
+              </div>
+            </div>
           </SidebarMenuItem>
           <SidebarMenuItem>
             <form action={signOut}>
