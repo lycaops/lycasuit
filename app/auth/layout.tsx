@@ -22,7 +22,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
       <div className="flex w-full items-center justify-center px-5 py-10 sm:px-8 lg:w-[55%] xl:w-1/2">
         <div className="w-full max-w-md">
           <div className="mb-8 flex items-center justify-center lg:hidden">
-            <img src="/lops.svg" alt="LycaOps" className="h-9 w-auto" />
+            <img src="/lops.svg" alt="LycaOps" className="h-auto w-2/3 max-w-[280px]" />
           </div>
           {children}
         </div>
