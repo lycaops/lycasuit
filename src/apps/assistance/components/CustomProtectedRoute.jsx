@@ -10,7 +10,7 @@ export default function CustomProtectedRoute() {
 
   if (loading || loggingOut) {
     return (
-      <div className="lo-screen" style={{ '--lo-screen-bg': 'var(--background)', position: 'fixed', inset: 0, zIndex: 1000, width: '100vw', minHeight: '100dvh', display: 'grid', placeItems: 'center', background: 'var(--background)' }}>
+      <div className="lo-screen" style={{ '--lo-screen-bg': 'var(--background)' }}>
         <Loader size={128} />
       </div>
     );

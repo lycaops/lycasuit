@@ -9,7 +9,7 @@ function AppContent() {
 
   if (loading) {
     return (
-      <div className="lo-screen" style={{ '--lo-screen-bg': '#f4f7fb', position: 'fixed', inset: 0, zIndex: 1000, width: '100vw', minHeight: '100dvh', display: 'grid', placeItems: 'center', background: '#f4f7fb' }}>
+      <div className="lo-screen" style={{ '--lo-screen-bg': '#f4f7fb' }}>
         <Loader size={128} />
       </div>
     );

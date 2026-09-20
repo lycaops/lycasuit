@@ -6,7 +6,7 @@ import Loader from "@/components/Loader"
 const App = dynamic(() => import("@incentive/App"), {
   ssr: false,
   loading: () => (
-    <div className="lo-screen" style={{ position: "fixed", inset: 0, zIndex: 1000, width: "100vw", minHeight: "100dvh", display: "grid", placeItems: "center", background: "#fff" }}>
+    <div className="lo-screen">
       <Loader size={128} />
     </div>
   ),
