@@ -1,12 +1,12 @@
 'use client';
 import React, { useState } from "react";
 import { useApp } from "@incentive/lib/AppContext";
-import { getText } from "@incentive/lib/csvUtils";
+import { formatCurrency, getNumber, getText } from "@incentive/lib/csvUtils";
 import { ArrowRight } from "lucide-react";
 import IncentiveGroupBadge from "./statement/IncentiveGroupBadge";
 
 export default function RetailerTable({ onSelect, records: recs }) {
-  const { t, setSelectedRetailer, records: ctxRecords } = useApp();
+  const { t, lang, setSelectedRetailer, records: ctxRecords } = useApp();
   const records = recs || ctxRecords;
   const [limit, setLimit] = useState(25);
 
@@ -28,7 +28,7 @@ export default function RetailerTable({ onSelect, records: recs }) {
               <th className="text-left px-4 py-2.5 font-medium">{t("retailer_id")}</th>
               <th className="text-left px-4 py-2.5 font-medium">ACCMGRID</th>
               <th className="text-left px-4 py-2.5 font-medium">HOTSPOTID</th>
-              <th className="text-left px-4 py-2.5 font-medium">{t("statement_period")}</th>
+              <th className="text-left px-4 py-2.5 font-medium">{t("total_paid")}</th>
               <th className="text-left px-4 py-2.5 font-medium">{t("incentive_group")}</th>
               <th className="px-4 py-2.5"></th>
             </tr>
@@ -39,7 +39,11 @@ export default function RetailerTable({ onSelect, records: recs }) {
                 <td className="px-4 py-2.5 font-medium text-slate-800">{getText(r, "RETAILER ID") || "—"}</td>
                 <td className="px-4 py-2.5 text-slate-600">{getText(r, "ACCMGRID") || "—"}</td>
                 <td className="px-4 py-2.5 text-slate-600">{getText(r, "HOTSPOTID") || "—"}</td>
-                <td className="px-4 py-2.5 text-slate-600">{getText(r, "MONTH") || "—"}</td>
+                <td className="px-4 py-2.5 text-slate-600">
+                  {getNumber(r, "TOTAL PAID (SBT+BT+VOU)") === null
+                    ? "—"
+                    : formatCurrency(getNumber(r, "TOTAL PAID (SBT+BT+VOU)"), lang)}
+                </td>
                 <td className="px-4 py-2.5"><IncentiveGroupBadge group={r._incentiveGroup} /></td>
                 <td className="px-4 py-2.5 text-right">
                   <button onClick={() => select(r)} className="inline-flex items-center gap-1 text-xs font-medium text-[#006AE0] hover:underline">
