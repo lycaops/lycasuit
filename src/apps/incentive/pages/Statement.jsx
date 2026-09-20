@@ -24,7 +24,8 @@ export default function Statement() {
       await exportStatementPDF(previewRef.current, id, lang);
     } catch (error) {
       console.error("Statement PDF export failed", error);
-      setExportError("PDF generation failed. Please try again.");
+      const message = error instanceof Error ? error.message : String(error);
+      setExportError(`PDF generation failed: ${message}`);
     } finally {
       setExporting(false);
     }

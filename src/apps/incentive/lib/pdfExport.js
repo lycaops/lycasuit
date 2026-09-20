@@ -35,14 +35,21 @@ export async function exportStatementPDF(container, retailerId, lang) {
 
   let first = true;
   for (const section of sections) {
-    const canvas = await html2canvas(section, {
+    const captureOptions = {
       scale: 2,
       backgroundColor: "#ffffff",
       useCORS: true,
       allowTaint: false,
       logging: false,
       windowWidth: Math.max(DESKTOP_WIDTH, document.documentElement.clientWidth),
-    });
+    };
+    let canvas;
+    try {
+      canvas = await html2canvas(section, { ...captureOptions, foreignObjectRendering: true });
+    } catch (foreignObjectError) {
+      console.warn("Native statement capture failed; retrying canvas capture", foreignObjectError);
+      canvas = await html2canvas(section, captureOptions);
+    }
     const imgData = canvas.toDataURL("image/jpeg", 0.8);
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
