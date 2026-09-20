@@ -11,6 +11,7 @@ import {
   LogOut,
   User as UserIcon,
   Home,
+  Languages,
   Menu,
   X,
   ChevronLeft,
@@ -109,10 +110,12 @@ export default function Layout({ children }) {
           )}
           {showSidebarLabels && (
             <div className="mt-3 border-t border-white/10 px-4 pt-3">
-              <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-white/50">Language</div>
-              <div className="flex gap-2">
-                <button onClick={() => setLang('en')} className={`flex-1 rounded-lg px-2 py-1.5 text-xs font-medium ${lang === 'en' ? 'bg-white text-[#21264e]' : 'bg-white/10 text-white/70 hover:bg-white/15'}`}>EN</button>
-                <button onClick={() => setLang('it')} className={`flex-1 rounded-lg px-2 py-1.5 text-xs font-medium ${lang === 'it' ? 'bg-white text-[#21264e]' : 'bg-white/10 text-white/70 hover:bg-white/15'}`}>IT</button>
+              <div className="flex items-center gap-2 text-white/70" aria-label="Language">
+                <Languages className="h-4 w-4 shrink-0" aria-hidden="true" />
+                <div className="flex items-center rounded-lg border border-white/20 p-0.5">
+                  <button onClick={() => setLang('en')} aria-pressed={lang === 'en'} className={`rounded-md px-2 py-1 text-[11px] font-semibold ${lang === 'en' ? 'bg-white text-[#21264e]' : ''}`}>EN</button>
+                  <button onClick={() => setLang('it')} aria-pressed={lang === 'it'} className={`rounded-md px-2 py-1 text-[11px] font-semibold ${lang === 'it' ? 'bg-white text-[#21264e]' : ''}`}>IT</button>
+                </div>
               </div>
             </div>
           )}
@@ -173,10 +176,12 @@ export default function Layout({ children }) {
                     <p className="truncate text-[11px] text-white/50">{roleLabel}{scopeLabel ? ` · ${scopeLabel}` : ''}</p>
                   </div>
                 </div>
-                <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-white/45">Language</p>
-                <div className="flex gap-2">
-                  <button onClick={() => setLang('en')} className={`flex-1 rounded-lg px-3 py-2 text-sm font-medium ${lang === 'en' ? 'bg-white text-[#21264e]' : 'bg-white/10 text-white/70'}`}>EN</button>
-                  <button onClick={() => setLang('it')} className={`flex-1 rounded-lg px-3 py-2 text-sm font-medium ${lang === 'it' ? 'bg-white text-[#21264e]' : 'bg-white/10 text-white/70'}`}>IT</button>
+                <div className="flex items-center gap-2 text-white/70" aria-label="Language">
+                  <Languages className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  <div className="flex items-center rounded-lg border border-white/20 p-0.5">
+                    <button onClick={() => setLang('en')} aria-pressed={lang === 'en'} className={`rounded-md px-2 py-1 text-[11px] font-semibold ${lang === 'en' ? 'bg-white text-[#21264e]' : ''}`}>EN</button>
+                    <button onClick={() => setLang('it')} aria-pressed={lang === 'it'} className={`rounded-md px-2 py-1 text-[11px] font-semibold ${lang === 'it' ? 'bg-white text-[#21264e]' : ''}`}>IT</button>
+                  </div>
                 </div>
                 <button onClick={() => logout(true)} className="mt-4 flex w-full items-center gap-2 rounded-lg px-1 py-2 text-sm text-white/60 hover:bg-white/10 hover:text-white">
                   <LogOut className="h-4 w-4" />

@@ -9,8 +9,6 @@ import {
   Users,
   UserCircle,
   Languages,
-  Check,
-  ChevronUp,
   Home,
   LogOut,
 } from "lucide-react"
@@ -26,15 +24,8 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
 } from "@/components/ui/sidebar"
 import { useI18n } from "@/lib/i18n/i18n-context"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 const PLATFORM_ADMIN_ROLES = ["SUPER-ADMIN", "HS-ADMIN", "PM-ADMIN", "CS-ADMIN", "COUNTRY-MANAGER", "UK-ADMIN"]
 
 interface SidebarUser {
@@ -48,8 +39,6 @@ interface SidebarUser {
 export function AppSidebar({ user }: { user: SidebarUser }) {
   const pathname = usePathname()
   const { t, language, setLanguage } = useI18n()
-  const { state } = useSidebar()
-  const isCollapsed = state === "collapsed"
 
   const nav = [
     { href: "/home", label: "Back to Home", icon: Home, show: true },
@@ -124,65 +113,13 @@ export function AppSidebar({ user }: { user: SidebarUser }) {
       <SidebarFooter className="border-white/10 bg-[#21264e]">
         <SidebarMenu>
           <SidebarMenuItem>
-            <form action={signOut}>
-              <SidebarMenuButton type="submit" tooltip={t("signOut")}>
-                <LogOut aria-hidden="true" />
-                <span>{t("signOut")}</span>
-              </SidebarMenuButton>
-            </form>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton
-                  size="lg"
-                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                  tooltip={language === "en" ? "Change Language" : "Cambia Lingua"}
-                >
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground group-data-[collapsible=icon]:mx-auto">
-                    <Languages className="h-4 w-4" aria-hidden="true" />
-                  </div>
-                  <div className="flex flex-1 flex-col gap-0.5 overflow-hidden leading-tight group-data-[collapsible=icon]:hidden">
-                    <span className="truncate text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      {language === "en" ? "Language" : "Lingua"}
-                    </span>
-                    <span className="truncate text-sm font-semibold text-sidebar-foreground">
-                      {language === "en" ? "English" : "Italiano"}
-                    </span>
-                  </div>
-                  <ChevronUp className="ml-auto h-4 w-4 text-muted-foreground group-data-[collapsible=icon]:hidden" />
-                  {isCollapsed && (
-                    <div className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#245bc1] text-[8px] font-bold text-white shadow-sm">
-                      {language.toUpperCase()}
-                    </div>
-                  )}
-                </SidebarMenuButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                side={isCollapsed ? "right" : "top"}
-                align={isCollapsed ? "start" : "end"}
-                className="w-[200px]"
-              >
-                <DropdownMenuItem
-                  className="flex items-center justify-between"
-                  onClick={() => setLanguage("en")}
-                >
-                  <span className="flex items-center gap-2">
-                    <span className="text-lg">🇬🇧</span> English
-                  </span>
-                  {language === "en" && <Check className="h-4 w-4" />}
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="flex items-center justify-between"
-                  onClick={() => setLanguage("it")}
-                >
-                  <span className="flex items-center gap-2">
-                    <span className="text-lg">🇮🇹</span> Italiano
-                  </span>
-                  {language === "it" && <Check className="h-4 w-4" />}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="flex items-center gap-2 px-3 py-3 text-white/70" aria-label="Language">
+              <Languages className="h-4 w-4 shrink-0" aria-hidden="true" />
+              <div className="flex items-center rounded-lg border border-white/20 p-0.5">
+                <button type="button" onClick={() => setLanguage("en")} aria-pressed={language === "en"} className={`rounded-md px-2 py-1 text-[11px] font-semibold ${language === "en" ? "bg-white text-[#21264e]" : ""}`}>EN</button>
+                <button type="button" onClick={() => setLanguage("it")} aria-pressed={language === "it"} className={`rounded-md px-2 py-1 text-[11px] font-semibold ${language === "it" ? "bg-white text-[#21264e]" : ""}`}>IT</button>
+              </div>
+            </div>
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" className="pointer-events-none group-data-[collapsible=icon]:!p-0 group-data-[collapsible=icon]:justify-center">
@@ -204,6 +141,14 @@ export function AppSidebar({ user }: { user: SidebarUser }) {
                 </span>
               </div>
             </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <form action={signOut}>
+              <SidebarMenuButton type="submit" tooltip={t("signOut")}>
+                <LogOut aria-hidden="true" />
+                <span>{t("signOut")}</span>
+              </SidebarMenuButton>
+            </form>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
