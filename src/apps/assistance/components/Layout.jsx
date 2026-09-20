@@ -62,18 +62,6 @@ export default function Layout({ children }) {
         </div>
       </div>
 
-      {showSidebarLabels && <div className="px-4 py-4 border-b border-white/10">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-[#245bc1] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-            {currentUser?.full_name?.charAt(0)?.toUpperCase() || 'U'}
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-white text-sm font-medium truncate">{currentUser?.full_name}</p>
-            <p className="text-white/50 text-xs truncate">{currentUser?.role} · {currentUser?.territory}</p>
-          </div>
-        </div>
-      </div>}
-
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
         <a
           href="/home"
@@ -103,7 +91,18 @@ export default function Layout({ children }) {
       })}
       </nav>
 
-      <div className="px-3 pb-4">
+      <div className="mt-auto px-3 pb-4">
+        {showSidebarLabels && <div className="border-t border-white/10 px-1 py-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-[#245bc1] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+              {currentUser?.full_name?.charAt(0)?.toUpperCase() || 'U'}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-white text-sm font-medium truncate">{currentUser?.full_name}</p>
+              <p className="text-white/50 text-xs truncate">{currentUser?.role} · {currentUser?.territory}</p>
+            </div>
+          </div>
+        </div>}
         {showSidebarLabels && <div className="px-3 py-3 mb-2 border-t border-white/10">
           <LanguageSwitcher compact />
         </div>}
@@ -135,9 +134,7 @@ export default function Layout({ children }) {
       {/* Mobile Top Bar */}
       <header className="lg:hidden fixed top-0 inset-x-0 bg-foreground z-30 px-4 h-[calc(3.5rem+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)] flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center p-0.5">
-            <img src="/lmac.png" alt="Lyca Market Assistance Center" className="w-full h-full object-contain" />
-          </div>
+          <img src="/lmac.png" alt="Lyca Market Assistance Center" className="h-8 w-8 object-contain" />
           <span className="text-white font-bold text-sm">{t('marketAssistanceCenter')}</span>
         </div>
         <button
