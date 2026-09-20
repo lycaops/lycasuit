@@ -18,29 +18,50 @@ function waitForImages(container) {
   );
 }
 
-function normalizeCaptureStyles(clonedDocument) {
-  const root = clonedDocument.body.firstElementChild;
-  if (!root) return;
-
-  const elements = [root, ...root.querySelectorAll("*")];
-  for (const element of elements) {
-    const computed = clonedDocument.defaultView.getComputedStyle(element);
-    for (let index = 0; index < computed.length; index += 1) {
-      const property = computed[index];
-      if (property.startsWith("--")) continue;
-      const value = computed.getPropertyValue(property);
-      if (!value) continue;
-      if (/okl(ab|ch)|color-mix/i.test(value)) {
-        element.style.removeProperty(property);
-        continue;
-      }
-      element.style.setProperty(property, value);
-    }
+function copyComputedStyles(source, target) {
+  const computed = window.getComputedStyle(source);
+  for (let index = 0; index < computed.length; index += 1) {
+    const property = computed[index];
+    if (property.startsWith("--")) continue;
+    const value = computed.getPropertyValue(property);
+    if (!value || /okl(ab|ch)|color-mix/i.test(value)) continue;
+    target.style.setProperty(property, value);
   }
 
-  // html2canvas parses stylesheet text itself and does not support oklab/oklch.
-  // Computed declarations above preserve the rendered appearance without those rules.
-  clonedDocument.querySelectorAll("style, link[rel='stylesheet']").forEach((node) => node.remove());
+  const sourceChildren = source.children;
+  const targetChildren = target.children;
+  for (let index = 0; index < sourceChildren.length; index += 1) {
+    copyComputedStyles(sourceChildren[index], targetChildren[index]);
+  }
+}
+
+async function createCaptureDocument(container) {
+  const iframe = document.createElement("iframe");
+  iframe.setAttribute("aria-hidden", "true");
+  iframe.style.position = "fixed";
+  iframe.style.left = "-100000px";
+  iframe.style.top = "0";
+  iframe.style.width = `${Math.max(DESKTOP_WIDTH, container.getBoundingClientRect().width)}px`;
+  iframe.style.height = "1px";
+  iframe.style.border = "0";
+  document.body.appendChild(iframe);
+
+  const captureDocument = iframe.contentDocument;
+  captureDocument.open();
+  captureDocument.write("<!doctype html><html><head></head><body></body></html>");
+  captureDocument.close();
+  captureDocument.body.style.margin = "0";
+  captureDocument.body.style.padding = "0";
+  captureDocument.body.style.background = "#ffffff";
+
+  const clone = container.cloneNode(true);
+  clone.style.width = "100%";
+  copyComputedStyles(container, clone);
+  captureDocument.body.appendChild(clone);
+  iframe.style.height = `${Math.max(clone.scrollHeight, 1)}px`;
+  await waitForImages(clone);
+
+  return { iframe, captureDocument, clone };
 }
 
 function addCanvasToPdf(pdf, canvas, pageWidth, margin, usableHeight, firstPage) {
@@ -92,18 +113,23 @@ export async function exportStatementPDF(container, retailerId, lang) {
   if (document.fonts?.ready) await document.fonts.ready;
   await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
-  const scale = Math.min(2, 30000 / Math.max(container.scrollWidth, container.scrollHeight, 1));
-  const canvas = await html2canvas(container, {
-    scale,
-    backgroundColor: "#ffffff",
-    useCORS: true,
-    allowTaint: false,
-    logging: false,
-    windowWidth: Math.max(DESKTOP_WIDTH, document.documentElement.clientWidth),
-    onclone: normalizeCaptureStyles,
-  });
-  if (!canvas.width || !canvas.height) throw new Error("Statement rendered empty");
-  addCanvasToPdf(pdf, canvas, pageWidth, margin, usableHeight, true);
+  const { iframe, captureDocument, clone } = await createCaptureDocument(container);
+  try {
+    const scale = Math.min(2, 30000 / Math.max(clone.scrollWidth, clone.scrollHeight, 1));
+    const canvas = await html2canvas(clone, {
+      scale,
+      backgroundColor: "#ffffff",
+      useCORS: true,
+      allowTaint: false,
+      logging: false,
+      windowWidth: Math.max(DESKTOP_WIDTH, clone.clientWidth),
+    });
+    if (!canvas.width || !canvas.height) throw new Error("Statement rendered empty");
+    addCanvasToPdf(pdf, canvas, pageWidth, margin, usableHeight, true);
+  } finally {
+    captureDocument.body.replaceChildren();
+    iframe.remove();
+  }
 
   // Page numbers
   const totalPages = pdf.internal.getNumberOfPages();
