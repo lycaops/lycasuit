@@ -794,13 +794,13 @@ export default function Dashboard() {
         {/* Mobile Close Button */}
         <button 
           onClick={() => setMobileMenuOpen(false)}
-          className="md:hidden absolute top-4 right-4 p-2 text-white/60 hover:text-white"
+          className="md:hidden absolute right-4 top-[calc(env(safe-area-inset-top)+1rem)] p-2 text-white/60 hover:text-white"
         >
           <X size={20} />
         </button>
 
         {/* Logo */}
-        <div className={`px-4 py-4 border-b border-white/10 flex items-center gap-3 ${sidebarCollapsed && !mobileMenuOpen ? 'justify-center' : 'justify-start'}`}>
+        <div className={`px-4 pb-4 pt-[calc(1rem+env(safe-area-inset-top))] md:py-4 border-b border-white/10 flex items-center gap-3 ${sidebarCollapsed && !mobileMenuOpen ? 'justify-center' : 'justify-start'}`}>
           <img
             src={sidebarCollapsed && !mobileMenuOpen 
               ? "https://cms-assets.ldsvcplatform.com/IT/s3fs-public/2023-09/MicrosoftTeams-image%20%2813%29.png"

@@ -154,8 +154,8 @@ export default function Layout({ children }) {
         {mobileNavOpen && (
           <div className="fixed inset-0 z-[80] flex md:hidden">
             <div className="absolute inset-0 bg-black/50" onClick={closeMobileNav} />
-            <aside className="relative flex w-72 max-w-[82%] flex-col bg-[#21264e] text-white shadow-2xl">
-              <button onClick={closeMobileNav} aria-label="Close navigation" className="absolute right-3 top-3 z-10 rounded-lg p-1.5 text-white/60 hover:bg-white/10 hover:text-white">
+            <aside className="relative flex w-72 max-w-[82%] flex-col bg-[#21264e] pt-[env(safe-area-inset-top)] text-white shadow-2xl">
+              <button onClick={closeMobileNav} aria-label="Close navigation" className="absolute right-3 top-[calc(env(safe-area-inset-top)+0.75rem)] z-10 rounded-lg p-1.5 text-white/60 hover:bg-white/10 hover:text-white">
                 <X className="h-5 w-5" />
               </button>
               <div className="flex items-center gap-3 border-b border-white/10 px-4 py-4">

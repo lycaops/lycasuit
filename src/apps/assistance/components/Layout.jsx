@@ -133,7 +133,7 @@ export default function Layout({ children }) {
       </aside>
 
       {/* Mobile Top Bar */}
-      <header className="lg:hidden fixed top-0 inset-x-0 bg-foreground z-30 px-4 h-14 flex items-center justify-between">
+      <header className="lg:hidden fixed top-0 inset-x-0 bg-foreground z-30 px-4 h-[calc(3.5rem+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)] flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center p-0.5">
             <img src="/lmac.png" alt="Lyca Market Assistance Center" className="w-full h-full object-contain" />
