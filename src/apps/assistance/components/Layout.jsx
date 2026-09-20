@@ -152,10 +152,10 @@ export default function Layout({ children }) {
       {mobileNavOpen &&
       <div className="lg:hidden fixed inset-0 z-50 flex">
           <div className="absolute inset-0 bg-black/50" onClick={() => setMobileNavOpen(false)} />
-          <aside className="relative w-72 max-w-[80%] bg-foreground flex flex-col">
+          <aside className="relative w-72 max-w-[80%] bg-foreground flex flex-col pt-[env(safe-area-inset-top)]">
             <button
             onClick={() => setMobileNavOpen(false)}
-            className="absolute top-3 right-3 text-white/60 p-1.5 rounded-lg hover:bg-white/10 z-10">
+            className="absolute right-3 top-[calc(env(safe-area-inset-top)+0.75rem)] text-white/60 p-1.5 rounded-lg hover:bg-white/10 z-10">
             
               <X className="w-5 h-5" />
             </button>

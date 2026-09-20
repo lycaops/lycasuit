@@ -944,25 +944,24 @@ export default function Dashboard() {
 
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Mobile Logo Stripe */}
-        <div className="md:hidden bg-[#21264E] py-2 flex justify-center items-center flex-shrink-0">
-          <img 
-            src="https://cms-assets.ldsvcplatform.com/IT/s3fs-public/inline-images/logo_new1.png" 
-            alt="Lyca Group" 
-            className="h-8 object-contain"
-          />
-        </div>
-
-        {/* Top Bar */}
-        <header className="bg-white border-b border-gray-200 px-4 py-3 flex flex-col md:flex-row md:flex-wrap md:items-center gap-2 md:gap-4 flex-shrink-0">
-          {/* Mobile Sidebar Toggle */}
-          <button 
+        {/* Mobile Top Bar */}
+        <div className="h-14 shrink-0 md:hidden" />
+        <header className="fixed inset-x-0 top-0 z-40 flex h-[calc(3.5rem+env(safe-area-inset-top))] items-center justify-between bg-[#21264E] px-4 pt-[env(safe-area-inset-top)] md:hidden">
+          <div className="flex items-center gap-2">
+            <img src="/lops_w.svg" alt="LycaOps" className="h-7 w-auto" />
+            <span className="text-sm font-bold text-white">Field IQ</span>
+          </div>
+          <button
             onClick={() => setMobileMenuOpen(true)}
-            className="md:hidden p-2 text-[#21264E] hover:bg-gray-100 rounded-lg self-start"
+            aria-label="Open navigation"
+            className="rounded-lg p-1.5 text-white hover:bg-white/10"
           >
             <Menu size={20} />
           </button>
+        </header>
 
+        {/* Top Bar */}
+        <header className="bg-white border-b border-gray-200 px-4 py-3 flex flex-col md:flex-row md:flex-wrap md:items-center gap-2 md:gap-4 flex-shrink-0">
           {/* DASHBOARD - Branch selector */}
           {view === VIEWS.DASHBOARD && (
             <div className="w-full md:w-auto flex items-center gap-2">

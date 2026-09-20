@@ -17,7 +17,7 @@ export function DashboardHeader({ user }: { user: DashboardUser }) {
   const { t } = useI18n()
   
   return (
-    <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b bg-background/80 px-4 backdrop-blur md:px-6">
+    <header className="fixed inset-x-0 top-0 z-40 flex h-[calc(3.5rem+env(safe-area-inset-top))] items-center gap-3 border-b bg-background/80 px-4 pt-[env(safe-area-inset-top)] backdrop-blur md:static md:z-10 md:h-14 md:px-6 md:pt-0">
       <SidebarTrigger />
       <img src="/lops.svg" alt="LycaOps" className="h-7 w-auto md:hidden" />
       <Separator orientation="vertical" className="h-6" />
