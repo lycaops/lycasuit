@@ -1,7 +1,9 @@
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { Inter, JetBrains_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Toaster } from "@/components/ui/sonner"
+import { InstallButton } from "@/components/pwa/install-button"
+import { PwaRegister } from "@/components/pwa/pwa-register"
 import { I18nProvider } from "@/lib/i18n/i18n-context"
 import "./globals.css"
 
@@ -12,9 +14,26 @@ export const metadata: Metadata = {
   title: "LycaOps",
   description:
     "Field IQ, Retailer Contracts, Incentive Statements and Market Assistance for Lycamobile Italy, behind a single login.",
+  manifest: "/manifest.webmanifest",
   icons: {
-    icon: "https://cms-assets.ldsvcplatform.com/IT/s3fs-public/2023-09/MicrosoftTeams-image%20%2813%29.png",
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico" },
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16.png", sizes: "16x16", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
   },
+  appleWebApp: {
+    capable: true,
+    title: "LycaOps",
+    statusBarStyle: "black-translucent",
+  },
+}
+
+export const viewport: Viewport = {
+  themeColor: "#152253",
+  viewportFit: "cover",
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -23,6 +42,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className="font-sans antialiased bg-background text-foreground">
         <I18nProvider>
           {children}
+          <PwaRegister />
+          <InstallButton />
           <Toaster richColors position="top-right" />
           {process.env.NODE_ENV === "production" && <Analytics />}
         </I18nProvider>

@@ -9,9 +9,9 @@ export const config = {
   matcher: [
     /*
      * Match all request paths except:
-     * - _next/static, _next/image, favicon.ico, image files
+     * - public PWA assets and all _next files
      * - /api routes (handle auth inside)
      */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next|manifest\\.webmanifest|sw\\.js|offline(?:/|$)|icons(?:/|$)|apple-touch-icon\\.png|favicon[^/]*$).*)",
   ],
 }
