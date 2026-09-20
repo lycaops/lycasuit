@@ -61,8 +61,8 @@ export function DashboardContent({ user, counts, recentRows }: DashboardContentP
   return (
     <div className="flex flex-col gap-5">
       <section className="relative overflow-hidden rounded-2xl bg-[#21264e] px-5 py-6 text-white shadow-[0_16px_40px_rgba(33,38,78,0.16)] sm:px-7 sm:py-7">
-        <img src="/h1.svg" alt="" aria-hidden="true" className="pointer-events-none absolute -right-12 -top-6 h-32 w-32 opacity-20" />
-        <img src="/h2.svg" alt="" aria-hidden="true" className="pointer-events-none absolute right-4 top-8 h-32 w-32 opacity-[.15]" />
+        <img src="/h1.svg" alt="" aria-hidden="true" className="pointer-events-none absolute -right-16 -top-10 h-48 w-48 opacity-20 sm:h-56 sm:w-56" />
+        <img src="/h2.svg" alt="" aria-hidden="true" className="pointer-events-none absolute right-0 top-6 h-48 w-48 opacity-[.15] sm:h-56 sm:w-56" />
         <div className="relative z-10 max-w-2xl">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#08dc7d]">Retailer contracts</p>
           <h1 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">

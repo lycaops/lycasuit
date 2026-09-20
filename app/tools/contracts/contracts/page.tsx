@@ -60,7 +60,7 @@ export default async function ContractsPage() {
         </Button>
       </div>
 
-      <Card>
+      <Card className="border-[#21264e]/10">
         <CardHeader>
           <CardTitle>All contracts</CardTitle>
           <CardDescription>

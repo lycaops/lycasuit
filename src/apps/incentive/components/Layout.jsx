@@ -102,7 +102,6 @@ export default function Layout({ children }) {
               <p className="truncate text-[11px] text-white/50">{roleLabel}{scopeLabel ? ` · ${scopeLabel}` : ''}</p>
             </div>
           </div>
-          {showSidebarLabels && <div className="px-4 py-1 text-xs text-white/50">{t('appSubtitle')}</div>}
           {showSidebarLabels && profile?.branch_name && (
             <div className="px-4 py-1 text-[11px] text-white/50 truncate">
               {scopeLabel}
@@ -138,7 +137,7 @@ export default function Layout({ children }) {
         <div className="h-14 shrink-0 md:hidden" />
         <header className="fixed inset-x-0 top-0 z-40 h-[calc(3.5rem+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)] bg-[#21264e] md:static md:h-16 md:pt-0 md:bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-8 shrink-0">
           <div className="flex items-center gap-2">
-            <img src="/lops_w.svg" alt="LycaOps" className="h-8 w-auto object-contain md:hidden" />
+            <img src="/statement.png" alt="Incentive Statement" className="h-8 w-8 object-contain md:hidden" />
             <h1 className="text-sm font-bold text-white md:text-lg md:text-slate-800">{t('appTitle')}</h1>
           </div>
           <div className="flex items-center gap-3">

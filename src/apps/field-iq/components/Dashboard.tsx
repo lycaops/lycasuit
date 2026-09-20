@@ -948,7 +948,7 @@ export default function Dashboard() {
         <div className="h-14 shrink-0 md:hidden" />
         <header className="fixed inset-x-0 top-0 z-40 flex h-[calc(3.5rem+env(safe-area-inset-top))] items-center justify-between bg-[#21264E] px-4 pt-[env(safe-area-inset-top)] md:hidden">
           <div className="flex items-center gap-2">
-            <img src="/lops_w.svg" alt="LycaOps" className="h-7 w-auto" />
+            <img src="/fiq.png" alt="Field IQ" className="h-8 w-8 object-contain" />
             <span className="text-sm font-bold text-white">Field IQ</span>
           </div>
           <button
