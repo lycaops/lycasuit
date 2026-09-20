@@ -54,7 +54,7 @@ export function HomeContent({
     <main className="min-h-dvh bg-[#f4f7fb] pb-16 lg:flex lg:h-dvh lg:overflow-hidden lg:pb-0">
       <div className="h-14 shrink-0 lg:hidden" />
       <header className="fixed inset-x-0 top-0 z-40 flex h-[calc(3.5rem+env(safe-area-inset-top))] items-center justify-between bg-[#21264e] px-4 pt-[env(safe-area-inset-top)] lg:hidden">
-        <img src="/lops_w.svg" alt="LycaOps" className="h-7 w-auto object-contain" />
+        <img src="/lops_w.svg" alt="LycaOps" className="h-8 w-auto object-contain" />
         <button
           type="button"
           onClick={() => setMobileSidebarOpen(true)}
@@ -76,8 +76,8 @@ export function HomeContent({
             >
               <X className="h-5 w-5" />
             </button>
-            <div className="flex w-full justify-center">
-              <img src="/lops.svg" alt="LycaOps" className="relative h-auto w-44 rounded-md bg-white px-3 py-2" />
+            <div className="flex w-full justify-start">
+              <img src="/lops_w.svg" alt="LycaOps" className="relative h-auto w-44 object-contain" />
             </div>
             <nav className="mt-8 flex min-h-0 flex-1 flex-col gap-1 overflow-y-hidden">
               <Link href="/home" onClick={() => setMobileSidebarOpen(false)} className="flex items-center gap-3 rounded-lg bg-white/10 px-3 py-2.5 text-sm font-medium text-white">

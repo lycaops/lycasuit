@@ -85,7 +85,10 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-6">
       {/* Welcome Header */}
-      <div className="bg-gradient-to-br from-foreground to-foreground rounded-2xl p-5 sm:p-6 text-white shadow-lg shadow-foreground/10">
+      <div className="relative overflow-hidden bg-gradient-to-br from-foreground to-foreground rounded-2xl p-5 sm:p-6 text-white shadow-lg shadow-foreground/10">
+        <img src="/h1.svg" alt="" aria-hidden="true" className="pointer-events-none absolute -right-24 -top-10 h-48 w-48 opacity-20 sm:h-56 sm:w-56" />
+        <img src="/h2.svg" alt="" aria-hidden="true" className="pointer-events-none absolute right-5 top-6 h-48 w-48 opacity-[.15] sm:h-56 sm:w-56" />
+        <div className="relative z-10">
         <p className="text-accent text-sm font-medium mb-1">{t('Welcome back')}</p>
         <h1 data-language-controlled className="text-2xl sm:text-3xl font-bold mb-1">
           {language === 'it' ? 'Ciao' : 'Hello'}, {currentUser?.full_name}
@@ -100,6 +103,7 @@ export default function AdminDashboard() {
           <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/10">
             {currentUser?.territory}
           </span>
+        </div>
         </div>
       </div>
 
