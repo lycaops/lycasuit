@@ -18,6 +18,27 @@ function waitForImages(container) {
   );
 }
 
+function normalizeCaptureStyles(clonedDocument) {
+  const root = clonedDocument.body.firstElementChild;
+  if (!root) return;
+
+  const elements = [root, ...root.querySelectorAll("*")];
+  for (const element of elements) {
+    const computed = clonedDocument.defaultView.getComputedStyle(element);
+    for (let index = 0; index < computed.length; index += 1) {
+      const property = computed[index];
+      if (property.startsWith("--")) continue;
+      const value = computed.getPropertyValue(property);
+      if (!value || /okl(ab|ch)|color-mix/i.test(value)) continue;
+      element.style.setProperty(property, value);
+    }
+  }
+
+  // html2canvas parses stylesheet text itself and does not support oklab/oklch.
+  // Computed declarations above preserve the rendered appearance without those rules.
+  clonedDocument.querySelectorAll("style, link[rel='stylesheet']").forEach((node) => node.remove());
+}
+
 function addCanvasToPdf(pdf, canvas, pageWidth, margin, usableHeight, firstPage) {
   const imageWidth = pageWidth - margin * 2;
   const pageSliceHeight = Math.max(1, Math.floor((canvas.width * usableHeight) / imageWidth));
@@ -79,6 +100,7 @@ export async function exportStatementPDF(container, retailerId, lang) {
       allowTaint: false,
       logging: false,
       windowWidth: Math.max(DESKTOP_WIDTH, document.documentElement.clientWidth),
+      onclone: normalizeCaptureStyles,
     };
     const canvas = await html2canvas(section, captureOptions);
     if (!canvas.width || !canvas.height) throw new Error("Statement section rendered empty");
