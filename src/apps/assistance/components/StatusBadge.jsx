@@ -4,7 +4,7 @@ import React from 'react';
 const STATUS_STYLES = {
   'Open': { backgroundColor: '#245bc1', color: '#ffffff', borderColor: '#7fa8ef' },
   'In Progress': { backgroundColor: '#0369a1', color: '#ffffff', borderColor: '#38bdf8' },
-  'Pending': { backgroundColor: '#b45309', color: '#ffffff', borderColor: '#fbbf24' },
+  'Pending': { backgroundColor: '#75653a', color: '#ffffff', borderColor: '#b9a66a' },
   'Completed': { backgroundColor: '#15803d', color: '#ffffff', borderColor: '#4ade80' },
   'Resolved': { backgroundColor: '#15803d', color: '#ffffff', borderColor: '#4ade80' },
   'Closed': { backgroundColor: '#475569', color: '#ffffff', borderColor: '#94a3b8' },
