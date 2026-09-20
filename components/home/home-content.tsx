@@ -110,13 +110,15 @@ export function HomeContent({
                   const Icon = ICONS[tool.icon ?? ""] ?? LayoutGrid
                   const accent = tool.accent_color ?? "#245BC1"
                   return (
-                    <ToolLink key={tool.key} tool={tool} className="group relative flex min-h-[210px] flex-col overflow-hidden rounded-[1.75rem] bg-white p-5 shadow-[0_10px_30px_rgba(33,38,78,0.07)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_18px_36px_rgba(33,38,78,0.13)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#245BC1] sm:min-h-[230px] sm:p-6">
+                    <ToolLink key={tool.key} tool={tool} className="group relative flex min-h-[190px] flex-col overflow-hidden rounded-[1.75rem] bg-white p-5 shadow-[0_10px_30px_rgba(33,38,78,0.07)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_18px_36px_rgba(33,38,78,0.13)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#245BC1] sm:min-h-[205px] sm:p-6">
                       <span aria-hidden className="absolute right-0 top-0 h-1.5 w-24 rounded-bl-full" style={{ backgroundColor: accent }} />
                       <div className="flex items-start justify-between gap-4">
-                        <div className="pt-1"><h2 className="text-xl font-semibold leading-tight tracking-tight text-[#21264E] sm:text-2xl">{TOOL_LABELS[tool.key] ? t(TOOL_LABELS[tool.key]) : tool.name}</h2></div>
-                        <div className="flex h-[78px] w-[92px] shrink-0 items-center justify-center p-1 sm:h-[94px] sm:w-[112px]">{LOGOS[tool.key] ? <img src={LOGOS[tool.key] as string} alt="" className="h-full w-full object-contain" /> : <Icon className="h-9 w-9" style={{ color: accent }} />}</div>
+                        <div className="min-w-0 flex-1 pt-1">
+                          <h2 className="text-xl font-semibold leading-tight tracking-tight text-[#21264E] sm:text-2xl">{TOOL_LABELS[tool.key] ? t(TOOL_LABELS[tool.key]) : tool.name}</h2>
+                          <p className="mt-4 max-w-sm text-sm leading-relaxed text-[#21264E]/65">{tool.description}</p>
+                        </div>
+                        <div className="flex h-[64px] w-[78px] shrink-0 items-center justify-center p-0 sm:h-[78px] sm:w-[96px]">{LOGOS[tool.key] ? <img src={LOGOS[tool.key] as string} alt="" className="h-full w-full object-contain" /> : <Icon className="h-9 w-9" style={{ color: accent }} />}</div>
                       </div>
-                      <p className="mt-3 max-w-sm text-sm leading-relaxed text-[#21264E]/65 sm:mt-4">{tool.description}</p>
                       <div className="mt-auto flex items-center justify-between border-t border-[#21264E]/10 pt-4"><span className="text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: accent }}>{t("openTool")}</span><span className="flex h-9 w-9 items-center justify-center rounded-full transition group-hover:translate-x-0.5" style={{ backgroundColor: `${accent}18`, color: accent }}><ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" /></span></div>
                     </ToolLink>
                   )

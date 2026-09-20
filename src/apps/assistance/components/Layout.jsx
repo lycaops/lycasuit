@@ -52,7 +52,7 @@ export default function Layout({ children }) {
   <div className="flex flex-col h-full">
       <div className={`px-4 py-4 border-b border-white/10 flex items-center gap-3 ${sidebarCollapsed && !mobileNavOpen ? 'justify-center' : 'justify-start'}`}>
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-white">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0">
             <img src="/lmac.png" alt="Lyca Market Assistance Center" className="w-9 h-9 object-contain" />
           </div>
           {showSidebarLabels && <div className="min-w-0">

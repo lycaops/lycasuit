@@ -59,12 +59,10 @@ export default function Layout({ children }) {
         style={{ backgroundColor: '#21264e' }}
       >
         <div className={`px-4 py-4 border-b border-white/10 flex items-center ${sidebarCollapsed ? 'justify-center' : 'justify-start'}`}>
-          <img
-            src="/logo.png"
-            alt="Logo"
-            crossOrigin="anonymous"
-            className={sidebarCollapsed ? 'h-8 w-8 object-contain' : 'h-8'}
-          />
+          <div className="flex min-w-0 items-center gap-2">
+            <img src="/statement.png" alt="Incentive Statement" className={sidebarCollapsed ? 'h-8 w-8 object-contain' : 'h-8 w-8 object-contain'} />
+            {!sidebarCollapsed && <span className="truncate text-sm font-semibold text-white">Incentive Statement</span>}
+          </div>
         </div>
         <nav className="flex-1 px-3 py-4 space-y-1">
           <button
@@ -155,9 +153,9 @@ export default function Layout({ children }) {
                 <X className="h-5 w-5" />
               </button>
               <div className="flex items-center gap-3 border-b border-white/10 px-4 py-4">
-                <img src="/lops_w.svg" alt="LycaOps" className="h-8 w-auto object-contain" />
+                <img src="/statement.png" alt="Incentive Statement" className="h-8 w-8 object-contain" />
                 <div>
-                  <p className="text-sm font-bold text-white">Retailer Statement</p>
+                  <p className="text-sm font-bold text-white">Incentive Statement</p>
                   <p className="text-xs text-white/50">LycaMobile Italy</p>
                 </div>
               </div>
