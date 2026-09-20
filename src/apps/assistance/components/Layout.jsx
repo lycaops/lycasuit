@@ -62,7 +62,7 @@ export default function Layout({ children }) {
         </div>
       </div>
 
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+      <nav className="min-h-0 flex-1 px-3 py-4 space-y-1 overflow-y-hidden">
         <a
           href="/home"
           onClick={() => setMobileNavOpen(false)}
@@ -91,7 +91,7 @@ export default function Layout({ children }) {
       })}
       </nav>
 
-      <div className="mt-auto px-3 pb-4">
+      <div className="mt-auto shrink-0 px-3 pb-4">
         {showSidebarLabels && <div className="border-t border-white/10 px-1 py-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-[#245bc1] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">

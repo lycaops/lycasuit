@@ -161,11 +161,11 @@ export default function Layout({ children }) {
                   <p className="text-sm font-bold text-white">Incentive Statement</p>
                 </div>
               </div>
-              <nav className="flex-1 space-y-1 px-3 py-4">
+              <nav className="min-h-0 flex-1 space-y-1 overflow-y-hidden px-3 py-4">
                 <button onClick={() => { window.location.href = '/home'; }} className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-white/60 hover:bg-white/10 hover:text-white"><Home className="h-5 w-5" />Back to Home</button>
                 {navItems.map((item) => { const Icon = item.icon; return <button key={item.to} onClick={() => { navigate(item.to); closeMobileNav(); }} className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium ${location.pathname === item.to ? 'bg-white/15 text-white' : 'text-white/60 hover:bg-white/10 hover:text-white'}`}><Icon className="h-5 w-5" />{item.label}</button> })}
               </nav>
-              <div className="border-t border-white/10 px-4 py-4">
+              <div className="shrink-0 border-t border-white/10 px-4 py-4">
                 <div className="mb-3 flex items-center gap-2">
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/20 text-white">
                     <UserIcon className="h-4 w-4" />

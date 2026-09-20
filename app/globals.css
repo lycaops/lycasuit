@@ -261,6 +261,6 @@
   position: fixed; inset: 0; z-index: 1000;
   width: 100vw; height: 100dvh; min-height: 100dvh;
   display: grid; place-items: center;
-  background: var(--lo-screen-bg, #fff);
+  background: var(--lo-screen-bg, #f4f7fb);
 }
 /* ===== end LycaOps loader ===== */

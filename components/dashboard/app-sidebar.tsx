@@ -82,7 +82,7 @@ export function AppSidebar({ user }: { user: SidebarUser }) {
         </SidebarMenu>
       </SidebarHeader>
 
-      <SidebarContent className="bg-[#21264e]">
+      <SidebarContent className="min-h-0 bg-[#21264e]">
         <SidebarGroup>
           <SidebarGroupLabel className="text-white/40 group-data-[collapsible=icon]:hidden">{t("workspace")}</SidebarGroupLabel>
           <SidebarGroupContent>
@@ -110,7 +110,7 @@ export function AppSidebar({ user }: { user: SidebarUser }) {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-white/10 bg-[#21264e]">
+      <SidebarFooter className="shrink-0 border-white/10 bg-[#21264e]">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" className="pointer-events-none group-data-[collapsible=icon]:!p-0 group-data-[collapsible=icon]:justify-center">
