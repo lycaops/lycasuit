@@ -72,11 +72,35 @@ function restoreStatementPalette(target) {
     if (classes.includes("border-slate-100")) {
       element.style.setProperty("border-color", "#f1f5f9");
     }
+    if (classes.includes("border-white/10")) {
+      element.style.setProperty("border-color", "rgba(255, 255, 255, 0.1)");
+    }
+    if (classes.includes("border-emerald-100")) {
+      element.style.setProperty("border-color", "#d1fae5");
+    }
+    if (classes.includes("border-emerald-200")) {
+      element.style.setProperty("border-color", "#a7f3d0");
+    }
+    if (classes.includes("border-amber-200")) {
+      element.style.setProperty("border-color", "#fde68a");
+    }
     if (classes.includes("bg-slate-50")) {
       element.style.setProperty("background-color", "#f8fafc");
     }
     if (classes.includes("bg-slate-200")) {
       element.style.setProperty("background-color", "#e2e8f0");
+    }
+    if (classes.includes("bg-emerald-50/50")) {
+      element.style.setProperty("background-color", "rgba(236, 253, 245, 0.5)");
+    }
+    if (classes.includes("text-emerald-600")) {
+      element.style.setProperty("color", "#059669");
+    }
+    if (classes.includes("text-emerald-700")) {
+      element.style.setProperty("color", "#047857");
+    }
+    if (classes.includes("text-slate-600")) {
+      element.style.setProperty("color", "#475569");
     }
     if (classes.includes("text-white/70")) {
       element.style.setProperty("color", "rgba(255, 255, 255, 0.7)");
@@ -99,6 +123,20 @@ function restoreStatementPalette(target) {
     }
     if (classes.includes("text-sm") && (classes.includes("font-medium") || classes.includes("font-bold"))) {
       element.style.setProperty("line-height", "1.25rem");
+    }
+    if (classes.includes("uppercase")) {
+      element.style.setProperty("word-spacing", "0.12em");
+      element.style.setProperty("white-space", "normal");
+    }
+    if (classes.includes("text-lg") || classes.includes("text-xl") || classes.includes("text-2xl")) {
+      element.style.setProperty("display", "block");
+      element.style.setProperty("white-space", "nowrap");
+      element.style.setProperty("word-break", "keep-all");
+    }
+    if (classes.includes("grid-cols-3")) {
+      element.style.setProperty("grid-template-columns", "repeat(3, minmax(0, 1fr))");
+    } else if (classes.includes("grid-cols-2")) {
+      element.style.setProperty("grid-template-columns", "repeat(2, minmax(0, 1fr))");
     }
   });
 }
