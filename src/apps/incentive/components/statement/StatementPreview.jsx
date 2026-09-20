@@ -87,7 +87,7 @@ const StatementPreview = forwardRef(({ row }, ref) => {
           </div>
           <div className="mt-4 pt-4 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2">
             <p className="text-xs text-slate-400">{t("footer_support")}: <span className="text-[#006AE0] font-medium">{t("footer_email")}</span></p>
-            <img src="/logo.png" alt="Logo" className="h-6" />
+            <img src="/logo_b.webp" alt="Logo" className="h-6" />
           </div>
         </div>
       </div>

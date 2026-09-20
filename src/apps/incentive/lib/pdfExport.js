@@ -75,6 +75,31 @@ function restoreStatementPalette(target) {
     if (classes.includes("bg-slate-50")) {
       element.style.setProperty("background-color", "#f8fafc");
     }
+    if (classes.includes("bg-slate-200")) {
+      element.style.setProperty("background-color", "#e2e8f0");
+    }
+    if (classes.includes("text-white/70")) {
+      element.style.setProperty("color", "rgba(255, 255, 255, 0.7)");
+    }
+    if (classes.includes("text-white/90")) {
+      element.style.setProperty("color", "rgba(255, 255, 255, 0.9)");
+    }
+    if (classes.includes("text-slate-500")) {
+      element.style.setProperty("color", "#64748b");
+    }
+    if (classes.includes("text-slate-700")) {
+      element.style.setProperty("color", "#334155");
+    }
+    if (classes.includes("text-slate-800")) {
+      element.style.setProperty("color", "#1e293b");
+    }
+    if (classes.includes("text-right") && classes.includes("font-semibold")) {
+      element.style.setProperty("white-space", "nowrap");
+      element.style.setProperty("word-break", "keep-all");
+    }
+    if (classes.includes("text-sm") && (classes.includes("font-medium") || classes.includes("font-bold"))) {
+      element.style.setProperty("line-height", "1.25rem");
+    }
   });
 }
 
