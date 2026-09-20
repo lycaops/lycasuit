@@ -42,10 +42,10 @@ const StatementPreview = forwardRef(({ row }, ref) => {
           </div>
         </div>
         <div className="px-8 py-6 max-w-5xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-2">
+          <div className="statement-meta-grid mb-2 grid grid-cols-2 gap-2 md:grid-cols-5">
             <InfoBlock label={t("retailer_id")} value={statement.retailerId} />
-            <InfoBlock label="ACCMGRID" value={statement.accmgId} />
-            <InfoBlock label="HOTSPOTID" value={statement.hotspotId} />
+            <InfoBlock label="Branch" value={statement.accmgId} />
+            <InfoBlock label="Zone" value={statement.hotspotId} />
             <InfoBlock label={t("statement_period")} value={statement.month} />
             <InfoBlock label={t("scheme_type")} value={effectiveScheme === "special" ? t("scheme_special") : t("scheme_normal")} />
           </div>

@@ -156,6 +156,9 @@ function restoreStatementPalette(target) {
     } else if (classes.includes("grid-cols-2")) {
       element.style.setProperty("grid-template-columns", "repeat(2, minmax(0, 1fr))");
     }
+    if (classes.includes("statement-meta-grid")) {
+      element.style.setProperty("grid-template-columns", "repeat(5, minmax(0, 1fr))");
+    }
   });
 }
 

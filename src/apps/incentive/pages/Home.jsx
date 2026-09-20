@@ -113,7 +113,7 @@ export default function Home() {
               <button
                 onClick={runSearch}
                 disabled={!month || loadingRecords}
-                className="inline-flex items-center gap-2 justify-center px-4 rounded-lg text-sm font-medium text-white bg-[#006AE0] disabled:opacity-50"
+                className="inline-flex w-full items-center gap-2 justify-center rounded-lg bg-[#006AE0] px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50 sm:w-auto"
               >
                 <Search className="w-4 h-4" /> {t('search_retailer')}
               </button>
