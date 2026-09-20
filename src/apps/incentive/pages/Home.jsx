@@ -7,6 +7,18 @@ import Dashboard from '@incentive/components/Dashboard';
 import { useApp } from '@incentive/lib/AppContext';
 import { Search, Database, Filter } from 'lucide-react';
 
+function formatIncentiveMonth(value) {
+  const match = /^(\d{4})-(\d{2})$/.exec(value);
+  if (!match) return value;
+
+  const [, year, month] = match;
+  const monthName = new Date(Date.UTC(Number(year), Number(month) - 1, 1)).toLocaleDateString('en-US', {
+    month: 'short',
+    timeZone: 'UTC',
+  });
+  return `${monthName}-${year.slice(-2)}`;
+}
+
 export default function Home() {
   const {
     t,
@@ -85,7 +97,7 @@ export default function Home() {
                 className="rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-[#006AE0] bg-white min-w-[180px]"
               >
                 <option value="">{t('select_incentive_month')}</option>
-                {months.map((value) => <option key={value} value={value}>{value}</option>)}
+                {months.map((value) => <option key={value} value={value}>{formatIncentiveMonth(value)}</option>)}
               </select>
               <div className="relative flex-1 min-w-[260px]">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
