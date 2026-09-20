@@ -18,61 +18,6 @@ function waitForImages(container) {
   );
 }
 
-function waitForStylesheets(doc) {
-  const sheets = Array.from(doc.querySelectorAll('link[rel="stylesheet"]'));
-  return Promise.all(
-    sheets.map((sheet) => new Promise((resolve) => {
-      if (sheet.sheet) {
-        resolve();
-        return;
-      }
-      sheet.addEventListener("load", resolve, { once: true });
-      sheet.addEventListener("error", resolve, { once: true });
-    }))
-  );
-}
-
-async function withDesktopClone(container, capture) {
-  const iframe = document.createElement("iframe");
-  iframe.setAttribute("aria-hidden", "true");
-  iframe.style.position = "fixed";
-  iframe.style.left = "-99999px";
-  iframe.style.top = "0";
-  iframe.style.width = `${DESKTOP_WIDTH}px`;
-  iframe.style.height = "0";
-  iframe.style.border = "0";
-  iframe.style.background = "#ffffff";
-  document.body.appendChild(iframe);
-
-  try {
-    const doc = iframe.contentDocument;
-    doc.open();
-    doc.write("<!DOCTYPE html><html><head></head><body></body></html>");
-    doc.close();
-
-    // Carry over the parent document's styles so Tailwind classes resolve inside the iframe
-    document.querySelectorAll('style, link[rel="stylesheet"]').forEach((node) => {
-      doc.head.appendChild(node.cloneNode(true));
-    });
-
-    const clone = container.cloneNode(true);
-    clone.style.width = "100%";
-    doc.body.appendChild(clone);
-
-    // Give the cloned document a real viewport before measuring responsive styles.
-    iframe.style.height = "10000px";
-    await waitForStylesheets(doc);
-    await waitForImages(clone);
-    if (doc.fonts?.ready) await doc.fonts.ready;
-    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
-    iframe.style.height = `${Math.max(clone.scrollHeight, 1)}px`;
-
-    await capture(doc);
-  } finally {
-    document.body.removeChild(iframe);
-  }
-}
-
 export async function exportStatementPDF(container, retailerId, lang) {
   const pdf = new jsPDF("p", "mm", "a4");
   const pageWidth = pdf.internal.pageSize.getWidth();
@@ -81,41 +26,44 @@ export async function exportStatementPDF(container, retailerId, lang) {
   const imgWidth = pageWidth - margin * 2;
   const usableHeight = pageHeight - margin * 2;
 
-  await withDesktopClone(container, async (doc) => {
-    const sections = Array.from(doc.querySelectorAll("[data-pdf-section]"));
-    if (sections.length === 0) throw new Error("No statement sections were found for PDF export");
-    let first = true;
+  const sections = Array.from(container.querySelectorAll("[data-pdf-section]"));
+  if (sections.length === 0) throw new Error("No statement sections were found for PDF export");
 
-    for (const section of sections) {
-      const canvas = await html2canvas(section, {
-        scale: 2,
-        backgroundColor: "#ffffff",
-        useCORS: true,
-        logging: false,
-        windowWidth: DESKTOP_WIDTH,
-      });
-      const imgData = canvas.toDataURL("image/jpeg", 0.8);
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+  await waitForImages(container);
+  if (document.fonts?.ready) await document.fonts.ready;
+  await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
-      if (!first) pdf.addPage();
-      first = false;
+  let first = true;
+  for (const section of sections) {
+    const canvas = await html2canvas(section, {
+      scale: 2,
+      backgroundColor: "#ffffff",
+      useCORS: true,
+      allowTaint: false,
+      logging: false,
+      windowWidth: Math.max(DESKTOP_WIDTH, document.documentElement.clientWidth),
+    });
+    const imgData = canvas.toDataURL("image/jpeg", 0.8);
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-      if (imgHeight <= usableHeight) {
-        pdf.addImage(imgData, "JPEG", margin, margin, imgWidth, imgHeight);
-      } else {
-        let heightLeft = imgHeight;
-        let position = margin;
-        pdf.addImage(imgData, "PNG", margin, position, imgWidth, imgHeight);
+    if (!first) pdf.addPage();
+    first = false;
+
+    if (imgHeight <= usableHeight) {
+      pdf.addImage(imgData, "JPEG", margin, margin, imgWidth, imgHeight);
+    } else {
+      let heightLeft = imgHeight;
+      let position = margin;
+      pdf.addImage(imgData, "JPEG", margin, position, imgWidth, imgHeight);
+      heightLeft -= usableHeight;
+      while (heightLeft > 0) {
+        pdf.addPage();
+        position = margin - (imgHeight - heightLeft);
+        pdf.addImage(imgData, "JPEG", margin, position, imgWidth, imgHeight);
         heightLeft -= usableHeight;
-        while (heightLeft > 0) {
-          pdf.addPage();
-          position = margin - (imgHeight - heightLeft);
-          pdf.addImage(imgData, "PNG", margin, position, imgWidth, imgHeight);
-          heightLeft -= usableHeight;
-        }
       }
     }
-  });
+  }
 
   // Page numbers
   const totalPages = pdf.internal.getNumberOfPages();
@@ -130,7 +78,7 @@ export async function exportStatementPDF(container, retailerId, lang) {
     );
   }
 
-  const safeId = (retailerId || "retailer").replace(/[^a-zA-Z0-9-_~]/g, "");
+  const safeId = String(retailerId || "retailer").replace(/[^a-zA-Z0-9-_~]/g, "");
   const filename =
     lang === "it"
       ? `Estratto_Incentivi_Rivenditore_${safeId}_IT.pdf`

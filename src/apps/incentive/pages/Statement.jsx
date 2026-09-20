@@ -13,13 +13,18 @@ export default function Statement() {
   const navigate = useNavigate();
   const previewRef = useRef(null);
   const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState("");
 
   const handlePDF = async () => {
     if (!previewRef.current || !selectedRetailer) return;
     setExporting(true);
+    setExportError("");
     try {
       const id = (selectedRetailer["RETAILER ID"] || selectedRetailer.retailerId || "retailer");
       await exportStatementPDF(previewRef.current, id, lang);
+    } catch (error) {
+      console.error("Statement PDF export failed", error);
+      setExportError("PDF generation failed. Please try again.");
     } finally {
       setExporting(false);
     }
@@ -72,6 +77,11 @@ export default function Statement() {
             </button>
           </div>
         </div>
+        {exportError && (
+          <p role="alert" className="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+            {exportError}
+          </p>
+        )}
 
         <div className="rounded-xl border border-slate-200 overflow-hidden shadow-sm">
           <StatementPreview ref={previewRef} row={selectedRetailer} />
