@@ -55,10 +55,10 @@ export function HomeHeader({ user, backToHome = false, sidebarMode = false }: Pr
           </span>
           <button
             onClick={signOut}
-            className={sidebarMode ? "inline-flex items-center gap-1.5 rounded-md px-0 py-1.5 text-sm text-white/60 transition hover:text-white" : "inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm text-[#21264E]/70 transition hover:bg-[#21264E]/5 hover:text-[#21264E]"}
+            className={sidebarMode ? "inline-flex items-center justify-start gap-1.5 rounded-md px-0 py-1.5 text-sm text-white/60 transition hover:text-white" : "inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm text-[#21264E]/70 transition hover:bg-[#21264E]/5 hover:text-[#21264E]"}
           >
             <LogOut className="h-4 w-4" />
-            <span className="hidden sm:inline">Sign out</span>
+            <span className="inline">{t("signOut")}</span>
           </button>
         </div>
       </div>
