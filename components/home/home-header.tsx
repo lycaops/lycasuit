@@ -33,7 +33,7 @@ export function HomeHeader({ user, backToHome = false, sidebarMode = false }: Pr
 
   return (
     <div className={sidebarMode ? "mt-4" : "border-b border-[#21264E]/10 bg-white"}>
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
+      <div className={sidebarMode ? "flex w-full items-center justify-start px-0 py-3" : "mx-auto flex max-w-6xl items-center justify-between px-6 py-3"}>
         <Link href="/home" className="flex items-center gap-3">
           <img
             src={sidebarMode ? "/logo.png" : "/logo_b.webp"}
@@ -45,7 +45,7 @@ export function HomeHeader({ user, backToHome = false, sidebarMode = false }: Pr
           </span>
         </Link>
 
-        <div className="flex items-center gap-4">
+        <div className={sidebarMode ? "flex w-full items-center justify-start gap-4" : "flex items-center gap-4"}>
           <div className={sidebarMode ? "hidden" : "hidden text-right sm:block"}>
             <p className="text-sm font-medium leading-tight text-[#21264E]">{user.full_name}</p>
             <p className="text-xs leading-tight text-[#21264E]/55">{user.role}</p>
