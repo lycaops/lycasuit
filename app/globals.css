@@ -162,6 +162,7 @@
   }
   body {
     @apply bg-background text-foreground;
+    overflow-x: hidden;
     font-size: var(--font-size-body);
     line-height: var(--line-height-body);
     padding-top: env(safe-area-inset-top);

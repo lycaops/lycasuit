@@ -3,7 +3,6 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
-  FileSignature,
   LayoutDashboard,
   FileText,
   PlusSquare,
@@ -77,30 +76,40 @@ export function AppSidebar({ user }: { user: SidebarUser }) {
   ]
 
   return (
-    <Sidebar collapsible="icon">
-      <SidebarHeader>
+    <Sidebar collapsible="icon" className="bg-[#21264e] text-white">
+      <SidebarHeader className="border-white/10 bg-[#21264e]">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" className="pointer-events-none group-data-[collapsible=icon]:!p-0 group-data-[collapsible=icon]:justify-center">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#245bc1] text-white">
-                <FileSignature className="h-4 w-4" aria-hidden="true" />
+            <SidebarMenuButton size="lg" className="pointer-events-none text-white hover:bg-transparent group-data-[collapsible=icon]:!p-0 group-data-[collapsible=icon]:justify-center">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white">
+                <img src="/lmac.png" alt="LycaOps" className="h-9 w-9 object-contain" />
               </div>
-              <div className="flex flex-col gap-0.5 overflow-hidden leading-tight group-data-[collapsible=icon]:hidden">
-                <span className="truncate text-sm font-semibold text-sidebar-foreground">
-                  {t("contractManager")}
-                </span>
-                <span className="truncate text-xs text-sidebar-foreground/70">
-                  {t("universalService")}
-                </span>
+              <div className="flex min-w-0 flex-col gap-0.5 overflow-hidden leading-tight group-data-[collapsible=icon]:hidden">
+                <span className="truncate text-sm font-bold text-white">RCM - LycaOps</span>
+                <span className="truncate text-xs text-[#ffc8b2]">{t("contractManager")}</span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
 
-      <SidebarContent>
+      <div className="border-b border-white/10 px-4 py-4 group-data-[collapsible=icon]:hidden">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#245bc1] text-sm font-bold text-white">
+            {user.full_name.charAt(0).toUpperCase()}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-medium text-white">{user.full_name}</p>
+            <p className="truncate text-xs text-white/50">
+              {user.role}{user.branch ? ` · ${user.branch}` : ""}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <SidebarContent className="bg-[#21264e]">
         <SidebarGroup>
-          <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden">{t("workspace")}</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-white/40 group-data-[collapsible=icon]:hidden">{t("workspace")}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {nav
@@ -126,7 +135,7 @@ export function AppSidebar({ user }: { user: SidebarUser }) {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter>
+      <SidebarFooter className="border-white/10 bg-[#21264e]">
         <SidebarMenu>
           <SidebarMenuItem>
             <form action={signOut}>

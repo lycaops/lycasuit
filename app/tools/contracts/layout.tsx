@@ -12,7 +12,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   return (
     <SidebarProvider>
       <AppSidebar user={user} />
-      <SidebarInset className="pt-14 md:pt-0">
+      <SidebarInset className="min-w-0 overflow-x-hidden pt-14 md:pt-0">
         <DashboardHeader user={user} />
         <div className="flex flex-1 flex-col gap-6 p-4 md:p-6 lg:p-8">{children}</div>
       </SidebarInset>
