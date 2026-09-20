@@ -29,7 +29,11 @@ function normalizeCaptureStyles(clonedDocument) {
       const property = computed[index];
       if (property.startsWith("--")) continue;
       const value = computed.getPropertyValue(property);
-      if (!value || /okl(ab|ch)|color-mix/i.test(value)) continue;
+      if (!value) continue;
+      if (/okl(ab|ch)|color-mix/i.test(value)) {
+        element.style.removeProperty(property);
+        continue;
+      }
       element.style.setProperty(property, value);
     }
   }
@@ -84,28 +88,22 @@ export async function exportStatementPDF(container, retailerId, lang) {
   const margin = 8;
   const usableHeight = pageHeight - margin * 2;
 
-  const sections = Array.from(container.querySelectorAll("[data-pdf-section]"));
-  if (sections.length === 0) throw new Error("No statement sections were found for PDF export");
-
   await waitForImages(container);
   if (document.fonts?.ready) await document.fonts.ready;
   await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
-  let first = true;
-  for (const section of sections) {
-    const captureOptions = {
-      scale: Math.min(2, 30000 / Math.max(section.scrollWidth, section.scrollHeight, 1)),
-      backgroundColor: "#ffffff",
-      useCORS: true,
-      allowTaint: false,
-      logging: false,
-      windowWidth: Math.max(DESKTOP_WIDTH, document.documentElement.clientWidth),
-      onclone: normalizeCaptureStyles,
-    };
-    const canvas = await html2canvas(section, captureOptions);
-    if (!canvas.width || !canvas.height) throw new Error("Statement section rendered empty");
-    first = addCanvasToPdf(pdf, canvas, pageWidth, margin, usableHeight, first);
-  }
+  const scale = Math.min(2, 30000 / Math.max(container.scrollWidth, container.scrollHeight, 1));
+  const canvas = await html2canvas(container, {
+    scale,
+    backgroundColor: "#ffffff",
+    useCORS: true,
+    allowTaint: false,
+    logging: false,
+    windowWidth: Math.max(DESKTOP_WIDTH, document.documentElement.clientWidth),
+    onclone: normalizeCaptureStyles,
+  });
+  if (!canvas.width || !canvas.height) throw new Error("Statement rendered empty");
+  addCanvasToPdf(pdf, canvas, pageWidth, margin, usableHeight, true);
 
   // Page numbers
   const totalPages = pdf.internal.getNumberOfPages();
