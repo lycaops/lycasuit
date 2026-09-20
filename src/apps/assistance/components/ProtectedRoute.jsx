@@ -6,7 +6,7 @@ import { useAuth } from '@assistance/lib/AuthContext';
 import UserNotRegisteredError from '@assistance/components/UserNotRegisteredError';
 
 const DefaultFallback = () => (
-  <div className="lo-screen">
+  <div className="lo-screen" style={{ position: 'fixed', inset: 0, zIndex: 1000, width: '100vw', minHeight: '100dvh', display: 'grid', placeItems: 'center', background: '#fff' }}>
   <Loader size={128} />
   </div>
 );

@@ -45,10 +45,10 @@ async function withDesktopClone(container, capture) {
     clone.style.width = "100%";
     doc.body.appendChild(clone);
 
-    // Size the iframe to its content so layout completes
-    iframe.style.height = `${clone.scrollHeight}px`;
     await waitForImages(clone);
     await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+    // Size the iframe after layout and image loading so html2canvas has stable dimensions.
+    iframe.style.height = `${Math.max(clone.scrollHeight, 1)}px`;
 
     await capture(doc);
   } finally {
@@ -66,6 +66,9 @@ export async function exportStatementPDF(container, retailerId, lang) {
 
   await withDesktopClone(container, async (doc) => {
     const sections = Array.from(doc.querySelectorAll("[data-pdf-section]"));
+    if (sections.length === 0) {
+      throw new Error("No printable statement sections found");
+    }
     let first = true;
 
     for (const section of sections) {
@@ -76,6 +79,9 @@ export async function exportStatementPDF(container, retailerId, lang) {
         logging: false,
         windowWidth: DESKTOP_WIDTH,
       });
+      if (canvas.width === 0 || canvas.height === 0) {
+        throw new Error("Statement section rendered without dimensions");
+      }
       const imgData = canvas.toDataURL("image/jpeg", 0.8);
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
@@ -87,12 +93,12 @@ export async function exportStatementPDF(container, retailerId, lang) {
       } else {
         let heightLeft = imgHeight;
         let position = margin;
-        pdf.addImage(imgData, "PNG", margin, position, imgWidth, imgHeight);
+        pdf.addImage(imgData, "JPEG", margin, position, imgWidth, imgHeight);
         heightLeft -= usableHeight;
         while (heightLeft > 0) {
           pdf.addPage();
           position = margin - (imgHeight - heightLeft);
-          pdf.addImage(imgData, "PNG", margin, position, imgWidth, imgHeight);
+          pdf.addImage(imgData, "JPEG", margin, position, imgWidth, imgHeight);
           heightLeft -= usableHeight;
         }
       }
