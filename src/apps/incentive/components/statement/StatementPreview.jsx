@@ -10,6 +10,7 @@ import RenewalSection from "./RenewalSection";
 import { UsageSection, PortOutSection } from "./UsagePortOutSection";
 import InsightsSection from "./InsightsSection";
 import StatementCharts from "./StatementCharts";
+import { getScheme } from "@incentive/lib/schemeReference";
 
 const LOGO_URL = "/logo.png";
 
@@ -24,7 +25,9 @@ function SectionTitle({ children, color }) {
 
 const StatementPreview = forwardRef(({ row }, ref) => {
   const { t, lang, scheme } = useApp();
-  const statement = buildRetailerStatement(row, lang, scheme);
+  const effectiveScheme = row?._scheme || scheme;
+  const schemeDetails = getScheme(effectiveScheme);
+  const statement = buildRetailerStatement(row, lang, effectiveScheme);
   const today = new Date().toLocaleDateString(lang === "it" ? "it-IT" : "en-GB");
 
   return (
@@ -44,7 +47,7 @@ const StatementPreview = forwardRef(({ row }, ref) => {
             <InfoBlock label="ACCMGRID" value={statement.accmgId} />
             <InfoBlock label="HOTSPOTID" value={statement.hotspotId} />
             <InfoBlock label={t("statement_period")} value={statement.month} />
-            <InfoBlock label={t("scheme_type")} value={scheme === "special" ? t("scheme_special") : t("scheme_normal")} />
+            <InfoBlock label={t("scheme_type")} value={effectiveScheme === "special" ? t("scheme_special") : t("scheme_normal")} />
           </div>
           <p className="text-xs text-slate-400 mb-4">{t("generation_date")}: {today}</p>
           <SectionTitle color="#21264e">{t("activation_summary")}</SectionTitle>
@@ -80,6 +83,13 @@ const StatementPreview = forwardRef(({ row }, ref) => {
         <div data-pdf-section>
           <SectionTitle color="#00D7FF">{t("automated_analysis")}</SectionTitle>
           <InsightsSection statement={statement} />
+          <div className="mt-6 rounded-lg border border-slate-200 bg-slate-50 p-4">
+            <p className="text-sm font-semibold text-slate-800">{schemeDetails.title[lang]}</p>
+            <p className="mt-1 text-xs text-slate-500">{schemeDetails.subtitle[lang]}</p>
+            <ul className="mt-3 space-y-1.5 pl-4 text-xs leading-relaxed text-slate-600">
+              {schemeDetails.terms[lang].map((term) => <li key={term} className="list-disc">{term}</li>)}
+            </ul>
+          </div>
           <div className="mt-6 rounded-lg bg-slate-50 border border-slate-200 p-4">
             <p className="text-xs font-semibold text-slate-600 mb-1">{t("disclaimer_title")}</p>
             <p className="text-xs text-slate-500 leading-relaxed">{t("disclaimer_text")}</p>

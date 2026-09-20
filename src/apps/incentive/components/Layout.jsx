@@ -181,7 +181,7 @@ export default function Layout({ children }) {
           </div>
         )}
 
-        <main className="flex-1 overflow-auto">{children}</main>
+        <main className="flex-1 overflow-x-hidden overflow-y-visible">{children}</main>
       </div>
     </div>
   );

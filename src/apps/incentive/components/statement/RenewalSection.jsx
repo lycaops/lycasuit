@@ -9,7 +9,7 @@ function RenewalBar({ rate, threshold }) {
   const achieved = threshold !== null && rate >= threshold;
   return (
     <div className="mt-2 flex items-center gap-2">
-      <div className="flex-1 h-2 rounded-full bg-slate-200 overflow-hidden relative">
+      <div className="flex-1 h-2 rounded-full bg-slate-200 overflow-hidden relative border-0 outline-none shadow-none">
         <div
           className="h-full rounded-full transition-all"
           style={{ width: `${pct}%`, backgroundColor: achieved ? "#08dc7d" : "#fbbf24" }}

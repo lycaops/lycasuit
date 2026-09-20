@@ -1472,7 +1472,7 @@ export default function Dashboard() {
         )}
 
         {/* Content */}
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto scroll-smooth [touch-action:pan-y]">
           {view === VIEWS.USERS && user?.role === 'HS-ADMIN' ? (
             <UserManagement />
           ) : view === VIEWS.IMPORT && user?.role === 'HS-ADMIN' ? (

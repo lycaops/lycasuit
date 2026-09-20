@@ -103,6 +103,11 @@ function restoreStatementPalette(target) {
     if (classes.includes("bg-slate-200")) {
       element.style.setProperty("background-color", "#e2e8f0");
     }
+    if (classes.includes("rounded-full") && classes.includes("overflow-hidden")) {
+      element.style.setProperty("border", "0");
+      element.style.setProperty("outline", "0");
+      element.style.setProperty("box-shadow", "none");
+    }
     if (classes.includes("bg-emerald-50/50")) {
       element.style.setProperty("background-color", "rgba(236, 253, 245, 0.5)");
     }
@@ -202,7 +207,7 @@ async function createCaptureDocument(source) {
 async function renderPage(source) {
   const { iframe, captureDocument, clone } = await createCaptureDocument(source);
   try {
-    const scale = Math.min(2, 24000 / Math.max(clone.scrollWidth, clone.scrollHeight, 1));
+    const scale = Math.min(1.5, 18000 / Math.max(clone.scrollWidth, clone.scrollHeight, 1));
     const canvas = await html2canvas(clone, {
       scale,
       backgroundColor: "#ffffff",
@@ -242,7 +247,7 @@ export async function exportStatementPDF(container, retailerId, lang) {
   const margin = 8;
 
   if (document.fonts?.ready) await document.fonts.ready;
-  await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  await new Promise((resolve) => requestAnimationFrame(resolve));
 
   const pages = Array.from(container.querySelectorAll("[data-pdf-section]"));
   if (pages.length !== 4) {
