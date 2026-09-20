@@ -12,6 +12,6 @@ export const config = {
      * - public PWA assets and all _next files
      * - /api routes (handle auth inside)
      */
-    "/((?!_next|manifest\\.webmanifest|sw\\.js|offline(?:/|$)|icons(?:/|$)|apple-touch-icon\\.png|favicon[^/]*$).*)",
+    "/((?!_next|manifest\\.webmanifest|sw\\.js|offline(?:/|$)|icons(?:/|$)|apple-touch-icon\\.png|favicon[^/]*$|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|woff2?|ttf|otf)$).*)",
   ],
 }
