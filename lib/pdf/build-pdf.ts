@@ -16,7 +16,7 @@ const BLACK = rgb(0, 0, 0)
 const MUTED = rgb(0.4, 0.4, 0.4)
 const LYCA_BLUE = rgb(0x1a / 255, 0x56 / 255, 0xa3 / 255)
 const BRAND_NAVY = rgb(0x21 / 255, 0x26 / 255, 0x4e / 255) // #21264e
-const SUMMARY_BG = rgb(0xe8 / 255, 0xf4 / 255, 0xfe / 255) // #E8F4FE
+const SUMMARY_BG = rgb(1, 1, 1) // #ffffff
 
 // ---------- Layout ----------
 const PAGE_W = 595.28 // A4 portrait

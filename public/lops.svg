@@ -1,8 +1,8 @@
 <svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 513" width="2000" height="513">
 	<style>
 		tspan { white-space:pre } 
-		.s0 { fill: #152253 } 
-		.s1 { fill: #08dc85 } 
+		.s0 { fill: #ffffff }
+		.s1 { fill: #ffffff }
 		.s2 { fill: #08dc7d } 
 		.s3 { fill: #006ae0 } 
 	</style>

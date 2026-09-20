@@ -24,7 +24,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           <div className="relative mb-8 flex h-32 items-center justify-center overflow-hidden rounded-2xl bg-[#21264e] px-5 lg:hidden">
             <img src="/h1.svg" alt="" aria-hidden="true" className="pointer-events-none absolute -right-10 -top-14 h-40 w-40 opacity-20" />
             <img src="/h2.svg" alt="" aria-hidden="true" className="pointer-events-none absolute -bottom-16 -left-12 h-44 w-44 opacity-15" />
-            <img src="/lops_w.svg" alt="LycaOps" className="relative h-auto w-full max-w-[230px] object-contain" />
+            <img src="/lops.svg" alt="LycaOps" className="relative h-auto w-full max-w-[230px] object-contain" />
           </div>
           {children}
         </div>
