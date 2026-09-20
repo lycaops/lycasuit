@@ -17,8 +17,21 @@ function waitForImages(container) {
   );
 }
 
-function copyComputedStyles(source, target) {
-  const computed = window.getComputedStyle(source);
+function waitForStylesheets(doc) {
+  return Promise.all(
+    Array.from(doc.querySelectorAll('link[rel="stylesheet"]')).map((sheet) =>
+      sheet.sheet
+        ? Promise.resolve()
+        : new Promise((resolve) => {
+            sheet.addEventListener("load", resolve, { once: true });
+            sheet.addEventListener("error", resolve, { once: true });
+          }),
+    ),
+  );
+}
+
+function copyComputedStyles(source, target, view) {
+  const computed = view.getComputedStyle(source);
   for (let index = 0; index < computed.length; index += 1) {
     const property = computed[index];
     if (property.startsWith("--")) continue;
@@ -30,11 +43,11 @@ function copyComputedStyles(source, target) {
   const sourceChildren = source.children;
   const targetChildren = target.children;
   for (let index = 0; index < sourceChildren.length; index += 1) {
-    copyComputedStyles(sourceChildren[index], targetChildren[index]);
+    copyComputedStyles(sourceChildren[index], targetChildren[index], view);
   }
 }
 
-function restoreTableOutlines(source, target) {
+function restoreTableOutlines(source, target, view) {
   const sourceTables = source.querySelectorAll("table");
   const targetTables = target.querySelectorAll("table");
 
@@ -45,8 +58,8 @@ function restoreTableOutlines(source, target) {
 
     targetTable.style.setProperty("border-collapse", "collapse");
     targetTable.style.setProperty("border-spacing", "0");
-    targetTable.style.setProperty("width", getComputedStyle(sourceTable).width);
-    targetTable.style.setProperty("table-layout", getComputedStyle(sourceTable).tableLayout || "auto");
+    targetTable.style.setProperty("width", view.getComputedStyle(sourceTable).width);
+    targetTable.style.setProperty("table-layout", view.getComputedStyle(sourceTable).tableLayout || "auto");
     targetTable.style.setProperty("border", "1px solid #e2e8f0");
 
     targetTable.querySelectorAll("thead").forEach((head) => {
@@ -147,7 +160,7 @@ async function createCaptureDocument(source) {
   iframe.style.position = "fixed";
   iframe.style.left = "-100000px";
   iframe.style.top = "0";
-  iframe.style.width = `${Math.max(DESKTOP_WIDTH, source.getBoundingClientRect().width)}px`;
+  iframe.style.width = `${DESKTOP_WIDTH}px`;
   iframe.style.height = "1px";
   iframe.style.border = "0";
   document.body.appendChild(iframe);
@@ -160,16 +173,28 @@ async function createCaptureDocument(source) {
   captureDocument.body.style.padding = "0";
   captureDocument.body.style.background = "#ffffff";
 
-  const clone = source.cloneNode(true);
-  clone.style.width = `${Math.max(1, source.getBoundingClientRect().width)}px`;
-  clone.style.maxWidth = "none";
-  clone.style.margin = "0";
-  copyComputedStyles(source, clone);
+  document.querySelectorAll('style, link[rel="stylesheet"]').forEach((node) => {
+    captureDocument.head.appendChild(node.cloneNode(true));
+  });
+
+  const styledClone = source.cloneNode(true);
+  styledClone.style.width = `${DESKTOP_WIDTH}px`;
+  styledClone.style.maxWidth = "none";
+  styledClone.style.margin = "0";
+  captureDocument.body.appendChild(styledClone);
+  await waitForStylesheets(captureDocument);
+  iframe.style.height = `${Math.max(styledClone.scrollHeight, 1)}px`;
+  await waitForImages(styledClone);
+  if (captureDocument.fonts?.ready) await captureDocument.fonts.ready;
+
+  const clone = styledClone.cloneNode(true);
+  copyComputedStyles(styledClone, clone, captureDocument.defaultView);
   restoreStatementPalette(clone);
-  restoreTableOutlines(source, clone);
+  restoreTableOutlines(styledClone, clone, captureDocument.defaultView);
+  styledClone.remove();
+  captureDocument.head.replaceChildren();
   captureDocument.body.appendChild(clone);
   iframe.style.height = `${Math.max(clone.scrollHeight, 1)}px`;
-  await waitForImages(clone);
 
   return { iframe, captureDocument, clone };
 }
