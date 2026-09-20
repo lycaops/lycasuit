@@ -82,7 +82,7 @@ export function AppSidebar({ user }: { user: SidebarUser }) {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" className="pointer-events-none text-white hover:bg-transparent group-data-[collapsible=icon]:!p-0 group-data-[collapsible=icon]:justify-center">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white">
-                <img src="/lmac.png" alt="LycaOps" className="h-9 w-9 object-contain" />
+                <img src="/rcm.png" alt="Retailer Contract Management" className="h-9 w-9 object-contain" />
               </div>
               <div className="flex min-w-0 flex-col gap-0.5 overflow-hidden leading-tight group-data-[collapsible=icon]:hidden">
                 <span className="truncate text-sm font-bold text-white">RCM - LycaOps</span>
