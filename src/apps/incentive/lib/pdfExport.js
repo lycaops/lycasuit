@@ -2,19 +2,18 @@
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 
-const DESKTOP_WIDTH = 1024; // matches the statement's max-w-5xl content width; activates md: breakpoints
+const DESKTOP_WIDTH = 1024;
 
 function waitForImages(container) {
-  const imgs = Array.from(container.querySelectorAll("img"));
   return Promise.all(
-    imgs.map((img) =>
+    Array.from(container.querySelectorAll("img")).map((img) =>
       img.complete
         ? Promise.resolve()
-        : new Promise((res) => {
-            img.onload = res;
-            img.onerror = res;
-          })
-    )
+        : new Promise((resolve) => {
+            img.onload = resolve;
+            img.onerror = resolve;
+          }),
+    ),
   );
 }
 
@@ -24,7 +23,7 @@ function copyComputedStyles(source, target) {
     const property = computed[index];
     if (property.startsWith("--")) continue;
     const value = computed.getPropertyValue(property);
-    if (!value || /okl(ab|ch)|color-mix/i.test(value)) continue;
+    if (!value || /\b(?:oklab|oklch|lab|lch|color-mix)\s*\(/i.test(value)) continue;
     target.style.setProperty(property, value);
   }
 
@@ -35,13 +34,13 @@ function copyComputedStyles(source, target) {
   }
 }
 
-async function createCaptureDocument(container) {
+async function createCaptureDocument(source) {
   const iframe = document.createElement("iframe");
   iframe.setAttribute("aria-hidden", "true");
   iframe.style.position = "fixed";
   iframe.style.left = "-100000px";
   iframe.style.top = "0";
-  iframe.style.width = `${Math.max(DESKTOP_WIDTH, container.getBoundingClientRect().width)}px`;
+  iframe.style.width = `${Math.max(DESKTOP_WIDTH, source.getBoundingClientRect().width)}px`;
   iframe.style.height = "1px";
   iframe.style.border = "0";
   document.body.appendChild(iframe);
@@ -54,9 +53,11 @@ async function createCaptureDocument(container) {
   captureDocument.body.style.padding = "0";
   captureDocument.body.style.background = "#ffffff";
 
-  const clone = container.cloneNode(true);
-  clone.style.width = "100%";
-  copyComputedStyles(container, clone);
+  const clone = source.cloneNode(true);
+  clone.style.width = `${Math.max(1, source.getBoundingClientRect().width)}px`;
+  clone.style.maxWidth = "none";
+  clone.style.margin = "0";
+  copyComputedStyles(source, clone);
   captureDocument.body.appendChild(clone);
   iframe.style.height = `${Math.max(clone.scrollHeight, 1)}px`;
   await waitForImages(clone);
@@ -64,58 +65,10 @@ async function createCaptureDocument(container) {
   return { iframe, captureDocument, clone };
 }
 
-function addCanvasToPdf(pdf, canvas, pageWidth, margin, usableHeight, firstPage) {
-  const imageWidth = pageWidth - margin * 2;
-  const pageSliceHeight = Math.max(1, Math.floor((canvas.width * usableHeight) / imageWidth));
-  let offsetY = 0;
-  let first = firstPage;
-
-  while (offsetY < canvas.height) {
-    const sliceHeight = Math.min(pageSliceHeight, canvas.height - offsetY);
-    const slice = document.createElement("canvas");
-    slice.width = canvas.width;
-    slice.height = sliceHeight;
-    const context = slice.getContext("2d");
-    if (!context) throw new Error("Could not prepare a PDF page");
-
-    context.fillStyle = "#ffffff";
-    context.fillRect(0, 0, slice.width, slice.height);
-    context.drawImage(
-      canvas,
-      0,
-      offsetY,
-      canvas.width,
-      sliceHeight,
-      0,
-      0,
-      slice.width,
-      slice.height,
-    );
-
-    if (!first) pdf.addPage();
-    first = false;
-    const sliceHeightMm = (slice.height * imageWidth) / slice.width;
-    pdf.addImage(slice.toDataURL("image/jpeg", 0.92), "JPEG", margin, margin, imageWidth, sliceHeightMm);
-    offsetY += sliceHeight;
-  }
-
-  return first;
-}
-
-export async function exportStatementPDF(container, retailerId, lang) {
-  const pdf = new jsPDF("p", "mm", "a4");
-  const pageWidth = pdf.internal.pageSize.getWidth();
-  const pageHeight = pdf.internal.pageSize.getHeight();
-  const margin = 8;
-  const usableHeight = pageHeight - margin * 2;
-
-  await waitForImages(container);
-  if (document.fonts?.ready) await document.fonts.ready;
-  await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-
-  const { iframe, captureDocument, clone } = await createCaptureDocument(container);
+async function renderPage(source) {
+  const { iframe, captureDocument, clone } = await createCaptureDocument(source);
   try {
-    const scale = Math.min(2, 30000 / Math.max(clone.scrollWidth, clone.scrollHeight, 1));
+    const scale = Math.min(2, 24000 / Math.max(clone.scrollWidth, clone.scrollHeight, 1));
     const canvas = await html2canvas(clone, {
       scale,
       backgroundColor: "#ffffff",
@@ -124,23 +77,54 @@ export async function exportStatementPDF(container, retailerId, lang) {
       logging: false,
       windowWidth: Math.max(DESKTOP_WIDTH, clone.clientWidth),
     });
-    if (!canvas.width || !canvas.height) throw new Error("Statement rendered empty");
-    addCanvasToPdf(pdf, canvas, pageWidth, margin, usableHeight, true);
+    if (!canvas.width || !canvas.height) throw new Error("Statement page rendered empty");
+    return canvas;
   } finally {
     captureDocument.body.replaceChildren();
     iframe.remove();
   }
+}
 
-  // Page numbers
-  const totalPages = pdf.internal.getNumberOfPages();
-  for (let i = 1; i <= totalPages; i++) {
-    pdf.setPage(i);
+function addPageCanvas(pdf, canvas, pageWidth, pageHeight, margin) {
+  const imageWidth = pageWidth - margin * 2;
+  const imageHeight = pageHeight - margin * 2;
+  const ratio = Math.min(imageWidth / canvas.width, imageHeight / canvas.height);
+  const width = canvas.width * ratio;
+  const height = canvas.height * ratio;
+  pdf.addImage(
+    canvas.toDataURL("image/jpeg", 0.92),
+    "JPEG",
+    (pageWidth - width) / 2,
+    margin,
+    width,
+    height,
+  );
+}
+
+export async function exportStatementPDF(container, retailerId, lang) {
+  const pdf = new jsPDF("p", "mm", "a4");
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const margin = 8;
+
+  if (document.fonts?.ready) await document.fonts.ready;
+  await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+  const pages = Array.from(container.querySelectorAll("[data-pdf-section]"));
+  if (pages.length !== 4) {
+    throw new Error(`Expected 4 statement pages, found ${pages.length}`);
+  }
+
+  for (let index = 0; index < pages.length; index += 1) {
+    if (index > 0) pdf.addPage();
+    const canvas = await renderPage(pages[index]);
+    addPageCanvas(pdf, canvas, pageWidth, pageHeight, margin);
     pdf.setFontSize(8);
     pdf.setTextColor(120, 120, 120);
     pdf.text(
-      `${lang === "it" ? "Pagina" : "Page"} ${i} / ${totalPages}`,
+      `${lang === "it" ? "Pagina" : "Page"} ${index + 1} / ${pages.length}`,
       pageWidth - margin - 20,
-      pageHeight - 4
+      pageHeight - 4,
     );
   }
 
