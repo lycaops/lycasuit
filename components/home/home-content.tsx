@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import type { ReactNode } from "react"
 import { ArrowRight, BarChart3, FileSignature, Home, LayoutGrid, LifeBuoy, Receipt, Users } from "lucide-react"
 import { useI18n } from "@/lib/i18n/i18n-context"
 import { HomeHeader } from "@/components/home/home-header"
@@ -26,6 +27,14 @@ const TOOL_LABELS: Record<string, "toolFieldIq" | "toolContracts" | "toolIncenti
   contracts: "toolContracts",
   incentive: "toolIncentive",
   assistance: "toolAssistance",
+}
+
+function ToolLink({ tool, className, children }: { tool: PlatformTool; className: string; children: ReactNode }) {
+  if (tool.key === "assistance") {
+    return <a href={tool.route} className={className}>{children}</a>
+  }
+
+  return <Link href={tool.route} className={className}>{children}</Link>
 }
 
 export function HomeContent({
@@ -55,7 +64,7 @@ export function HomeContent({
           <p className="px-3 pb-1 pt-5 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/40">{t("yourWorkspace")}</p>
           {tools.map((tool) => {
             const Icon = ICONS[tool.icon ?? ""] ?? LayoutGrid
-            return <Link key={tool.key} href={tool.route} className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-white/65 transition hover:bg-white/10 hover:text-white"><Icon className="h-4 w-4" />{TOOL_LABELS[tool.key] ? t(TOOL_LABELS[tool.key]) : tool.name}</Link>
+            return <ToolLink key={tool.key} tool={tool} className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-white/65 transition hover:bg-white/10 hover:text-white"><Icon className="h-4 w-4" />{TOOL_LABELS[tool.key] ? t(TOOL_LABELS[tool.key]) : tool.name}</ToolLink>
           })}
         </nav>
         <div className="mt-auto border-t border-white/10 pt-5">
@@ -97,7 +106,7 @@ export function HomeContent({
                   const Icon = ICONS[tool.icon ?? ""] ?? LayoutGrid
                   const accent = tool.accent_color ?? "#245BC1"
                   return (
-                    <Link key={tool.key} href={tool.route} className="group relative flex min-h-[245px] flex-col overflow-hidden rounded-[1.75rem] bg-white p-5 shadow-[0_10px_30px_rgba(33,38,78,0.07)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_18px_36px_rgba(33,38,78,0.13)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#245BC1] sm:min-h-[270px] sm:p-6">
+                    <ToolLink key={tool.key} tool={tool} className="group relative flex min-h-[245px] flex-col overflow-hidden rounded-[1.75rem] bg-white p-5 shadow-[0_10px_30px_rgba(33,38,78,0.07)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_18px_36px_rgba(33,38,78,0.13)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#245BC1] sm:min-h-[270px] sm:p-6">
                       <span aria-hidden className="absolute right-0 top-0 h-1.5 w-24 rounded-bl-full" style={{ backgroundColor: accent }} />
                       <div className="flex items-start justify-between gap-4">
                         <div className="pt-1"><h2 className="text-xl font-semibold leading-tight tracking-tight text-[#21264E] sm:text-2xl">{TOOL_LABELS[tool.key] ? t(TOOL_LABELS[tool.key]) : tool.name}</h2></div>
@@ -105,7 +114,7 @@ export function HomeContent({
                       </div>
                       <p className="mt-7 max-w-sm text-sm leading-relaxed text-[#21264E]/65 sm:mt-8">{tool.description}</p>
                       <div className="mt-auto flex items-center justify-between border-t border-[#21264E]/10 pt-4"><span className="text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: accent }}>{t("openTool")}</span><span className="flex h-9 w-9 items-center justify-center rounded-full transition group-hover:translate-x-0.5" style={{ backgroundColor: `${accent}18`, color: accent }}><ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" /></span></div>
-                    </Link>
+                    </ToolLink>
                   )
                 })}
               </div>

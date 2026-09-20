@@ -21,6 +21,7 @@ function friendlyAuthError(message) {
 export function CustomAuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -129,6 +130,7 @@ export function CustomAuthProvider({ children }) {
   };
 
   const logout = async () => {
+    setLoggingOut(true);
     localStorage.removeItem(STORAGE_KEY);
     await supabase.auth.signOut().catch(() => {});
     setCurrentUser(null);
@@ -137,7 +139,7 @@ export function CustomAuthProvider({ children }) {
   const isAdmin = currentUser && ADMIN_ROLES.includes(currentUser.role);
 
   return (
-    <CustomAuthContext.Provider value={{ currentUser, login, logout, loading, isAdmin, validateEmail }}>
+    <CustomAuthContext.Provider value={{ currentUser, login, logout, loading, loggingOut, isAdmin, validateEmail }}>
       {children}
     </CustomAuthContext.Provider>
   );
