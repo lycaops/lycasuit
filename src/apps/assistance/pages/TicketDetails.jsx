@@ -196,7 +196,7 @@ export default function TicketDetails() {
       </button>
 
       {/* Ticket Header */}
-      <Card className="border-0 shadow-lg rounded-2xl overflow-hidden">
+      <Card className="border-0 shadow-lg rounded-2xl py-0 overflow-hidden">
         <div className="bg-foreground p-5 sm:p-6">
           <div className="flex items-start justify-between flex-wrap gap-3">
             <div>
