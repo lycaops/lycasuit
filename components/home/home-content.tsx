@@ -44,7 +44,7 @@ export function HomeContent({
     <main className="min-h-dvh bg-[#f4f7fb] pb-16 lg:flex lg:pb-0">
       <aside className="relative hidden w-72 shrink-0 flex-col overflow-hidden bg-[#21264e] px-6 py-6 text-white lg:sticky lg:top-0 lg:flex lg:h-dvh lg:max-h-dvh">
         <img src="/h2.svg" alt="" aria-hidden="true" className="pointer-events-none absolute -bottom-8 -left-12 h-72 w-72 opacity-20" />
-        <img src="/h1.svg" alt="" aria-hidden="true" className="pointer-events-none absolute bottom-28 -right-24 h-64 w-64 opacity-[.15]" />
+        <img src="/h1.svg" alt="" aria-hidden="true" className="pointer-events-none absolute bottom-28 -right-28 h-64 w-64 opacity-[.15]" />
         <div>
           <img src="/lops.svg" alt="LycaOps" className="relative h-auto w-44 rounded-md bg-white px-3 py-2" />
         </div>
