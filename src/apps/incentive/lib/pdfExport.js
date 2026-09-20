@@ -34,6 +34,50 @@ function copyComputedStyles(source, target) {
   }
 }
 
+function restoreTableOutlines(source, target) {
+  const sourceTables = source.querySelectorAll("table");
+  const targetTables = target.querySelectorAll("table");
+
+  for (let index = 0; index < sourceTables.length; index += 1) {
+    const sourceTable = sourceTables[index];
+    const targetTable = targetTables[index];
+    if (!targetTable) continue;
+
+    targetTable.style.setProperty("border-collapse", "collapse");
+    targetTable.style.setProperty("border-spacing", "0");
+    targetTable.style.setProperty("width", getComputedStyle(sourceTable).width);
+    targetTable.style.setProperty("table-layout", getComputedStyle(sourceTable).tableLayout || "auto");
+    targetTable.style.setProperty("border", "1px solid #e2e8f0");
+
+    targetTable.querySelectorAll("thead").forEach((head) => {
+      head.style.setProperty("background-color", "#f8fafc");
+    });
+    targetTable.querySelectorAll("tbody tr").forEach((row) => {
+      row.style.setProperty("border-top", "1px solid #f1f5f9");
+    });
+    targetTable.querySelectorAll("th, td").forEach((cell) => {
+      cell.style.setProperty("border-color", "#f1f5f9");
+      cell.style.setProperty("border-style", "solid");
+      cell.style.setProperty("border-width", "0");
+    });
+  }
+}
+
+function restoreStatementPalette(target) {
+  target.querySelectorAll("*").forEach((element) => {
+    const classes = typeof element.className === "string" ? element.className : "";
+    if (classes.includes("border-slate-200")) {
+      element.style.setProperty("border-color", "#e2e8f0");
+    }
+    if (classes.includes("border-slate-100")) {
+      element.style.setProperty("border-color", "#f1f5f9");
+    }
+    if (classes.includes("bg-slate-50")) {
+      element.style.setProperty("background-color", "#f8fafc");
+    }
+  });
+}
+
 async function createCaptureDocument(source) {
   const iframe = document.createElement("iframe");
   iframe.setAttribute("aria-hidden", "true");
@@ -58,6 +102,8 @@ async function createCaptureDocument(source) {
   clone.style.maxWidth = "none";
   clone.style.margin = "0";
   copyComputedStyles(source, clone);
+  restoreStatementPalette(clone);
+  restoreTableOutlines(source, clone);
   captureDocument.body.appendChild(clone);
   iframe.style.height = `${Math.max(clone.scrollHeight, 1)}px`;
   await waitForImages(clone);
