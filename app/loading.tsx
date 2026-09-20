@@ -2,7 +2,7 @@ import Loader from "@/components/Loader";
 
 export default function Loading() {
   return (
-    <div style={{ display: "grid", placeItems: "center", minHeight: "60vh" }}>
+    <div className="grid min-h-dvh place-items-center">
       <Loader size={128} />
     </div>
   );
