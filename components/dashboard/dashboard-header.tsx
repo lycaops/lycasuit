@@ -1,10 +1,7 @@
 "use client"
 
-import { LogOut } from "lucide-react"
-import { signOut } from "@/app/auth/actions"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { Separator } from "@/components/ui/separator"
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useI18n } from "@/lib/i18n/i18n-context"
 
@@ -22,6 +19,7 @@ export function DashboardHeader({ user }: { user: DashboardUser }) {
   return (
     <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b bg-background/80 px-4 backdrop-blur md:px-6">
       <SidebarTrigger />
+      <img src="/lops.svg" alt="LycaOps" className="h-7 w-auto md:hidden" />
       <Separator orientation="vertical" className="h-6" />
 
       <div className="flex min-w-0 flex-1 items-center gap-2">
@@ -41,12 +39,6 @@ export function DashboardHeader({ user }: { user: DashboardUser }) {
         ) : null}
       </div>
 
-      <form action={signOut}>
-        <Button variant="ghost" size="sm" type="submit">
-          <LogOut className="mr-1.5 h-4 w-4" aria-hidden="true" />
-          {t("signOut")}
-        </Button>
-      </form>
     </header>
   )
 }

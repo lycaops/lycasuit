@@ -28,7 +28,7 @@ export function MobileToolNav() {
             </Link>
           )
         }
-        if (item.href === "/tools/assistance") {
+        if (item.href === "/tools/assistance" || item.href === "/tools/incentive") {
           return (
             <a key={item.href} href={item.href} aria-label={item.label} className={`flex h-12 min-w-0 flex-1 shrink-0 flex-col items-center justify-center gap-1 rounded-lg px-1 py-1.5 text-[10px] font-medium ${active ? "text-[#245bc1]" : "text-[#21264e]/55"}`}>
               <Icon className="h-5 w-5" />

@@ -13,7 +13,9 @@ import {
   Check,
   ChevronUp,
   Home,
+  LogOut,
 } from "lucide-react"
+import { signOut } from "@/app/auth/actions"
 import {
   Sidebar,
   SidebarContent,
@@ -126,6 +128,14 @@ export function AppSidebar({ user }: { user: SidebarUser }) {
 
       <SidebarFooter>
         <SidebarMenu>
+          <SidebarMenuItem>
+            <form action={signOut}>
+              <SidebarMenuButton type="submit" tooltip={t("signOut")}>
+                <LogOut aria-hidden="true" />
+                <span>{t("signOut")}</span>
+              </SidebarMenuButton>
+            </form>
+          </SidebarMenuItem>
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
