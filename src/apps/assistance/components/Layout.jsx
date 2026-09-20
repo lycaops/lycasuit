@@ -36,9 +36,9 @@ export default function Layout({ children }) {
 
   const navItems = isAdmin ? NAV_ITEMS.admin : NAV_ITEMS.standard;
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login', { replace: true });
+  const handleLogout = async () => {
+    await logout();
+    window.location.assign('/tools/assistance/login');
   };
 
   const isActive = (path) => {

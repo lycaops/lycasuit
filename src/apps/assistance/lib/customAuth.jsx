@@ -128,9 +128,9 @@ export function CustomAuthProvider({ children }) {
     return { success: true, user: sessionUser };
   };
 
-  const logout = () => {
+  const logout = async () => {
     localStorage.removeItem(STORAGE_KEY);
-    supabase.auth.signOut().catch(() => {});
+    await supabase.auth.signOut().catch(() => {});
     setCurrentUser(null);
   };
 
