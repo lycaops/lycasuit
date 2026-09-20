@@ -10,6 +10,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import BranchCoverageChart from '@fieldiq/components/BranchCoverageChart';
 import CoverageMap from '@fieldiq/components/CoverageMap';
 import type { RetailerCoverage, RpaUser, ZoneCoverageSummary } from '@fieldiq/types';
+import Loader from '@/components/Loader';
 
 type ViewTab = 'all' | 'not-covered' | 'red-flagged' | 'inactive';
 
@@ -994,7 +995,7 @@ export default function CoverageView({ user }: { user: RpaUser }) {
 
           {/* Retailer Details Table */}
           {loading ? (
-            <div className="text-center py-8 text-gray-500">Loading coverage data...</div>
+            <div className="flex justify-center py-8"><Loader size={64} weight={8} /></div>
           ) : filteredCoverage.length === 0 ? (
             <div className="text-center py-8 text-gray-500">No records found</div>
           ) : (

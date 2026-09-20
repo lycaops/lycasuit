@@ -5,7 +5,7 @@ import { toast } from "sonner"
 import { ArrowLeft, ArrowRight, CheckCircle2, Download, FileText, User, MapPin, Phone, Mail, Hash } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Spinner } from "@/components/ui/spinner"
+import Loader from "@/components/Loader"
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
 import { Progress } from "@/components/ui/progress"
 import { SignaturePad, type SignaturePadHandle } from "@/components/contracts/signature-pad"
@@ -357,7 +357,7 @@ export function RetailerSignPanel(props: {
                 disabled={pendingDraft}
                 className="w-full sm:w-auto"
               >
-                {pendingDraft ? <Spinner className="mr-2 h-4 w-4" /> : <Download className="mr-2 h-4 w-4" />}
+                {pendingDraft ? <Loader size={18} weight={26} inherit label="Downloading draft" /> : <Download className="mr-2 h-4 w-4" />}
                 {t("downloadDraftPdf")}
               </Button>
               <Button
@@ -407,7 +407,7 @@ export function RetailerSignPanel(props: {
                 disabled={pending}
                 className="w-full bg-brand-navy hover:bg-brand-navy/90 sm:w-auto sm:px-8"
               >
-                {pending ? <Spinner className="mr-2 h-4 w-4" /> : null}
+                {pending ? <Loader size={18} weight={26} inherit label="Sending code" /> : null}
                 {t("sendOtp")}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
@@ -450,7 +450,7 @@ export function RetailerSignPanel(props: {
                   disabled={pending || otp.replace(/\s+/g, "").length !== 6}
                   className="w-full bg-brand-navy hover:bg-brand-navy/90 sm:w-auto sm:px-8"
                 >
-                  {pending ? <Spinner className="mr-2 h-4 w-4" /> : null}
+                  {pending ? <Loader size={18} weight={26} inherit label="Verifying code" /> : null}
                   {t("verifyOtp")}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>

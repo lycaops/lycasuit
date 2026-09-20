@@ -8,7 +8,8 @@ import { useLanguage } from '@assistance/lib/LanguageContext';
 import StatCard from '@assistance/components/StatCard';
 import TicketCard from '@assistance/components/TicketCard';
 import { Button } from '@assistance/components/ui/button';
-import { PlusCircle, Inbox, Clock, AlertOctagon, CheckCircle2, Loader2, FileText } from 'lucide-react';
+import { PlusCircle, Inbox, Clock, AlertOctagon, CheckCircle2, FileText } from 'lucide-react';
+import Loader from '@/components/Loader';
 import { BarChart, Bar, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 const STATUS_CHART_COLORS = {
@@ -64,7 +65,7 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-6 h-6 text-foreground animate-spin" />
+        <Loader size={64} weight={8} />
       </div>
     );
   }

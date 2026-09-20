@@ -2,7 +2,8 @@
 import React, { useEffect, useState } from "react";
 import { appParams } from "@assistance/lib/app-params";
 import { Button } from "@assistance/components/ui/button";
-import { ShieldCheck, Loader2 } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
+import Loader from '@/components/Loader';
 import AuthLayout from "@assistance/components/AuthLayout";
 
 // App-side OAuth consent page for the app's MCP server. The platform redirects
@@ -139,8 +140,7 @@ export default function OAuthConsent() {
     return (
       <AuthLayout icon={ShieldCheck} title="Authorize access">
         <div className="flex items-center justify-center py-6 text-muted-foreground">
-          <Loader2 className="w-5 h-5 mr-2 animate-spin" aria-hidden="true" />
-          Loading…
+          <Loader size={18} weight={26} inherit label="Loading" />
         </div>
       </AuthLayout>
     );
@@ -231,7 +231,7 @@ export default function OAuthConsent() {
           disabled={submitting}
           onClick={() => respond("approve")}
         >
-          {submitting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+          {submitting ? <Loader size={18} weight={26} inherit label="Submitting" /> : null}
           Approve
         </Button>
       </div>

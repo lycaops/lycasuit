@@ -4,7 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@incentive/components/ui/button';
 import { Input } from '@incentive/components/ui/input';
 import { Label } from '@incentive/components/ui/label';
-import { UserPlus, Mail, Lock, Loader2, User as UserIcon } from 'lucide-react';
+import { UserPlus, Mail, Lock, User as UserIcon } from 'lucide-react';
+import Loader from '@/components/Loader';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@incentive/components/ui/input-otp';
 import AuthLayout from '@incentive/components/AuthLayout';
 import { toast } from '@incentive/components/ui/use-toast';
@@ -106,7 +107,7 @@ export default function Register() {
         >
           {loading ? (
             <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              <Loader size={18} weight={26} inherit label="Creating account" />
               Verifying...
             </>
           ) : (
@@ -229,7 +230,7 @@ export default function Register() {
         <Button type="submit" className="w-full h-12 font-medium" disabled={loading}>
           {loading ? (
             <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              <Loader size={18} weight={26} inherit label="Creating account" />
               Creating account...
             </>
           ) : (

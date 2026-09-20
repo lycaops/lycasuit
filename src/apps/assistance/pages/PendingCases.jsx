@@ -9,7 +9,8 @@ import UrgencyBadge from '@assistance/components/UrgencyBadge';
 import { formatDate } from '@assistance/lib/authUtils';
 import { CATEGORY_LIST, STATUS_OPTIONS } from '@assistance/lib/categories';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@assistance/components/ui/select';
-import { Loader2, Inbox, Clock, SlidersHorizontal, X } from 'lucide-react';
+import { Inbox, Clock, SlidersHorizontal, X } from 'lucide-react';
+import Loader from '@/components/Loader';
 
 export default function PendingCases() {
   const { isAdmin } = useCustomAuth();
@@ -49,7 +50,7 @@ export default function PendingCases() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-6 h-6 text-foreground animate-spin" />
+        <Loader size={64} weight={8} />
       </div>
     );
   }

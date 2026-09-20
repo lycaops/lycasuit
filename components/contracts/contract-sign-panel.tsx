@@ -13,7 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Spinner } from "@/components/ui/spinner"
+import Loader from "@/components/Loader"
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
 import { SignaturePad, type SignaturePadHandle } from "./signature-pad"
 import {
@@ -360,7 +360,7 @@ export function ContractSignPanel({ contractId }: { contractId: string }) {
                 disabled={pending}
                 className="w-full bg-brand-navy hover:bg-brand-navy/90 sm:w-auto sm:px-8"
               >
-                {pending ? <Spinner className="mr-2 h-4 w-4" /> : null}
+                {pending ? <Loader size={18} weight={26} inherit label="Saving signature" /> : null}
                 {t("next")}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
@@ -428,7 +428,7 @@ export function ContractSignPanel({ contractId }: { contractId: string }) {
                     disabled={pending || otp.replace(/\\s+/g, "").length !== 6}
                     className="w-full bg-brand-navy hover:bg-brand-navy/90 sm:w-auto sm:px-8"
                   >
-                    {pending ? <Spinner className="mr-2 h-4 w-4" /> : null}
+                    {pending ? <Loader size={18} weight={26} inherit label="Verifying code" /> : null}
                     {t("verifyOtp")}
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
@@ -459,7 +459,7 @@ export function ContractSignPanel({ contractId }: { contractId: string }) {
                 disabled={pending}
                 className="w-full bg-brand-green font-bold text-brand-navy hover:bg-brand-green/90 sm:w-auto sm:px-8"
               >
-                {pending ? <Spinner className="mr-2 h-4 w-4" /> : null}
+                {pending ? <Loader size={18} weight={26} inherit label="Generating contract" /> : null}
                 {t("completeAndGeneratePdf")}
               </Button>
             </div>

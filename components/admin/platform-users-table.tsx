@@ -3,7 +3,8 @@
 import { useMemo, useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { Check, Loader2, Pencil, Plus, Search, ShieldCheck, ShieldOff, Trash2 } from "lucide-react"
+import { Check, Pencil, Plus, Search, ShieldCheck, ShieldOff, Trash2 } from "lucide-react"
+import Loader from "@/components/Loader"
 import { toast } from "sonner"
 import { deletePlatformUser, setToolAccess, updatePlatformUser } from "@/app/admin/users/actions"
 import { Button } from "@/components/ui/button"
@@ -114,7 +115,7 @@ export function PlatformUsersTable({
           className="w-full bg-transparent text-sm text-[#21264E] outline-none placeholder:text-[#21264E]/40"
         />
         <span className="shrink-0 text-xs text-[#21264E]/50">{filtered.length} users</span>
-        {pending && <Loader2 className="h-4 w-4 animate-spin text-[#245BC1]" />}
+        {pending && <Loader size={18} weight={26} inherit label="Processing user action" />}
         <Button size="sm" className="ml-auto" asChild>
           <Link href="/admin/users/new">
           <Plus className="mr-1.5 h-4 w-4" /> Add user

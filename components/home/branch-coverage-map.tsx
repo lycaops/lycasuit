@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { GitBranch, Layers3, MapPinned } from "lucide-react"
+import Loader from "@/components/Loader"
 
 declare global {
   interface Window {
@@ -468,7 +469,7 @@ export function BranchCoverageMap() {
             ) : null}
             {!error && !ready ? (
               <div className="absolute inset-0 flex items-center justify-center p-6 text-center text-sm text-slate-600">
-                Loading map…
+                <Loader size={64} weight={8} />
               </div>
             ) : null}
           </div>

@@ -18,8 +18,9 @@ import {
   Card, CardContent } from
 '@/components/ui/card';
 import {
-  ArrowLeft, Loader2, Save, CheckCircle2, AlertCircle, MessageSquare } from
-'lucide-react';
+  ArrowLeft, Save, CheckCircle2, AlertCircle, MessageSquare
+} from 'lucide-react';
+import Loader from '@/components/Loader';
 import { formatDateTime } from '@assistance/lib/authUtils';
 
 export default function TicketDetails() {
@@ -172,7 +173,7 @@ export default function TicketDetails() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-6 h-6 text-foreground animate-spin" />
+        <Loader size={64} weight={8} />
       </div>);
 
   }
@@ -348,7 +349,7 @@ export default function TicketDetails() {
                 disabled={actionLoading}
                 className="flex-1 rounded-xl bg-[#08dc7d] hover:bg-[#08dc7d]/90 text-white">
                 
-                  {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Confirm'}
+                  {actionLoading ? <Loader size={18} weight={26} inherit label="Confirming" /> : 'Confirm'}
                 </Button>
               </div>
             </div>

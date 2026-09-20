@@ -1,3 +1,4 @@
+import Loader from '@/components/Loader';
 'use client';
 import { db } from '@assistance/api/db';
 import React, { useState, useEffect, useRef } from 'react';
@@ -142,7 +143,7 @@ export default function NotificationBar() {
               </div>
             </div>
             {loading ? (
-              <div className="p-8 text-center text-sm text-foreground/50">Loading...</div>
+              <div className="flex justify-center p-8"><Loader size={64} weight={8} /></div>
             ) : notifications.length === 0 ? (
               <div className="p-8 text-center text-sm text-foreground/50">No new notifications</div>
             ) : (

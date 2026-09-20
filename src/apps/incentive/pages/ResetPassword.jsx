@@ -4,7 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@incentive/components/ui/button';
 import { Input } from '@incentive/components/ui/input';
 import { Label } from '@incentive/components/ui/label';
-import { Lock, Loader2, AlertTriangle } from 'lucide-react';
+import { Lock, AlertTriangle } from 'lucide-react';
+import Loader from '@/components/Loader';
 import AuthLayout from '@incentive/components/AuthLayout';
 import { useAuth } from '@incentive/lib/AuthContext';
 import supabase from '@incentive/api/supabaseClient';
@@ -56,8 +57,7 @@ export default function ResetPassword() {
     return (
       <AuthLayout icon={Lock} title="Checking session" subtitle="One moment…">
         <div className="flex items-center justify-center py-6 text-muted-foreground">
-          <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-          Loading…
+          <Loader size={64} weight={8} />
         </div>
       </AuthLayout>
     );
@@ -138,7 +138,7 @@ export default function ResetPassword() {
         <Button type="submit" className="w-full h-12 font-medium" disabled={loading || done}>
           {loading ? (
             <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              <Loader size={18} weight={26} inherit label="Updating password" />
               Resetting...
             </>
           ) : (

@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
-import { Spinner } from "@/components/ui/spinner"
+import Loader from "@/components/Loader"
 
 export function LoginForm() {
   const router = useRouter()
@@ -58,7 +58,7 @@ export function LoginForm() {
           </div>
 
           <Button type="submit" disabled={loading} className="mt-2 h-12 w-full bg-[#006ae0] font-medium text-white shadow-[0_10px_20px_rgba(0,106,224,0.18)] hover:bg-[#0056b8]">
-            {loading ? <Spinner className="mr-2 h-4 w-4" /> : null}
+            {loading ? <Loader size={18} weight={26} inherit label="Logging in" /> : null}
             {loading ? "Logging in..." : "Log in"}
           </Button>
 

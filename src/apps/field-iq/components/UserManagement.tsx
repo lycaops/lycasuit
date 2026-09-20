@@ -9,6 +9,7 @@ import {
   UserPlus, Pencil, Trash2, X, Check, Search, Shield, Building2,
   Users, AlertTriangle, ChevronDown, Eye, EyeOff, User, FileDown,
 } from 'lucide-react';
+import Loader from '@/components/Loader';
 
 const ROLES: { value: RpaUser['role']; label: string; color: string }[] = [
   { value: 'HS-ADMIN', label: 'HS Admin', color: 'bg-[#46286E] text-white' },
@@ -456,11 +457,7 @@ export default function UserManagement() {
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-20 text-gray-400">
-            <svg className="animate-spin h-6 w-6 mr-3" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-            </svg>
-            Loading users...
+            <Loader size={64} weight={8} />
           </div>
         ) : filteredUsers.length === 0 ? (
           <div className="text-center py-20 text-gray-400">

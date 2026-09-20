@@ -5,7 +5,8 @@ import Layout from "@incentive/components/Layout";
 import StatementPreview from "@incentive/components/statement/StatementPreview";
 import { useApp } from "@incentive/lib/AppContext";
 import { exportStatementPDF } from "@incentive/lib/pdfExport";
-import { ArrowLeft, Download, Loader2 } from "lucide-react";
+import { ArrowLeft, Download } from "lucide-react";
+import Loader from '@/components/Loader';
 
 export default function Statement() {
   const { t, lang, selectedRetailer, setLang } = useApp();
@@ -66,7 +67,7 @@ export default function Statement() {
               className="inline-flex items-center gap-1.5 px-4 py-2 text-sm rounded-lg font-medium text-white disabled:opacity-60"
               style={{ backgroundColor: "#08dc7d" }}
             >
-              {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+              {exporting ? <Loader size={18} weight={26} inherit label="Generating PDF" /> : <Download className="w-4 h-4" />}
               {exporting ? t("downloading") : t("generate_pdf")}
             </button>
           </div>

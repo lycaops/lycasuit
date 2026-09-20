@@ -6,7 +6,8 @@ import { Link, useSearchParams } from "react-router-dom";
 import { Button } from "@assistance/components/ui/button";
 import { Input } from "@assistance/components/ui/input";
 import { Label } from "@assistance/components/ui/label";
-import { Lock, Loader2, AlertTriangle } from "lucide-react";
+import { Lock, AlertTriangle } from "lucide-react";
+import Loader from '@/components/Loader';
 import AuthLayout from "@assistance/components/AuthLayout";
 
 export default function ResetPassword() {
@@ -103,7 +104,7 @@ export default function ResetPassword() {
         <Button type="submit" className="w-full h-12 font-medium" disabled={loading}>
           {loading ? (
             <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              <Loader size={18} weight={26} inherit label="Updating password" />
               Resetting...
             </>
           ) : (

@@ -30,7 +30,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Spinner } from "@/components/ui/spinner"
+import Loader from "@/components/Loader"
 import { useI18n } from "@/lib/i18n/i18n-context"
 import type { AppUser } from "@/lib/types"
 import { 
@@ -266,7 +266,7 @@ export function UsersTable({ users }: { users: AppUser[] }) {
                         className="h-8 w-8 p-0 hover:bg-brand-navy/10 focus-visible:ring-brand-navy shrink-0"
                         disabled={pending}
                       >
-                        {pending ? <Spinner className="h-4 w-4 animate-spin" /> : <MoreHorizontal className="h-4 w-4 text-brand-navy" />}
+                        {pending ? <Loader size={18} weight={26} inherit label="Processing user action" /> : <MoreHorizontal className="h-4 w-4 text-brand-navy" />}
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-[200px]">

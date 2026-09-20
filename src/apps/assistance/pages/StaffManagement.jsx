@@ -22,8 +22,9 @@ import {
 } from '@assistance/lib/categories';
 import { toast } from '@assistance/components/ui/use-toast';
 import {
-  Loader2, Search, UserPlus, Pencil, Power, PowerOff, Users, Mail
+  Search, UserPlus, Pencil, Power, PowerOff, Users, Mail
 } from 'lucide-react';
+import Loader from '@/components/Loader';
 
 const ALL_ROLES = [...ADMIN_ROLES, ...STANDARD_ROLES];
 
@@ -152,7 +153,7 @@ export default function StaffManagement() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-6 h-6 text-foreground animate-spin" />
+        <Loader size={64} weight={8} />
       </div>
     );
   }
@@ -358,7 +359,7 @@ export default function StaffManagement() {
                 Cancel
               </Button>
               <Button type="submit" disabled={formLoading} className="rounded-xl bg-foreground hover:bg-foreground/90 text-white">
-                {formLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : editing ? 'Save Changes' : 'Add Staff'}
+                {formLoading ? <Loader size={18} weight={26} inherit label="Saving staff" /> : editing ? 'Save Changes' : 'Add Staff'}
               </Button>
             </DialogFooter>
           </form>

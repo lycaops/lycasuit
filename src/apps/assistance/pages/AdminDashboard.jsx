@@ -9,7 +9,8 @@ import StatCard from '@assistance/components/StatCard';
 import StatusBadge from '@assistance/components/StatusBadge';
 import UrgencyBadge from '@assistance/components/UrgencyBadge';
 import { formatDate } from '@assistance/lib/authUtils';
-import { FileText, Inbox, Clock, CheckCircle2, AlertOctagon, AlertTriangle, Loader2, ArrowRight } from 'lucide-react';
+import { FileText, Inbox, Clock, CheckCircle2, AlertOctagon, AlertTriangle, ArrowRight } from 'lucide-react';
+import Loader from '@/components/Loader';
 import { Cell, PieChart, Pie, ResponsiveContainer, Tooltip } from 'recharts';
 
 const STATUS_CHART_COLORS = {
@@ -76,7 +77,7 @@ export default function AdminDashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-6 h-6 text-foreground animate-spin" />
+        <Loader size={64} weight={8} />
       </div>
     );
   }

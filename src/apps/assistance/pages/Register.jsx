@@ -6,7 +6,8 @@ import { Link } from "react-router-dom";
 import { Button } from "@assistance/components/ui/button";
 import { Input } from "@assistance/components/ui/input";
 import { Label } from "@assistance/components/ui/label";
-import { UserPlus, Mail, Lock, Loader2 } from "lucide-react";
+import { UserPlus, Mail, Lock } from "lucide-react";
+import Loader from '@/components/Loader';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@assistance/components/ui/input-otp";
 import AuthLayout from "@assistance/components/AuthLayout";
 import GoogleIcon from "@assistance/components/GoogleIcon";
@@ -110,7 +111,7 @@ export default function Register() {
         >
           {loading ? (
             <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              <Loader size={18} weight={26} inherit label="Creating account" />
               Verifying...
             </>
           ) : (
@@ -221,7 +222,7 @@ export default function Register() {
         <Button type="submit" className="w-full h-12 font-medium" disabled={loading}>
           {loading ? (
             <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              <Loader size={18} weight={26} inherit label="Creating account" />
               Creating account...
             </>
           ) : (

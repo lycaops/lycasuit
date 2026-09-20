@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Spinner } from "@/components/ui/spinner"
+import Loader from "@/components/Loader"
 
 export default function ResetPasswordPage() {
   const [pending, startTransition] = useTransition()
@@ -177,7 +177,7 @@ export default function ResetPasswordPage() {
     return (
       <Card className="w-full">
         <CardContent className="flex items-center justify-center py-10">
-          <Spinner className="h-5 w-5" />
+          <Loader size={64} weight={8} />
         </CardContent>
       </Card>
     )
@@ -241,7 +241,7 @@ export default function ResetPasswordPage() {
               />
             </div>
             <Button type="submit" disabled={pending} className="w-full">
-              {pending ? <Spinner className="mr-2 h-4 w-4" /> : <Lock className="mr-2 h-4 w-4" />}
+              {pending ? <Loader size={18} weight={26} inherit label="Updating password" /> : <Lock className="mr-2 h-4 w-4" />}
               Update password
             </Button>
           </form>

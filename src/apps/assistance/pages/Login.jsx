@@ -7,7 +7,8 @@ import { Input } from '@assistance/components/ui/input';
 import { Label } from '@assistance/components/ui/label';
 import { Card } from '@assistance/components/ui/card';
 import logo from '@assistance/Public/logo.svg';
-import { AlertCircle, ArrowRight, ArrowLeft, Mail, Lock, Loader2 } from 'lucide-react';
+import { AlertCircle, ArrowRight, ArrowLeft, Mail, Lock } from 'lucide-react';
+import Loader from '@/components/Loader';
 import LanguageSwitcher from '@assistance/components/LanguageSwitcher';
 import { useLanguage } from '@assistance/lib/LanguageContext';
 
@@ -123,7 +124,7 @@ export default function Login() {
                 className="w-full rounded-xl bg-foreground hover:bg-foreground/90 text-white font-medium h-11">
                 
                   {loading ?
-                <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> {t('verifying')}</> :
+                    <><Loader size={18} weight={26} inherit label="Verifying" /> {t('verifying')}</> :
 
                 <>{t('continue')} <ArrowRight className="w-4 h-4 ml-2" /></>
                 }
@@ -161,7 +162,7 @@ export default function Login() {
                   className="flex-1 rounded-xl bg-foreground hover:bg-foreground/90 text-white font-medium h-11">
                   
                     {loading ?
-                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> {t('signingIn')}</> :
+                    <><Loader size={18} weight={26} inherit label="Signing in" /> {t('signingIn')}</> :
 
                     t('signIn')
                   }

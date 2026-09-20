@@ -4,7 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@incentive/components/ui/button';
 import { Input } from '@incentive/components/ui/input';
 import { Label } from '@incentive/components/ui/label';
-import { LogIn, Mail, Lock, Loader2 } from 'lucide-react';
+import { LogIn, Mail, Lock } from 'lucide-react';
+import Loader from '@/components/Loader';
 import AuthLayout from '@incentive/components/AuthLayout';
 import { useAuth } from '@incentive/lib/AuthContext';
 import { safeReturnTo } from '@incentive/lib/authReturnTo';
@@ -103,7 +104,7 @@ export default function Login() {
         >
           {loading ? (
             <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              <Loader size={18} weight={26} inherit label="Signing in" />
               Logging in...
             </>
           ) : (

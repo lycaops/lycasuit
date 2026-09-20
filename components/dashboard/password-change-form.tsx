@@ -6,7 +6,7 @@ import { Eye, EyeOff, Lock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Spinner } from "@/components/ui/spinner"
+import Loader from "@/components/Loader"
 import { createClient } from "@/lib/supabase/client"
 
 export function PasswordChangeForm() {
@@ -101,7 +101,7 @@ export function PasswordChangeForm() {
       </div>
 
       <Button type="submit" disabled={pending} className="w-full bg-brand-navy hover:bg-brand-navy/90">
-        {pending ? <Spinner className="mr-2 h-4 w-4" /> : <Lock className="mr-2 h-4 w-4" />}
+        {pending ? <Loader size={18} weight={26} inherit label="Updating password" /> : <Lock className="mr-2 h-4 w-4" />}
         Update Password
       </Button>
     </form>

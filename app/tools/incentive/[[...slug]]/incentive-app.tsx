@@ -1,12 +1,13 @@
 "use client"
 
 import dynamic from "next/dynamic"
+import Loader from "@/components/Loader"
 
 const App = dynamic(() => import("@incentive/App"), {
   ssr: false,
   loading: () => (
-    <div className="fixed inset-0 flex items-center justify-center">
-      <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" />
+    <div className="lo-screen">
+      <Loader size={128} />
     </div>
   ),
 })

@@ -12,6 +12,7 @@ import {
   Activity, Target, AlertTriangle, BarChart3,
   Zap, ArrowUpRight, ArrowDownRight,
 } from 'lucide-react';
+import Loader from '@/components/Loader';
 
 interface Props {
   summary: RetailerSummary;
@@ -950,7 +951,7 @@ export default function RetailerAnalysis({ summary, monthlyData }: Props) {
 
       <ChartCard title="Stock Distribution (Year-over-Year)" id="cSTK">
         {stockLoading ? (
-          <div className="text-center py-10 text-gray-400 text-sm">Loading stock data...</div>
+          <div className="flex justify-center py-10"><Loader size={64} weight={8} /></div>
         ) : stockError ? (
           <div className="text-center py-10 text-red-600 text-sm">{stockError}</div>
         ) : stockInsights.yoy.length === 0 ? (
@@ -1016,7 +1017,7 @@ export default function RetailerAnalysis({ summary, monthlyData }: Props) {
 
       <ChartCard title="Face Value Stock Details" id="tSTK">
         {stockLoading ? (
-          <div className="text-center py-10 text-gray-400 text-sm">Loading stock data...</div>
+          <div className="flex justify-center py-10"><Loader size={64} weight={8} /></div>
         ) : stockError ? (
           <div className="text-center py-10 text-red-600 text-sm">{stockError}</div>
         ) : stockInsights.faceValueRows.length === 0 ? (

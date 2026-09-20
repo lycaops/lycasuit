@@ -13,7 +13,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Spinner } from "@/components/ui/spinner"
+import Loader from "@/components/Loader"
 import { UserFormFields } from "./user-form-fields"
 import { createUserAction } from "@/app/tools/contracts/users/actions"
 import type { Role } from "@/lib/branches"
@@ -91,7 +91,7 @@ export function NewUserDialog() {
               Cancel
             </Button>
             <Button type="submit" disabled={pending}>
-              {pending ? <Spinner className="mr-2 h-4 w-4" /> : null}
+              {pending ? <Loader size={18} weight={26} inherit label="Creating user" /> : null}
               Create user
             </Button>
           </DialogFooter>

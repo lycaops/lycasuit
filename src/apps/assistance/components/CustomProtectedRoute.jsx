@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
+import Loader from '@/components/Loader';
 import { useCustomAuth } from '@assistance/lib/customAuth';
 import Layout from '@assistance/components/Layout';
 
@@ -9,8 +10,8 @@ export default function CustomProtectedRoute() {
 
   if (loading || loggingOut) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-background">
-        <div className="w-10 h-10 border-4 border-destructive border-t-foreground rounded-full animate-spin"></div>
+      <div className="lo-screen" style={{ '--lo-screen-bg': 'var(--background)' }}>
+        <Loader size={128} />
       </div>
     );
   }

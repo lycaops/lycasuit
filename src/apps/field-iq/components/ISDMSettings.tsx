@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@fieldiq/lib/supabase';
 import type { RpaUser } from '@fieldiq/types';
 import { X, Save, AlertCircle } from 'lucide-react';
+import Loader from '@/components/Loader';
 
 interface ISDMSettingsProps {
   user?: RpaUser;
@@ -111,7 +112,7 @@ export default function ISDMSettings({ user, onClose, onSettingsSaved }: ISDMSet
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-white rounded-lg p-8 max-w-2xl w-full mx-4">
-          <p className="text-center text-gray-600">Loading settings...</p>
+          <div className="flex justify-center"><Loader size={64} weight={8} /></div>
         </div>
       </div>
     );

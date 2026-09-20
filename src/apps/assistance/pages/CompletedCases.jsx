@@ -8,7 +8,8 @@ import StatusBadge from '@assistance/components/StatusBadge';
 import { formatDate } from '@assistance/lib/authUtils';
 import { CATEGORY_LIST } from '@assistance/lib/categories';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@assistance/components/ui/select';
-import { Loader2, Inbox, CheckCircle2, SlidersHorizontal, X } from 'lucide-react';
+import { Inbox, CheckCircle2, SlidersHorizontal, X } from 'lucide-react';
+import Loader from '@/components/Loader';
 
 export default function CompletedCases() {
   const { isAdmin } = useCustomAuth();
@@ -47,7 +48,7 @@ export default function CompletedCases() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-6 h-6 text-foreground animate-spin" />
+        <Loader size={64} weight={8} />
       </div>
     );
   }

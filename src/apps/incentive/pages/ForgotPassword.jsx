@@ -4,7 +4,8 @@ import { Link } from 'react-router-dom';
 import { Button } from '@incentive/components/ui/button';
 import { Input } from '@incentive/components/ui/input';
 import { Label } from '@incentive/components/ui/label';
-import { Mail, ArrowLeft, Loader2 } from 'lucide-react';
+import { Mail, ArrowLeft } from 'lucide-react';
+import Loader from '@/components/Loader';
 import AuthLayout from '@incentive/components/AuthLayout';
 import { useAuth } from '@incentive/lib/AuthContext';
 
@@ -77,7 +78,7 @@ export default function ForgotPassword() {
           <Button type="submit" className="w-full h-12 font-medium" disabled={loading}>
             {loading ? (
               <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                <Loader size={18} weight={26} inherit label="Sending reset email" />
                 Sending...
               </>
             ) : (

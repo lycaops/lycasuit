@@ -14,7 +14,8 @@ import {
 import { Button } from '@assistance/components/ui/button';
 import { CATEGORY_LIST, STATUS_OPTIONS, IMPACT_OPTIONS, URGENCY_OPTIONS } from '@assistance/lib/categories';
 import { formatDate } from '@assistance/lib/authUtils';
-import { Loader2, Search, SlidersHorizontal, X, Inbox } from 'lucide-react';
+import { Search, SlidersHorizontal, X, Inbox } from 'lucide-react';
+import Loader from '@/components/Loader';
 
 export default function AllTickets() {
   const { isAdmin } = useCustomAuth();
@@ -78,7 +79,7 @@ export default function AllTickets() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-6 h-6 text-foreground animate-spin" />
+        <Loader size={64} weight={8} />
       </div>
     );
   }

@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { Spinner } from "@/components/ui/spinner"
+import Loader from "@/components/Loader"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
@@ -176,7 +176,7 @@ export function EditUserDialog({
                     disabled={pending}
                     className="h-7 text-[10px] border-brand-navy/10 hover:bg-brand-navy/5 text-brand-navy font-bold uppercase"
                   >
-                    {pending ? <Spinner className="mr-1.5 h-3 w-3" /> : <Mail className="mr-1.5 h-3 w-3" />}
+                    {pending ? <Loader size={18} weight={26} inherit label="Sending reset email" /> : <Mail className="mr-1.5 h-3 w-3" />}
                     Email Link
                   </Button>
                   <Button
@@ -187,7 +187,7 @@ export function EditUserDialog({
                     disabled={pending}
                     className="h-7 text-[10px] bg-brand-navy hover:bg-brand-navy/90 shadow-sm font-bold uppercase"
                   >
-                    {pending ? <Spinner className="mr-1.5 h-3 w-3" /> : <Key className="mr-1.5 h-3 w-3" />}
+                    {pending ? <Loader size={18} weight={26} inherit label="Setting temporary password" /> : <Key className="mr-1.5 h-3 w-3" />}
                     Set Temp
                   </Button>
                 </div>
@@ -226,7 +226,7 @@ export function EditUserDialog({
               Discard
             </Button>
             <Button type="submit" disabled={pending} size="sm" className="bg-brand-navy hover:bg-brand-navy/90 px-8 shadow-md text-xs font-bold uppercase tracking-widest">
-              {pending ? <Spinner className="mr-2 h-4 w-4" /> : null}
+              {pending ? <Loader size={18} weight={26} inherit label="Updating account" /> : null}
               Update Account
             </Button>
           </DialogFooter>

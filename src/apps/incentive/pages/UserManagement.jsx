@@ -6,7 +6,6 @@ import { supabase } from "@incentive/api/supabaseClient";
 
 import {
   UserPlus,
-  Loader2,
   Shield,
   User as UserIcon,
   AlertCircle,
@@ -19,6 +18,7 @@ import {
   Save,
   Trash2,
 } from "lucide-react";
+  import Loader from '@/components/Loader';
 
 const ROLES = [
   { value: "admin", label: "Admin", desc: "Full access to everything" },
@@ -478,7 +478,7 @@ export default function UserManagement() {
                 className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg text-sm font-semibold text-white disabled:opacity-60"
                 style={{ backgroundColor: "#006AE0" }}
               >
-                {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                {submitting ? <Loader size={18} weight={26} inherit label="Saving user" /> : <Save className="w-4 h-4" />}
                 {editingId ? "Save Changes" : "Create User"}
               </button>
             </div>
@@ -497,7 +497,7 @@ export default function UserManagement() {
           </div>
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-6 h-6 text-slate-300 animate-spin" />
+              <Loader size={64} weight={8} />
             </div>
           ) : users.length === 0 ? (
             <div className="p-8 text-center text-sm text-slate-400">

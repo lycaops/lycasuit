@@ -6,7 +6,7 @@ import { toast } from "sonner"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import { Spinner } from "@/components/ui/spinner"
+import Loader from "@/components/Loader"
 import {
   Select,
   SelectContent,
@@ -364,7 +364,7 @@ export function NewContractForm({
 
       <Button type="submit" size="lg" disabled={pending} className="mt-4">
         {pending ? (
-          <Spinner className="mr-2 h-4 w-4" />
+          <Loader size={18} weight={26} inherit label={mode === "edit" ? "Saving contract" : "Creating contract"} />
         ) : mode === "edit" ? (
           t("saveChanges")
         ) : (

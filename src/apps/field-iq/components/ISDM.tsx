@@ -6,6 +6,7 @@ import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, L
 import { TrendingUp, Calendar, AlertCircle, CheckCircle2, Trophy, Settings } from 'lucide-react';
 import { NORTH_REGION, SOUTH_REGION, normalizeBranch } from '@fieldiq/data/mockData';
 import ISDMSettings from './ISDMSettings';
+import Loader from '@/components/Loader';
 
 interface ISDMProps {
   user?: RpaUser;
@@ -631,11 +632,7 @@ export default function ISDM({ user, branch, zone, region }: ISDMProps) {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="flex items-center gap-3 text-[#21264E]">
-          <svg className="animate-spin h-6 w-6" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-          </svg>
-          Loading ISDM data...
+          <Loader size={64} weight={8} />
         </div>
       </div>
     );

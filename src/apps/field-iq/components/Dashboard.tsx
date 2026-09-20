@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { generatePDF } from '@fieldiq/utils/pdfExport';
 import { ALL_BRANCHES, BRANCH_TO_ZONES, normalizeBranch, NORTH_REGION, SOUTH_REGION } from '@fieldiq/data/mockData';
+import Loader from '@/components/Loader';
 
 const VIEWS = { DASHBOARD: 'dashboard', KPI: 'kpi', ISDM: 'isdm', IMPORT: 'import', USERS: 'users', COVERAGE: 'coverage', RETAILER_PERFORMANCE: 'retailer_performance', PLAN_ACTIVATION: 'plan_activation' } as const;
 type View = (typeof VIEWS)[keyof typeof VIEWS];
@@ -1344,7 +1345,7 @@ export default function Dashboard() {
                 value={retailerSearch}
                 onChange={e => { setRetailerSearch(e.target.value); setShowRetailerDropdown(true); }}
                 onFocus={() => setShowRetailerDropdown(true)}
-                placeholder={loadingRetailers ? 'Loading retailers...' : `Search retailers in ${selectedBranch}...`}
+                placeholder={`Search retailers in ${selectedBranch}...`}
                 className="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg text-[#21264E] placeholder:text-gray-400 focus:ring-2 focus:ring-[#245bc1] outline-none"
               />
               {showRetailerDropdown && filteredRetailers.length > 0 && (
@@ -1499,11 +1500,7 @@ export default function Dashboard() {
           ) : loadingMonthly ? (
             <div className="flex items-center justify-center h-full">
               <div className="flex items-center gap-3 text-[#21264E]">
-                <svg className="animate-spin h-6 w-6" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-                Loading retailer data...
+                <Loader size={64} weight={8} />
               </div>
             </div>
           ) : selectedSummary ? (

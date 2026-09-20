@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Spinner } from "@/components/ui/spinner"
+import Loader from "@/components/Loader"
 import { Pencil, Plus, Shield } from "lucide-react"
 
 export interface PlatformUserRow {
@@ -358,7 +358,7 @@ export function PlatformUserForm({
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange?.(false)} disabled={pending}>Cancel</Button>
-            <Button type="submit" disabled={pending}>{pending && <Spinner className="mr-2 h-4 w-4" />}{editing ? "Save changes" : "Create user"}</Button>
+            <Button type="submit" disabled={pending}>{pending && <Loader size={18} weight={26} inherit label={editing ? "Saving changes" : "Creating user"} />}{editing ? "Save changes" : "Create user"}</Button>
           </DialogFooter>
         </form>
       </div>

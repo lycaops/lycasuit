@@ -6,6 +6,7 @@ import RetailerTable from '@incentive/components/RetailerTable';
 import Dashboard from '@incentive/components/Dashboard';
 import { useApp } from '@incentive/lib/AppContext';
 import { Search, Database, Filter } from 'lucide-react';
+import Loader from '@/components/Loader';
 
 function formatIncentiveMonth(value) {
   const match = /^(\d{4})-(\d{2})$/.exec(value);
@@ -78,7 +79,7 @@ export default function Home() {
 
         {loadingRecords && records.length === 0 && (
           <div className="flex items-center justify-center py-12">
-            <div className="w-8 h-8 border-4 border-slate-200 border-t-[#21264e] rounded-full animate-spin" />
+            <Loader size={64} weight={8} />
           </div>
         )}
 

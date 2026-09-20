@@ -9,7 +9,8 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from '@assistance/components/ui/select';
 import { STATUS_OPTIONS } from '@assistance/lib/categories';
-import { Loader2, Search, Inbox } from 'lucide-react';
+import { Search, Inbox } from 'lucide-react';
+import Loader from '@/components/Loader';
 
 export default function MyTickets() {
   const { currentUser } = useCustomAuth();
@@ -47,7 +48,7 @@ export default function MyTickets() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-6 h-6 text-foreground animate-spin" />
+        <Loader size={64} weight={8} />
       </div>
     );
   }

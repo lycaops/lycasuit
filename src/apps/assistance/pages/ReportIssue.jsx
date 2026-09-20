@@ -13,7 +13,8 @@ import { Input } from '@assistance/components/ui/input';
 import { Label } from '@assistance/components/ui/label';
 import { Textarea } from '@assistance/components/ui/textarea';
 import { Card } from '@assistance/components/ui/card';
-import { ArrowLeft, Loader2, CheckCircle2, AlertCircle, Send } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, AlertCircle, Send } from 'lucide-react';
+import Loader from '@/components/Loader';
 
 const MAX_DESC = 2000;
 
@@ -244,7 +245,7 @@ export default function ReportIssue() {
               className="flex-1 rounded-xl bg-foreground hover:bg-foreground/90 text-white font-medium h-11"
             >
               {submitting ? (
-                <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Submitting...</>
+                <><Loader size={18} weight={26} inherit label="Submitting" /> Submitting...</>
               ) : (
                 <><Send className="w-4 h-4 mr-2" /> Submit Report</>
               )}

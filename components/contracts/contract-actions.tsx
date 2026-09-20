@@ -4,7 +4,7 @@ import { useTransition } from "react"
 import { Download, Link, Mail, MessageCircle, Share2, FileText } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
-import { Spinner } from "@/components/ui/spinner"
+import Loader from "@/components/Loader"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -170,7 +170,7 @@ export function ContractActions({
             className="border-brand-navy text-brand-navy hover:bg-brand-navy/5"
           >
             {pendingDraft ? (
-              <Spinner className="mr-2 h-4 w-4" />
+              <Loader size={18} weight={26} inherit label="Downloading draft" />
             ) : (
               <FileText className="mr-1.5 h-4 w-4" aria-hidden="true" />
             )}
@@ -184,7 +184,7 @@ export function ContractActions({
                 className="border-brand-navy text-brand-navy hover:bg-brand-navy/5"
               >
                 {pendingDraftShare ? (
-                  <Spinner className="mr-2 h-4 w-4" />
+                  <Loader size={18} weight={26} inherit label="Sharing draft" />
                 ) : (
                   <Share2 className="mr-1.5 h-4 w-4" aria-hidden="true" />
                 )}
@@ -213,7 +213,7 @@ export function ContractActions({
       )}
       <Button onClick={download} disabled={disabled || pendingDownload}>
         {pendingDownload ? (
-          <Spinner className="mr-2 h-4 w-4" />
+          <Loader size={18} weight={26} inherit label="Downloading contract" />
         ) : (
           <Download className="mr-1.5 h-4 w-4" aria-hidden="true" />
         )}
@@ -225,7 +225,7 @@ export function ContractActions({
         disabled={disabled || pendingEmail}
       >
         {pendingEmail ? (
-          <Spinner className="mr-2 h-4 w-4" />
+          <Loader size={18} weight={26} inherit label="Sending email" />
         ) : (
           <Mail className="mr-1.5 h-4 w-4" aria-hidden="true" />
         )}

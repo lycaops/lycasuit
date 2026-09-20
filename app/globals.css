@@ -172,3 +172,76 @@
     font: inherit;
   }
 }
+
+/* ===== LycaOps loader ===== */
+:root {
+  --lo-blue: #006ae0;
+  --lo-green: #08dc7d;
+  --lo-cycle: 3s;
+}
+.lo {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: var(--size, 96px);
+  height: var(--size, 96px);
+}
+.lo svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.lo::before {
+  content: "";
+  position: absolute;
+  inset: -45%;
+  background: radial-gradient(circle, rgba(8, 220, 125, .24) 0%, rgba(8, 220, 125, 0) 58%);
+  opacity: 0;
+  animation: lo-glow var(--lo-cycle) ease-in-out infinite;
+  pointer-events: none;
+}
+.lo .ghost-blue  { fill: var(--lo-blue);  opacity: .16; }
+.lo .ghost-green { fill: var(--lo-green); opacity: .16; }
+.lo .blue, .lo .green {
+  stroke-width: var(--sw, 6);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  stroke-opacity: 0;
+  fill-opacity: 0;
+}
+.lo .blue  { fill: var(--lo-blue);  stroke: var(--lo-blue);  animation: lo-blue  var(--lo-cycle) ease-in-out infinite; }
+.lo .green { fill: var(--lo-green); stroke: var(--lo-green); animation: lo-green var(--lo-cycle) ease-in-out infinite; }
+@keyframes lo-blue {
+  0%   { stroke-dashoffset: 100; stroke-opacity: 0; fill-opacity: 0; }
+  2%   { stroke-dashoffset: 100; stroke-opacity: 1; fill-opacity: 0; }
+  32%  { stroke-dashoffset: 0;   stroke-opacity: 1; fill-opacity: 0; }
+  44%  { stroke-dashoffset: 0;   stroke-opacity: 0; fill-opacity: 1; }
+  86%  { stroke-dashoffset: 0;   stroke-opacity: 0; fill-opacity: 1; }
+  100% { stroke-dashoffset: 0;   stroke-opacity: 0; fill-opacity: 0; }
+}
+@keyframes lo-green {
+  0%   { stroke-dashoffset: 100; stroke-opacity: 0; fill-opacity: 0; }
+  14%  { stroke-dashoffset: 100; stroke-opacity: 0; fill-opacity: 0; }
+  16%  { stroke-dashoffset: 100; stroke-opacity: 1; fill-opacity: 0; }
+  50%  { stroke-dashoffset: 0;   stroke-opacity: 1; fill-opacity: 0; }
+  62%  { stroke-dashoffset: 0;   stroke-opacity: 0; fill-opacity: 1; }
+  86%  { stroke-dashoffset: 0;   stroke-opacity: 0; fill-opacity: 1; }
+  100% { stroke-dashoffset: 0;   stroke-opacity: 0; fill-opacity: 0; }
+}
+@keyframes lo-glow {
+  0%, 48% { opacity: 0; }
+  64%, 84% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lo::before { animation: none; opacity: .6; }
+  .lo .blue, .lo .green { animation: none; stroke-opacity: 0; fill-opacity: 1; }
+  .lo svg { animation: lo-fade 2.4s ease-in-out infinite alternate; }
+  @keyframes lo-fade { from { opacity: .45; } to { opacity: 1; } }
+}
+.lo--inherit { --lo-blue: currentColor; --lo-green: currentColor; }
+/* Full-screen overlay, only for blocking the whole screen */
+.lo-screen {
+  position: fixed; inset: 0; z-index: 1000;
+  display: grid; place-items: center;
+  background: var(--lo-screen-bg, #fff);
+}
+/* ===== end LycaOps loader ===== */
