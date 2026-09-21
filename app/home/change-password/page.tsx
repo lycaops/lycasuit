@@ -1,13 +1,9 @@
 import Link from "next/link"
-import dynamic from "next/dynamic"
 import { ArrowLeft, KeyRound } from "lucide-react"
 import { getMyTools, isPlatformAdmin, requirePlatformUser } from "@/lib/auth"
+import { HomeSidebarApp } from "@/components/home/home-sidebar-app"
 import { PasswordChangeForm } from "@/components/dashboard/password-change-form"
 import { MobileToolNav } from "@/components/dashboard/mobile-tool-nav"
-
-const HomeSidebar = dynamic(() => import("@/components/home/home-sidebar"), {
-  ssr: false,
-})
 
 export default async function ChangePasswordPage() {
   const user = await requirePlatformUser()
@@ -17,7 +13,7 @@ export default async function ChangePasswordPage() {
 
   return (
     <main className="min-h-dvh bg-[#f4f7fb] pb-16 lg:flex lg:h-dvh lg:overflow-hidden lg:pb-0">
-      <HomeSidebar user={sidebarUser} tools={tools} admin={admin} />
+      <HomeSidebarApp user={sidebarUser} tools={tools} admin={admin} />
       <div className="min-w-0 flex-1">
         <div className="flex flex-1 flex-col gap-4 md:gap-6 p-4 md:p-6 lg:p-8">
           <div className="flex flex-wrap items-center gap-3">
