@@ -89,7 +89,7 @@ export function HomeContent({
                   const Icon = ICONS[tool.icon ?? ""] ?? LayoutGrid
                   return <ToolLink key={tool.key} tool={tool} className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-white/65 transition hover:bg-white/10 hover:text-white" onClick={() => setMobileSidebarOpen(false)}><Icon className="h-4 w-4" />{TOOL_LABELS[tool.key] ? t(TOOL_LABELS[tool.key]) : tool.name}</ToolLink>
                 })}
-                <p className="px-3 pb-1 pt-5 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/40">Account</p>
+                <p className="px-3 pb-1 pt-5 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/40">{t("account")}</p>
                 {admin && (
                   <Link href="/admin/users" onClick={() => setMobileSidebarOpen(false)} className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-white/65 transition hover:bg-white/10 hover:text-white">
                     <Users className="h-4 w-4" /> {t("userManagement")}
@@ -100,7 +100,7 @@ export function HomeContent({
                   onClick={() => setMobileSidebarOpen(false)}
                   className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-white/65 transition hover:bg-white/10 hover:text-white text-left"
                 >
-                  <KeyRound className="h-4 w-4" /> Change Password
+                  <KeyRound className="h-4 w-4" /> {t("changePassword")}
                 </Link>
               </nav>
             </div>
@@ -129,7 +129,7 @@ export function HomeContent({
           })}
         </nav>
         <div className="mt-auto border-t border-white/10 pt-5">
-          <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/40 mb-1">Account</p>
+          <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/40 mb-1">{t("account")}</p>
           {admin && (
             <Link href="/admin/users" className="mb-1 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-white/70 transition hover:bg-white/10 hover:text-white">
               <Users className="h-4 w-4" /> {t("userManagement")}
@@ -139,7 +139,7 @@ export function HomeContent({
             href="/home/change-password"
             className="mb-4 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-white/70 transition hover:bg-white/10 hover:text-white text-left"
           >
-            <KeyRound className="h-4 w-4" /> Change Password
+            <KeyRound className="h-4 w-4" /> {t("changePassword")}
           </Link>
           <p className="truncate text-sm font-medium">{user.full_name}</p>
           <p className="mt-1 truncate text-xs text-white/45">{user.role}</p>

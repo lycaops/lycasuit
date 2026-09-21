@@ -10,8 +10,10 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Loader from "@/components/Loader"
+import { useI18n } from "@/lib/i18n/i18n-context"
 
 export default function ResetPasswordPage() {
+  const { t } = useI18n()
   const [pending, startTransition] = useTransition()
   const [ready, setReady] = useState(false)
   const [hasSession, setHasSession] = useState<boolean>(false)
@@ -21,7 +23,6 @@ export default function ResetPasswordPage() {
   const checkSession = async (mounted: boolean) => {
     try {
       const supabase = createClient()
-      // Use getUser() as it's more reliable than getSession() for verifying a fresh session
       const { data: { user }, error } = await supabase.auth.getUser()
       
       if (mounted) {
@@ -59,7 +60,6 @@ export default function ResetPasswordPage() {
         error 
       })
 
-      // 1. Handle explicit Supabase verification errors
       if (error || errorDescription) {
         if (mounted) {
           setErrorMsg(errorDescription || error || "Link verification failed.")
@@ -68,7 +68,6 @@ export default function ResetPasswordPage() {
         return
       }
 
-      // 2. Handle PKCE code exchange
       if (code) {
         console.log("Exchanging PKCE code...")
         const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
@@ -88,11 +87,9 @@ export default function ResetPasswordPage() {
         }
       }
 
-      // 3. Initial check for session
       const found = await checkSession(mounted)
       if (found) return
 
-      // 4. If we have a hash, it might take a moment for the client library to parse it and set cookies
       if (window.location.hash) {
         console.log("Hash detected, starting retry loop...")
         for (let i = 0; i < 6; i++) {
@@ -104,13 +101,11 @@ export default function ResetPasswordPage() {
         }
       }
 
-      // 5. Done checking
       if (mounted) {
         setReady(true)
       }
     }
 
-    // Auth state listener as a secondary catch for background updates
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("Auth event:", event, !!session)
       if (mounted && session) {
@@ -121,7 +116,6 @@ export default function ResetPasswordPage() {
 
     init()
 
-    // Safety timeout: stop spinner after 10s regardless
     const timer = setTimeout(() => {
       if (mounted && !ready) {
         console.log("Safety timeout reached")
@@ -139,11 +133,11 @@ export default function ResetPasswordPage() {
   function submit(e: React.FormEvent) {
     e.preventDefault()
     if (formData.password.length < 6) {
-      toast.error("Password must be at least 6 characters long")
+      toast.error(t("resetPasswordMinLength"))
       return
     }
     if (formData.password !== formData.confirmPassword) {
-      toast.error("Passwords do not match")
+      toast.error(t("resetPasswordMismatch"))
       return
     }
 
@@ -159,7 +153,7 @@ export default function ResetPasswordPage() {
           toast.error(msg || "Failed to update password")
           return
         }
-        toast.success("Password updated successfully")
+        toast.success(t("resetPasswordUpdateSuccess"))
         setFormData({ password: "", confirmPassword: "" })
       } catch (err) {
         const msg =
@@ -191,9 +185,9 @@ export default function ResetPasswordPage() {
             <Shield className="h-5 w-5" aria-hidden="true" />
           </div>
           <div className="flex flex-col">
-            <h1 className="text-xl font-semibold">Reset password</h1>
+            <h1 className="text-xl font-semibold">{t("resetPasswordTitle")}</h1>
             <p className="text-sm text-muted-foreground">
-              Choose a new password for your account.
+              {t("resetPasswordSubtitle")}
             </p>
           </div>
         </div>
@@ -205,19 +199,19 @@ export default function ResetPasswordPage() {
         ) : !hasSession ? (
           <div className="space-y-4">
             <div className="rounded-lg border p-3 text-sm text-muted-foreground">
-              This reset link is invalid or has expired. Request a new one from your administrator.
+              {t("resetPasswordInvalid")}
             </div>
             <div className="flex flex-col gap-2">
               <Button onClick={() => window.location.reload()} variant="outline" className="w-full">
                  <RefreshCw className="mr-2 h-4 w-4" />
-                 Check again
+                 {t("resetPasswordCheckAgain")}
                </Button>
             </div>
           </div>
         ) : (
           <form onSubmit={submit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="password">New password</Label>
+              <Label htmlFor="password">{t("resetPasswordNew")}</Label>
               <Input
                 id="password"
                 type="password"
@@ -228,7 +222,7 @@ export default function ResetPasswordPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm new password</Label>
+              <Label htmlFor="confirmPassword">{t("resetPasswordConfirm")}</Label>
               <Input
                 id="confirmPassword"
                 type="password"
@@ -241,14 +235,14 @@ export default function ResetPasswordPage() {
               />
             </div>
             <Button type="submit" disabled={pending} className="w-full">
-              {pending ? <Loader size={18} weight={26} inherit label="Updating password" /> : <Lock className="mr-2 h-4 w-4" />}
-              Update password
+              {pending ? <Loader size={18} weight={26} inherit label={t("resetPasswordSubmitting")} /> : <Lock className="mr-2 h-4 w-4" />}
+              {t("resetPasswordSubmit")}
             </Button>
           </form>
         )}
 
         <Button variant="outline" asChild>
-          <Link href="/auth/login">Back to sign in</Link>
+          <Link href="/auth/login">{t("resetPasswordBackToSignIn")}</Link>
         </Button>
       </CardContent>
     </Card>

@@ -25,6 +25,24 @@ export const translations = {
     toolContracts: "Retailer Contracts",
     toolIncentive: "Incentive Statements",
     toolAssistance: "Market Assistance",
+    changePassword: "Change Password",
+    backToHome: "Back to Home",
+    account: "Account",
+
+    // Reset Password Page
+    resetPasswordTitle: "Reset password",
+    resetPasswordSubtitle: "Choose a new password for your account.",
+    resetPasswordNew: "New password",
+    resetPasswordConfirm: "Confirm new password",
+    resetPasswordSubmit: "Update password",
+    resetPasswordSubmitting: "Updating password",
+    resetPasswordBackToSignIn: "Back to sign in",
+    resetPasswordInvalid: "This reset link is invalid or has expired. Request a new one from your administrator.",
+    resetPasswordCheckAgain: "Check again",
+    resetPasswordMinLength: "Password must be at least 6 characters long",
+    resetPasswordMismatch: "Passwords do not match",
+    resetPasswordUpdateSuccess: "Password updated successfully",
+    resetPasswordNoSession: "Unable to update password: there is no active session. Please sign in again.",
     
     // Header
     signOut: "Sign out",
@@ -244,6 +262,24 @@ export const translations = {
     toolContracts: "Contratti rivenditori",
     toolIncentive: "Rendiconti incentivi",
     toolAssistance: "Assistenza mercato",
+    changePassword: "Modifica password",
+    backToHome: "Torna alla Home",
+    account: "Account",
+
+    // Reset Password Page
+    resetPasswordTitle: "Reimposta password",
+    resetPasswordSubtitle: "Scegli una nuova password per il tuo account.",
+    resetPasswordNew: "Nuova password",
+    resetPasswordConfirm: "Conferma nuova password",
+    resetPasswordSubmit: "Aggiorna password",
+    resetPasswordSubmitting: "Aggiornamento password",
+    resetPasswordBackToSignIn: "Torna all'accesso",
+    resetPasswordInvalid: "Questo link di reimpostazione non è valido o è scaduto. Richiedine uno nuovo al tuo amministratore.",
+    resetPasswordCheckAgain: "Controlla di nuovo",
+    resetPasswordMinLength: "La password deve essere lunga almeno 6 caratteri",
+    resetPasswordMismatch: "Le password non corrispondono",
+    resetPasswordUpdateSuccess: "Password aggiornata correttamente",
+    resetPasswordNoSession: "Impossibile aggiornare la password: non c'è una sessione attiva. Accedi di nuovo.",
     
     // Header
     signOut: "Esci",
