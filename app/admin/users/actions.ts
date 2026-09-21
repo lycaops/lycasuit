@@ -61,6 +61,41 @@ function computeDesignation(roleCode: string): Designation | null {
   return sanitizeDesignation(DESIGNATION_BY_ROLE[roleCode] ?? null)
 }
 
+// Territory values allowed by the `app_users_territory_check` constraint
+// (see supabase/migrations/20260918000001_unified_core.sql): North Region,
+// Milan, Bologna, Torino, Padova, South Region, Rome, Napoli, Bari, Palermo,
+// ITALY (All). Branch display names like "HS BARI" violate the check.
+const TERRITORY_BY_BRANCH: Record<string, string> = {
+  "LMIT-HS-MILAN": "Milan",
+  "LMIT-HS-BOLOGNA": "Bologna",
+  "LMIT-HS-TORINO": "Torino",
+  "LMIT-HS-PADOVA": "Padova",
+  "LMIT-HS-BARI": "Bari",
+  "LMIT-HS-NAPLES": "Napoli",
+  "LMIT-HS-ROME": "Rome",
+  "LMIT-HS-PALERMO": "Palermo",
+}
+
+const ALLOWED_TERRITORIES = [
+  "North Region",
+  "Milan",
+  "Bologna",
+  "Torino",
+  "Padova",
+  "South Region",
+  "Rome",
+  "Napoli",
+  "Bari",
+  "Palermo",
+  "ITALY (All)",
+] as const
+
+/** Keep only territory values the database check constraint allows. */
+function sanitizeTerritory(value: string | null | undefined): string | null {
+  if (value == null) return null
+  return (ALLOWED_TERRITORIES as readonly string[]).includes(value) ? value : null
+}
+
 async function computeTerritory(
   supabase: ReturnType<typeof createClient> | ReturnType<typeof createAdminClient>,
   roleCode: string,
@@ -71,33 +106,36 @@ async function computeTerritory(
   const assignedBranches = branches && branches.length > 0 ? branches : (chosenBranch ? [chosenBranch] : [])
 
   switch (roleCode) {
-    case "ZONE-MANAGER":
+    case "ZONE-MANAGER": {
+      // Territory must be one of the zones' branch territories allowed by the
+      // app_users_territory_check constraint; zone names themselves are not.
+      const branchCode = zone
+        ? (await supabase.from("zones").select("branch_id,branch:branches!inner(code)").eq("code", zone).maybeSingle()).data
+        : null
+      const code = (branchCode as any)?.branch?.code ?? null
+      return code ? TERRITORY_BY_BRANCH[code] ?? null : null
+    }
     case "FSE": {
       if (!zone) return null
       const { data: zoneRow } = await supabase
         .from("zones")
-        .select("name,branch:branch_id(code,name)")
+        .select("short_code,branch:branch_id(code)")
         .eq("code", zone)
         .maybeSingle()
       if (!zoneRow) return null
-      const zoneName = (zoneRow as any)?.name ?? null
-      const branchName = (zoneRow as any)?.branch?.name ?? null
-      return branchName && zoneName ? `${zoneName} (${branchName})` : zoneName ?? branchName ?? null
+      const shortCode = (zoneRow as any)?.short_code ?? null
+      const branchCode = (zoneRow as any)?.branch?.code ?? null
+      return sanitizeTerritory(shortCode) ?? TERRITORY_BY_BRANCH[branchCode] ?? null
     }
     case "ASM": {
       if (!chosenBranch) return null
-      const { data } = await supabase
-        .from("branches")
-        .select("name")
-        .eq("code", chosenBranch)
-        .maybeSingle()
-      return data?.name ?? null
+      return TERRITORY_BY_BRANCH[chosenBranch] ?? null
     }
     case "RSM": {
       if (assignedBranches.length === 0) return null
       const all = [...NORTH_BRANCHES, ...SOUTH_BRANCHES]
       if (all.every((b) => assignedBranches.includes(b))) {
-        return "All Italy"
+        return "ITALY (All)"
       }
       if (NORTH_BRANCHES.every((b) => assignedBranches.includes(b))) {
         return "North Region"
@@ -105,17 +143,10 @@ async function computeTerritory(
       if (SOUTH_BRANCHES.every((b) => assignedBranches.includes(b))) {
         return "South Region"
       }
-      const { data } = await supabase
-        .from("branches")
-        .select("code,name")
-        .in("code", assignedBranches)
-      const nameFor = new Map((data ?? []).map((b: any) => [b.code, b.name || b.code]))
-      return assignedBranches
-        .map((c) => nameFor.get(c) || c.replace("LMIT-HS-", ""))
-        .join(", ")
+      return null
     }
     default: {
-      return "All Italy"
+      return "ITALY (All)"
     }
   }
 }
@@ -160,7 +191,7 @@ export async function createPlatformUser(input: {
   }
 
   const designation = sanitizeDesignation(input.designation) ?? computeDesignation(input.role)
-  const territory = input.territory ?? (await computeTerritory(admin, input.role, {
+  const territory = sanitizeTerritory(input.territory) ?? (await computeTerritory(admin, input.role, {
     branches: input.branches,
     branch: input.branch,
     zone: input.zone,
@@ -216,7 +247,7 @@ export async function updatePlatformUser(
   const supabase = await createClient()
 
   let designation = patch.designation !== undefined ? sanitizeDesignation(patch.designation) : undefined
-  let territory = patch.territory
+  let territory = patch.territory !== undefined ? sanitizeTerritory(patch.territory) : undefined
   const needsRoleRecompute = (patch.role !== undefined || patch.branches !== undefined || patch.branch !== undefined || patch.zone !== undefined)
   if (needsRoleRecompute) {
     let role = patch.role
