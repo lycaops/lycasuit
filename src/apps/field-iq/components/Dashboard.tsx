@@ -776,7 +776,7 @@ export default function Dashboard() {
 
         {/* Nav */}
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-          <nav className="flex min-h-0 flex-1 p-3 space-y-1 overflow-y-auto pr-1">
+          <nav className="flex min-h-0 flex-1 flex-col p-3 gap-1 overflow-y-auto pr-1">
             <button
               onClick={() => { window.location.href = '/home'; setMobileMenuOpen(false); }}
               className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition text-white/60 hover:bg-white/10 hover:text-white"
@@ -784,71 +784,71 @@ export default function Dashboard() {
               <Home size={20} />
               {(!sidebarCollapsed || mobileMenuOpen) && 'Back to Home'}
             </button>
-          <button
-            onClick={() => { setView(VIEWS.DASHBOARD); setMobileMenuOpen(false); }}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
-              view === VIEWS.DASHBOARD ? 'bg-white/15 text-white' : 'text-white/60 hover:bg-white/10 hover:text-white'
-            }`}
-          >
-            <LayoutDashboard size={20} />
-            {(!sidebarCollapsed || mobileMenuOpen) && 'Dashboard'}
-          </button>
-          <button
-            onClick={() => { setView(VIEWS.KPI); setMobileMenuOpen(false); }}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
-              view === VIEWS.KPI ? 'bg-white/15 text-white' : 'text-white/60 hover:bg-white/10 hover:text-white'
-            }`}
-          >
-            <TrendingUp size={20} />
-            {(!sidebarCollapsed || mobileMenuOpen) && 'KPI'}
-          </button>
-          <button
-            onClick={() => { setView(VIEWS.ISDM); setMobileMenuOpen(false); }}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
-              view === VIEWS.ISDM ? 'bg-white/15 text-white' : 'text-white/60 hover:bg-white/10 hover:text-white'
-            }`}
-          >
-            <Trophy size={20} />
-            {(!sidebarCollapsed || mobileMenuOpen) && 'ISDM'}
-          </button>
-          <button
-            onClick={() => { setView(VIEWS.COVERAGE); setMobileMenuOpen(false); }}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
-              view === VIEWS.COVERAGE ? 'bg-white/15 text-white' : 'text-white/60 hover:bg-white/10 hover:text-white'
-            }`}
-          >
-            <Globe size={20} />
-            {(!sidebarCollapsed || mobileMenuOpen) && 'Coverage'}
-          </button>
-          <button
-            onClick={() => { setView(VIEWS.RETAILER_PERFORMANCE); setMobileMenuOpen(false); }}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
-              view === VIEWS.RETAILER_PERFORMANCE ? 'bg-white/15 text-white' : 'text-white/60 hover:bg-white/10 hover:text-white'
-            }`}
-          >
-            <Activity size={20} />
-            {(!sidebarCollapsed || mobileMenuOpen) && 'Retailer Performance'}
-          </button>
-          <button
-            onClick={() => { setView(VIEWS.PLAN_ACTIVATION); setMobileMenuOpen(false); }}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
-              view === VIEWS.PLAN_ACTIVATION ? 'bg-white/15 text-white' : 'text-white/60 hover:bg-white/10 hover:text-white'
-            }`}
-          >
-            <BarChart2 size={20} />
-              {(!sidebarCollapsed || mobileMenuOpen) && 'Plan Activation Report'}
-          </button>
-          {user?.role === 'HS-ADMIN' && (
             <button
-              onClick={() => { setView(VIEWS.IMPORT); setMobileMenuOpen(false); }}
+              onClick={() => { setView(VIEWS.DASHBOARD); setMobileMenuOpen(false); }}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
-                view === VIEWS.IMPORT ? 'bg-white/15 text-white' : 'text-white/60 hover:bg-white/10 hover:text-white'
+                view === VIEWS.DASHBOARD ? 'bg-white/15 text-white' : 'text-white/60 hover:bg-white/10 hover:text-white'
               }`}
             >
-              <Upload size={20} />
-              {(!sidebarCollapsed || mobileMenuOpen) && 'Data Import'}
+              <LayoutDashboard size={20} />
+              {(!sidebarCollapsed || mobileMenuOpen) && 'Dashboard'}
             </button>
-          )}
+            <button
+              onClick={() => { setView(VIEWS.KPI); setMobileMenuOpen(false); }}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
+                view === VIEWS.KPI ? 'bg-white/15 text-white' : 'text-white/60 hover:bg-white/10 hover:text-white'
+              }`}
+            >
+              <TrendingUp size={20} />
+              {(!sidebarCollapsed || mobileMenuOpen) && 'KPI'}
+            </button>
+            <button
+              onClick={() => { setView(VIEWS.ISDM); setMobileMenuOpen(false); }}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
+                view === VIEWS.ISDM ? 'bg-white/15 text-white' : 'text-white/60 hover:bg-white/10 hover:text-white'
+              }`}
+            >
+              <Trophy size={20} />
+              {(!sidebarCollapsed || mobileMenuOpen) && 'ISDM'}
+            </button>
+            <button
+              onClick={() => { setView(VIEWS.COVERAGE); setMobileMenuOpen(false); }}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
+                view === VIEWS.COVERAGE ? 'bg-white/15 text-white' : 'text-white/60 hover:bg-white/10 hover:text-white'
+              }`}
+            >
+              <Globe size={20} />
+              {(!sidebarCollapsed || mobileMenuOpen) && 'Coverage'}
+            </button>
+            <button
+              onClick={() => { setView(VIEWS.RETAILER_PERFORMANCE); setMobileMenuOpen(false); }}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
+                view === VIEWS.RETAILER_PERFORMANCE ? 'bg-white/15 text-white' : 'text-white/60 hover:bg-white/10 hover:text-white'
+              }`}
+            >
+              <Activity size={20} />
+              {(!sidebarCollapsed || mobileMenuOpen) && 'Retailer Performance'}
+            </button>
+            <button
+              onClick={() => { setView(VIEWS.PLAN_ACTIVATION); setMobileMenuOpen(false); }}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
+                view === VIEWS.PLAN_ACTIVATION ? 'bg-white/15 text-white' : 'text-white/60 hover:bg-white/10 hover:text-white'
+              }`}
+            >
+              <BarChart2 size={20} />
+              {(!sidebarCollapsed || mobileMenuOpen) && 'Plan Activation Report'}
+            </button>
+            {user?.role === 'HS-ADMIN' && (
+              <button
+                onClick={() => { setView(VIEWS.IMPORT); setMobileMenuOpen(false); }}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
+                  view === VIEWS.IMPORT ? 'bg-white/15 text-white' : 'text-white/60 hover:bg-white/10 hover:text-white'
+                }`}
+              >
+                <Upload size={20} />
+                {(!sidebarCollapsed || mobileMenuOpen) && 'Data Import'}
+              </button>
+            )}
           </nav>
         </div>
 

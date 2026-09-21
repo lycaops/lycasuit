@@ -7,15 +7,6 @@ import { useI18n } from "@/lib/i18n/i18n-context"
 import { HomeHeader } from "@/components/home/home-header"
 import { MobileToolNav } from "@/components/dashboard/mobile-tool-nav"
 import type { PlatformTool } from "@/lib/auth"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { PasswordChangeForm } from "@/components/dashboard/password-change-form"
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   BarChart3,
@@ -57,14 +48,13 @@ export function HomeContent({
 }) {
   const { t } = useI18n()
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
-  const [pwdDialogOpen, setPwdDialogOpen] = useState(false)
   const firstName = user.full_name?.split(" ")[0] ?? "there"
 
   return (
     <main className="min-h-dvh bg-[#f4f7fb] pb-16 lg:flex lg:h-dvh lg:overflow-hidden lg:pb-0">
       <div className="h-14 shrink-0 lg:hidden" />
       <header className="fixed inset-x-0 top-0 z-40 flex h-[calc(3.5rem+env(safe-area-inset-top))] items-center justify-between bg-[#21264e] px-4 pt-[env(safe-area-inset-top)] lg:hidden">
-        <img src="/fieldiq.png" alt="LycaOps" className="h-8 w-auto object-contain" />
+        <img src="/lops_w.svg" alt="LycaOps" className="h-8 w-auto object-contain" />
         <button
           type="button"
           onClick={() => setMobileSidebarOpen(true)}
@@ -87,7 +77,7 @@ export function HomeContent({
               <X className="h-5 w-5" />
             </button>
             <div className="flex w-full justify-start shrink-0">
-              <img src="/fieldiq.png" alt="LycaOps" className="relative h-auto w-44 object-contain" />
+              <img src="/lops_w.svg" alt="LycaOps" className="relative h-auto w-44 object-contain" />
             </div>
             <div className="mt-8 flex min-h-0 flex-1 flex-col overflow-hidden">
               <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto pr-1">
@@ -105,23 +95,13 @@ export function HomeContent({
                     <Users className="h-4 w-4" /> {t("userManagement")}
                   </Link>
                 )}
-                <Dialog open={pwdDialogOpen} onOpenChange={setPwdDialogOpen}>
-                  <DialogTrigger asChild>
-                    <button
-                      type="button"
-                      className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-white/65 transition hover:bg-white/10 hover:text-white text-left"
-                    >
-                      <KeyRound className="h-4 w-4" /> Change Password
-                    </button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                      <DialogTitle>Change Password</DialogTitle>
-                      <DialogDescription>Update the password for your account.</DialogDescription>
-                    </DialogHeader>
-                    <PasswordChangeForm onSuccess={() => { setPwdDialogOpen(false); setMobileSidebarOpen(false); }} />
-                  </DialogContent>
-                </Dialog>
+                <Link
+                  href="/home/change-password"
+                  onClick={() => setMobileSidebarOpen(false)}
+                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-white/65 transition hover:bg-white/10 hover:text-white text-left"
+                >
+                  <KeyRound className="h-4 w-4" /> Change Password
+                </Link>
               </nav>
             </div>
             <div className="shrink-0 border-t border-white/10 pt-5 mt-5">
@@ -136,7 +116,7 @@ export function HomeContent({
         <img src="/h2.svg" alt="" aria-hidden="true" className="pointer-events-none absolute -bottom-8 -left-12 h-72 w-72 opacity-20" />
         <img src="/h1.svg" alt="" aria-hidden="true" className="pointer-events-none absolute bottom-28 -right-20 h-64 w-64 opacity-[.15]" />
         <div className="flex w-full justify-start shrink-0">
-          <img src="/fieldiq.png" alt="LycaOps" className="relative h-auto w-44 object-contain" />
+          <img src="/lops_w.svg" alt="LycaOps" className="relative h-auto w-44 object-contain" />
         </div>
         <nav className="mt-8 flex flex-col gap-1">
           <Link href="/home" className="flex items-center gap-3 rounded-lg bg-white/10 px-3 py-2.5 text-sm font-medium text-white">
@@ -149,28 +129,18 @@ export function HomeContent({
           })}
         </nav>
         <div className="mt-auto border-t border-white/10 pt-5">
+          <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/40 mb-1">Account</p>
           {admin && (
-            <Link href="/admin/users" className="mb-4 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-white/70 transition hover:bg-white/10 hover:text-white">
+            <Link href="/admin/users" className="mb-1 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-white/70 transition hover:bg-white/10 hover:text-white">
               <Users className="h-4 w-4" /> {t("userManagement")}
             </Link>
           )}
-          <Dialog open={pwdDialogOpen} onOpenChange={setPwdDialogOpen}>
-            <DialogTrigger asChild>
-              <button
-                type="button"
-                className={`mb-4 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-white/70 transition hover:bg-white/10 hover:text-white text-left`}
-              >
-                <KeyRound className="h-4 w-4" /> Change Password
-              </button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>Change Password</DialogTitle>
-                <DialogDescription>Update the password for your account.</DialogDescription>
-              </DialogHeader>
-              <PasswordChangeForm onSuccess={() => setPwdDialogOpen(false)} />
-            </DialogContent>
-          </Dialog>
+          <Link
+            href="/home/change-password"
+            className="mb-4 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-white/70 transition hover:bg-white/10 hover:text-white text-left"
+          >
+            <KeyRound className="h-4 w-4" /> Change Password
+          </Link>
           <p className="truncate text-sm font-medium">{user.full_name}</p>
           <p className="mt-1 truncate text-xs text-white/45">{user.role}</p>
           <HomeHeader user={user} sidebarMode />
