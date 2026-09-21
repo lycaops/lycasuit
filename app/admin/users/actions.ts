@@ -10,6 +10,80 @@ export interface ActionResult {
   error?: string
 }
 
+const NORTH_BRANCHES = ["LMIT-HS-BOLOGNA", "LMIT-HS-MILAN", "LMIT-HS-PADOVA", "LMIT-HS-TORINO"]
+const SOUTH_BRANCHES = ["LMIT-HS-BARI", "LMIT-HS-NAPLES", "LMIT-HS-PALERMO", "LMIT-HS-ROME"]
+
+async function computeDesignation(
+  supabase: ReturnType<typeof createClient> | ReturnType<typeof createAdminClient>,
+  roleCode: string,
+): Promise<string | null> {
+  const { data } = await supabase
+    .from("app_roles")
+    .select("label")
+    .eq("code", roleCode)
+    .maybeSingle()
+  return data?.label ?? null
+}
+
+async function computeTerritory(
+  supabase: ReturnType<typeof createClient> | ReturnType<typeof createAdminClient>,
+  roleCode: string,
+  opts: { branches?: string[] | null; branch?: string | null; zone?: string | null },
+): Promise<string | null> {
+  const { branches, zone } = opts
+  const chosenBranch = opts.branch ?? branches?.[0] ?? null
+  const assignedBranches = branches && branches.length > 0 ? branches : (chosenBranch ? [chosenBranch] : [])
+
+  switch (roleCode) {
+    case "ZONE-MANAGER":
+    case "FSE": {
+      if (!zone) return null
+      const { data: zoneRow } = await supabase
+        .from("zones")
+        .select("name,branch:branch_id(code,name)")
+        .eq("code", zone)
+        .maybeSingle()
+      if (!zoneRow) return null
+      const zoneName = (zoneRow as any)?.name ?? null
+      const branchName = (zoneRow as any)?.branch?.name ?? null
+      return branchName && zoneName ? `${zoneName} (${branchName})` : zoneName ?? branchName ?? null
+    }
+    case "ASM": {
+      if (!chosenBranch) return null
+      const { data } = await supabase
+        .from("branches")
+        .select("name")
+        .eq("code", chosenBranch)
+        .maybeSingle()
+      return data?.name ?? null
+    }
+    case "RSM": {
+      if (assignedBranches.length === 0) return null
+      const all = [...NORTH_BRANCHES, ...SOUTH_BRANCHES]
+      if (all.every((b) => assignedBranches.includes(b))) {
+        return "All Italy"
+      }
+      if (NORTH_BRANCHES.every((b) => assignedBranches.includes(b))) {
+        return "North Region"
+      }
+      if (SOUTH_BRANCHES.every((b) => assignedBranches.includes(b))) {
+        return "South Region"
+      }
+      const { data } = await supabase
+        .from("branches")
+        .select("code,name")
+        .in("code", assignedBranches)
+      const nameFor = new Map((data ?? []).map((b: any) => [b.code, b.name || b.code]))
+      return assignedBranches
+        .map((c) => nameFor.get(c) || c.replace("LMIT-HS-", ""))
+        .join(", ")
+    }
+    default: {
+      return "All Italy"
+    }
+  }
+}
+
 /**
  * Create ONE account that works across every tool in the suite.
  * Replaces the four separate sign-up flows the old apps each had.
@@ -49,6 +123,13 @@ export async function createPlatformUser(input: {
     return { ok: false, error: authError?.message ?? "Could not create the login." }
   }
 
+  const designation = input.designation ?? (await computeDesignation(admin, input.role))
+  const territory = input.territory ?? (await computeTerritory(admin, input.role, {
+    branches: input.branches,
+    branch: input.branch,
+    zone: input.zone,
+  }))
+
   // The on_auth_user_created trigger already inserted a VIEWER row; fill it in.
   const { error: profileError } = await admin
     .from("app_users")
@@ -60,8 +141,8 @@ export async function createPlatformUser(input: {
       branches: input.branches,
       branch: input.branch ?? input.branches[0] ?? null,
       zone: input.zone ?? null,
-      designation: input.designation ?? null,
-      territory: input.territory ?? null,
+      designation,
+      territory,
       mobile_number: input.mobileNumber ?? null,
       is_active: true,
     })
@@ -98,6 +179,33 @@ export async function updatePlatformUser(
   await requirePlatformAdmin()
   const supabase = await createClient()
 
+  let designation = patch.designation
+  let territory = patch.territory
+  const needsRoleRecompute = (patch.role !== undefined || patch.branches !== undefined || patch.branch !== undefined || patch.zone !== undefined)
+  if (needsRoleRecompute) {
+    let role = patch.role
+    let branches = patch.branches
+    let branch = patch.branch
+    let zone = patch.zone
+    if (role === undefined || branches === undefined || branch === undefined || zone === undefined) {
+      const { data: existing } = await supabase
+        .from("app_users")
+        .select("role,branches,branch,zone")
+        .eq("id", userId)
+        .maybeSingle()
+      role = role ?? (existing as any)?.role
+      branches = branches ?? (existing as any)?.branches
+      branch = branch ?? (existing as any)?.branch
+      zone = zone ?? (existing as any)?.zone
+    }
+    if (role && designation === undefined) {
+      designation = await computeDesignation(supabase, role)
+    }
+    if (role && territory === undefined) {
+      territory = await computeTerritory(supabase, role, { branches, branch, zone })
+    }
+  }
+
   const { error } = await supabase
     .from("app_users")
     .update({
@@ -108,8 +216,8 @@ export async function updatePlatformUser(
       ...(patch.branches !== undefined ? { branches: patch.branches } : {}),
       ...(patch.branch !== undefined ? { branch: patch.branch } : {}),
       ...(patch.zone !== undefined ? { zone: patch.zone } : {}),
-      ...(patch.designation !== undefined ? { designation: patch.designation } : {}),
-      ...(patch.territory !== undefined ? { territory: patch.territory } : {}),
+      ...(designation !== undefined ? { designation } : {}),
+      ...(territory !== undefined ? { territory } : {}),
       ...(patch.mobileNumber !== undefined ? { mobile_number: patch.mobileNumber } : {}),
       ...(patch.isActive !== undefined ? { is_active: patch.isActive } : {}),
       ...(patch.pdfExportEnabled !== undefined
