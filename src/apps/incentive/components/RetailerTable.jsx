@@ -24,28 +24,28 @@ export default function RetailerTable({ onSelect, records: recs }) {
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-slate-50 text-slate-500 text-xs uppercase tracking-wide">
-              <th className="text-left px-4 py-2.5 font-medium">{t("retailer_id")}</th>
-              <th className="text-left px-4 py-2.5 font-medium">ACCMGRID</th>
-              <th className="text-left px-4 py-2.5 font-medium">HOTSPOTID</th>
-              <th className="text-left px-4 py-2.5 font-medium">{t("total_paid")}</th>
-              <th className="text-left px-4 py-2.5 font-medium">{t("incentive_group")}</th>
-              <th className="px-4 py-2.5"></th>
+            <tr className="bg-slate-50 text-slate-500 text-[10px] md:text-xs uppercase tracking-wide">
+              <th className="text-left px-3 md:px-4 py-2 md:py-2.5 font-medium whitespace-nowrap">{t("retailer_id")}</th>
+              <th className="text-left px-3 md:px-4 py-2 md:py-2.5 font-medium whitespace-nowrap">ACCMGRID</th>
+              <th className="text-left px-3 md:px-4 py-2 md:py-2.5 font-medium whitespace-nowrap">HOTSPOTID</th>
+              <th className="text-left px-3 md:px-4 py-2 md:py-2.5 font-medium whitespace-nowrap">{t("total_paid")}</th>
+              <th className="text-left px-3 md:px-4 py-2 md:py-2.5 font-medium whitespace-nowrap">{t("incentive_group")}</th>
+              <th className="px-3 md:px-4 py-2 md:py-2.5 whitespace-nowrap"></th>
             </tr>
           </thead>
           <tbody>
             {shown.map((r, i) => (
               <tr key={r._id || i} className="border-t border-slate-100 hover:bg-blue-50/40 transition-colors">
-                <td className="px-4 py-2.5 font-medium text-slate-800">{getText(r, "RETAILER ID") || "—"}</td>
-                <td className="px-4 py-2.5 text-slate-600">{getText(r, "ACCMGRID") || "—"}</td>
-                <td className="px-4 py-2.5 text-slate-600">{getText(r, "HOTSPOTID") || "—"}</td>
-                <td className="px-4 py-2.5 text-slate-600">
+                <td className="px-3 md:px-4 py-2 md:py-2.5 font-medium text-slate-800 whitespace-nowrap">{getText(r, "RETAILER ID") || "—"}</td>
+                <td className="px-3 md:px-4 py-2 md:py-2.5 text-slate-600 whitespace-nowrap">{getText(r, "ACCMGRID") || "—"}</td>
+                <td className="px-3 md:px-4 py-2 md:py-2.5 text-slate-600 whitespace-nowrap">{getText(r, "HOTSPOTID") || "—"}</td>
+                <td className="px-3 md:px-4 py-2 md:py-2.5 text-slate-600 whitespace-nowrap">
                   {getNumber(r, "TOTAL PAID (SBT+BT+VOU)") === null
                     ? "—"
                     : formatCurrency(getNumber(r, "TOTAL PAID (SBT+BT+VOU)"), lang)}
                 </td>
-                <td className="px-4 py-2.5"><IncentiveGroupBadge group={r._incentiveGroup} /></td>
-                <td className="px-4 py-2.5 text-right">
+                <td className="px-3 md:px-4 py-2 md:py-2.5 whitespace-nowrap"><IncentiveGroupBadge group={r._incentiveGroup} /></td>
+                <td className="px-3 md:px-4 py-2 md:py-2.5 text-right whitespace-nowrap">
                   <button onClick={() => select(r)} className="inline-flex items-center gap-1 text-xs font-medium text-[#006AE0] hover:underline">
                     {t("view_statement")} <ArrowRight className="w-3 h-3" />
                   </button>

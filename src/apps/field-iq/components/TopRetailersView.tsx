@@ -303,7 +303,7 @@ const avgRenewalRate = hasAggregatedData && yearlyZoneData
   );
 
   return (
-    <div className="p-6 overflow-y-auto bg-[#eff8ff]">
+    <div className="p-6 overflow-y-auto bg-[#f4f7fb]">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-[#21264E] mb-2">Retailer Performance Overview</h1>
@@ -316,7 +316,7 @@ const avgRenewalRate = hasAggregatedData && yearlyZoneData
             </div>
             <div className="space-y-4">
               {yearlyAnalysis.map(ya => (
-                <div key={ya.year} className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 p-3 bg-[#fff7f2] rounded-lg border border-[#245bc1]/10">
+                <div key={ya.year} className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 p-3 bg-[#eff8ff] rounded-lg border border-[#245bc1]/10">
                   <div className="flex flex-col">
                     <span className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">{ya.year} Totals</span>
                     <span className="text-sm font-bold text-[#21264E]">{ya.monthCount} Months</span>

@@ -779,7 +779,7 @@ export default function RetailerAnalysis({ summary, monthlyData }: Props) {
       <ChartCard title="GA Activations - Calendar Overlay" id="cGA">
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 mb-4 pdf-ga-tiles">
           {yearlyTotals.map(yt => (
-            <div key={yt.year} className="flex items-center gap-3 bg-[#fff7f2] rounded-lg p-3">
+            <div key={yt.year} className="flex items-center gap-3 bg-[#eff8ff] rounded-lg p-3">
               <div className="w-3 h-3 rounded-full" style={{ backgroundColor: YEAR_COLORS[yt.year] || '#006AE0' }} />
               <div>
                 <p className="text-xs text-gray-500">{yt.year} Total GA</p>

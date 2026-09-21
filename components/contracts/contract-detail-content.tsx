@@ -41,34 +41,34 @@ export function ContractDetailContent({ contract, user, isEdit }: ContractDetail
   const dateFormat = language === "en" ? "en-GB" : "it-IT"
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
+    <div className="flex flex-col gap-4 md:gap-6">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="flex items-start gap-3 min-w-0">
           <Button asChild variant="ghost" size="sm">
             <Link href="/tools/contracts/contracts">
               <ArrowLeft className="mr-1.5 h-4 w-4" aria-hidden="true" />
               {t("back")}
             </Link>
           </Button>
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">
+          <div className="min-w-0">
+            <h1 className="text-xl md:text-2xl font-semibold tracking-tight break-words">
               {contract.company_name}
             </h1>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs md:text-sm text-muted-foreground break-words">
               {contract.shop_name} · {t("created")}{" "}
               {new Date(contract.created_at).toLocaleDateString(dateFormat)}
             </p>
           </div>
         </div>
-        <Badge className={statusTone}>{statusLabel}</Badge>
+        <Badge className={statusTone + " shrink-0"}>{statusLabel}</Badge>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:gap-6 lg:grid-cols-3">
         {isEdit && contract.status !== "SIGNED" ? (
           <Card className="lg:col-span-1">
-            <CardHeader className="flex flex-row items-start justify-between gap-4">
+            <CardHeader className="flex flex-row items-start justify-between gap-4 p-4 md:p-6">
               <div>
-                <CardTitle>{t("editContractTitle")}</CardTitle>
+                <CardTitle className="text-lg md:text-xl">{t("editContractTitle")}</CardTitle>
                 <CardDescription>
                   {t("editContractDesc")}
                 </CardDescription>
@@ -79,7 +79,7 @@ export function ContractDetailContent({ contract, user, isEdit }: ContractDetail
                 </Link>
               </Button>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-4 md:p-6">
               <NewContractForm
                 currentUser={user}
                 mode="edit"
@@ -90,9 +90,9 @@ export function ContractDetailContent({ contract, user, isEdit }: ContractDetail
           </Card>
         ) : (
           <Card className="lg:col-span-1">
-            <CardHeader className="flex flex-row items-start justify-between gap-4">
+            <CardHeader className="flex flex-row items-start justify-between gap-4 p-4 md:p-6">
               <div>
-                <CardTitle>{t("retailerDetails")}</CardTitle>
+                <CardTitle className="text-lg md:text-xl">{t("retailerDetails")}</CardTitle>
                 <CardDescription>{t("contractMetadataDesc")}</CardDescription>
               </div>
               {contract.status !== "SIGNED" ? (
@@ -104,8 +104,8 @@ export function ContractDetailContent({ contract, user, isEdit }: ContractDetail
                 </Button>
               ) : null}
             </CardHeader>
-            <CardContent>
-              <dl className="grid grid-cols-1 gap-3 text-sm">
+            <CardContent className="p-4 md:p-6">
+              <dl className="grid grid-cols-1 gap-3 md:gap-4 text-xs md:text-sm">
                 <Row label={t("company")} value={contract.company_name} />
                 <Row label={t("vatNumberLabel")} value={contract.vat_number} />
                 <Row
@@ -137,16 +137,16 @@ export function ContractDetailContent({ contract, user, isEdit }: ContractDetail
             </CardContent>
           </Card>
         )}
-        <div className="lg:col-span-2 flex flex-col gap-6">
+        <div className="lg:col-span-2 flex flex-col gap-4 md:gap-6">
           {contract.status !== "SIGNED" && (
             <Card>
-              <CardHeader>
-                <CardTitle>{t("draftActions")}</CardTitle>
+              <CardHeader className="p-4 md:p-6">
+                <CardTitle className="text-lg md:text-xl">{t("draftActions")}</CardTitle>
                 <CardDescription>
                   {t("draftActionsDesc")}
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-4 md:p-6">
                 <ContractActions contractId={contract.id} status={contract.status} />
               </CardContent>
             </Card>
@@ -156,13 +156,13 @@ export function ContractDetailContent({ contract, user, isEdit }: ContractDetail
             <ContractSignPanel contractId={contract.id} />
           ) : (
             <Card>
-              <CardHeader>
-                <CardTitle>{t("signedContractTitle")}</CardTitle>
+              <CardHeader className="p-4 md:p-6">
+                <CardTitle className="text-lg md:text-xl">{t("signedContractTitle")}</CardTitle>
                 <CardDescription>
                   {t("signedContractDesc")}
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-4 md:p-6">
                 <ContractActions contractId={contract.id} status={contract.status} />
               </CardContent>
             </Card>
@@ -175,11 +175,11 @@ export function ContractDetailContent({ contract, user, isEdit }: ContractDetail
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex flex-col gap-0.5">
-      <dt className="text-xs uppercase tracking-wide text-muted-foreground">
+    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-0.5 sm:gap-3 py-1.5 sm:py-2 border-b border-gray-100 last:border-0">
+      <dt className="text-[10px] sm:text-xs uppercase tracking-wide text-muted-foreground sm:w-32 sm:shrink-0">
         {label}
       </dt>
-      <dd className="break-words font-medium">{value}</dd>
+      <dd className="break-words font-medium sm:text-right">{value}</dd>
     </div>
   )
 }

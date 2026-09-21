@@ -61,7 +61,7 @@ export default function Home() {
 
   return (
     <Layout>
-      <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-6">
+      <div className="p-3 md:p-8 max-w-7xl mx-auto space-y-4 md:space-y-6">
         {recordsError && (
           <div className="rounded-lg bg-red-50 border border-red-200 p-4 flex items-start gap-3 text-sm text-red-700">
             <Database className="w-5 h-5 shrink-0 mt-0.5" />
@@ -85,7 +85,7 @@ export default function Home() {
 
         <>
           <>
-            <div className="flex flex-wrap items-stretch gap-3">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch gap-3">
               <select
                 value={month}
                 onChange={(e) => {
@@ -95,12 +95,12 @@ export default function Home() {
                   setBranchFilter('');
                   setZoneFilter('');
                 }}
-                className="rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-[#006AE0] bg-white min-w-[180px]"
+                className="w-full sm:w-auto rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-[#006AE0] bg-white sm:min-w-[180px]"
               >
                 <option value="">{t('select_incentive_month')}</option>
                 {months.map((value) => <option key={value} value={value}>{formatIncentiveMonth(value)}</option>)}
               </select>
-              <div className="relative flex-1 min-w-[260px]">
+              <div className="relative flex-1 min-w-0">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   value={query}
@@ -113,7 +113,7 @@ export default function Home() {
               <button
                 onClick={runSearch}
                 disabled={!month || loadingRecords}
-                className="inline-flex w-full items-center gap-2 justify-center rounded-lg bg-[#006AE0] px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50 sm:w-auto"
+                className="inline-flex w-full sm:w-auto items-center gap-2 justify-center rounded-lg bg-[#006AE0] px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
               >
                 <Search className="w-4 h-4" /> {t('search_retailer')}
               </button>
@@ -121,7 +121,7 @@ export default function Home() {
 
             {showFilters && (
               <div className="flex flex-wrap items-center gap-3 bg-white rounded-xl border border-slate-200 p-3">
-                <div className="flex items-center gap-1.5 text-sm text-slate-500 px-1">
+                <div className="flex items-center gap-1.5 text-sm text-slate-500 px-1 w-full sm:w-auto">
                   <Filter className="w-4 h-4" /> {t('filter_by')}
                 </div>
                 {hasBranchData && (
@@ -131,7 +131,7 @@ export default function Home() {
                       setBranchFilter(e.target.value);
                       setZoneFilter('');
                     }}
-                    className="rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[#006AE0] bg-white min-w-[140px]"
+                    className="w-full sm:w-auto rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[#006AE0] bg-white sm:min-w-[140px]"
                   >
                     <option value="">{t('all_branches')}</option>
                     {filterOptions.branches.map((b) => (
@@ -145,7 +145,7 @@ export default function Home() {
                   <select
                     value={zoneFilter}
                     onChange={(e) => setZoneFilter(e.target.value)}
-                    className="rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[#006AE0] bg-white min-w-[140px]"
+                    className="w-full sm:w-auto rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[#006AE0] bg-white sm:min-w-[140px]"
                   >
                     <option value="">{t('all_zones')}</option>
                     {filterOptions.zones.map((z) => (
@@ -161,7 +161,7 @@ export default function Home() {
                       setBranchFilter('');
                       setZoneFilter('');
                     }}
-                    className="text-xs font-medium text-slate-500 hover:text-slate-700 hover:underline ml-auto"
+                    className="text-xs font-medium text-slate-500 hover:text-slate-700 hover:underline sm:ml-auto w-full sm:w-auto text-center sm:text-right"
                   >
                     {t('clear_filters')}
                   </button>

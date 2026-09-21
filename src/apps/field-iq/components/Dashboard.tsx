@@ -738,7 +738,7 @@ export default function Dashboard() {
      'bg-[#08DC7D]';
 
   return (
-    <div className="flex h-screen bg-[#F4FAFF] overflow-hidden relative">
+    <div className="flex h-screen bg-[#f4f7fb] overflow-hidden relative">
       {/* Mobile Sidebar Overlay */}
       {mobileMenuOpen && (
         <div 
@@ -752,43 +752,38 @@ export default function Dashboard() {
         fixed inset-y-0 left-0 z-50 md:relative 
         ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
         ${sidebarCollapsed ? 'md:w-[72px]' : 'md:w-64 w-64'} 
-        bg-[#21264E] text-white flex flex-col transition-all duration-300 flex-shrink-0
+        bg-[#21264E] text-white flex flex-col transition-all duration-300 flex-shrink-0 overflow-hidden
       `}>
         {/* Mobile Close Button */}
         <button 
           onClick={() => setMobileMenuOpen(false)}
-          className="md:hidden absolute right-4 top-[calc(env(safe-area-inset-top)+1rem)] p-2 text-white/60 hover:text-white"
+          className="md:hidden absolute right-4 top-[calc(env(safe-area-inset-top)+1rem)] p-2 text-white/60 hover:text-white z-10"
         >
           <X size={20} />
         </button>
 
         {/* Logo */}
-        <div className={`px-4 pb-4 pt-[calc(1rem+env(safe-area-inset-top))] md:py-4 border-b border-white/10 flex items-center gap-3 ${sidebarCollapsed && !mobileMenuOpen ? 'justify-center' : 'justify-start'}`}>
+        <div className={`shrink-0 px-4 pb-4 pt-[calc(1rem+env(safe-area-inset-top))] md:py-4 border-b border-white/10 flex items-center gap-3 ${sidebarCollapsed && !mobileMenuOpen ? 'justify-center' : 'justify-start'}`}>
           <img
             src={sidebarCollapsed && !mobileMenuOpen 
-              ? "https://cms-assets.ldsvcplatform.com/IT/s3fs-public/2023-09/MicrosoftTeams-image%20%2813%29.png"
-              : "https://cms-assets.ldsvcplatform.com/IT/s3fs-public/inline-images/logo_new1.png"
+              ? "/fiq.png"
+              : "/fieldiq.png"
             }
             alt="Logo"
-            className={`flex-shrink-0 transition-all duration-300 ${sidebarCollapsed && !mobileMenuOpen ? 'md:h-8 md:w-8' : 'h-10 w-auto max-w-full'}`}
+            className={`flex-shrink-0 transition-all duration-300 object-contain ${sidebarCollapsed && !mobileMenuOpen ? 'md:h-8 md:w-8' : 'h-8 md:h-10 w-auto max-w-full'}`}
           />
-          {(!sidebarCollapsed || mobileMenuOpen) && (
-            <span className="font-bold text-lg leading-tight whitespace-nowrap">
-              <span>Field&nbsp;</span>
-              <span className="text-[#006ae0]">IQ</span>
-            </span>
-          )}
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 p-3 space-y-1">
-          <button
-            onClick={() => { window.location.href = '/home'; setMobileMenuOpen(false); }}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition text-white/60 hover:bg-white/10 hover:text-white"
-          >
-            <Home size={20} />
-            {(!sidebarCollapsed || mobileMenuOpen) && 'Back to Home'}
-          </button>
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+          <nav className="flex min-h-0 flex-1 p-3 space-y-1 overflow-y-auto pr-1">
+            <button
+              onClick={() => { window.location.href = '/home'; setMobileMenuOpen(false); }}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition text-white/60 hover:bg-white/10 hover:text-white"
+            >
+              <Home size={20} />
+              {(!sidebarCollapsed || mobileMenuOpen) && 'Back to Home'}
+            </button>
           <button
             onClick={() => { setView(VIEWS.DASHBOARD); setMobileMenuOpen(false); }}
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
@@ -854,10 +849,11 @@ export default function Dashboard() {
               {(!sidebarCollapsed || mobileMenuOpen) && 'Data Import'}
             </button>
           )}
-        </nav>
+          </nav>
+        </div>
 
         {/* User */}
-        <div className="p-4 border-t border-white/10">
+        <div className="shrink-0 p-4 border-t border-white/10">
           {(!sidebarCollapsed || mobileMenuOpen) && (
             <>
               <div className="flex items-center gap-2 mb-2">
@@ -889,7 +885,7 @@ export default function Dashboard() {
         {/* Collapse toggle (only on desktop) */}
         <button
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-          className="hidden md:flex p-2.5 text-white/40 hover:text-white text-center border-t border-white/10 items-center justify-center"
+          className="hidden md:flex shrink-0 p-2.5 text-white/40 hover:text-white text-center border-t border-white/10 items-center justify-center"
         >
           {sidebarCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
         </button>
@@ -1310,7 +1306,7 @@ export default function Dashboard() {
                         setRetailerSearch(r.retailer_id);
                         setShowRetailerDropdown(false);
                       }}
-                      className={`w-full text-left px-4 py-2.5 text-sm hover:bg-[#F4FAFF] transition flex items-center justify-between ${
+                      className={`w-full text-left px-4 py-2.5 text-sm hover:bg-[#f4f7fb] transition flex items-center justify-between ${
                         r.retailer_id === selectedRetailerId ? 'bg-[#E8F4FE] font-medium' : ''
                       }`}
                     >

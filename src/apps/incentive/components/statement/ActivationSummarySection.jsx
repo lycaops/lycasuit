@@ -16,11 +16,11 @@ function EarningsRow({ label, qty, rate, amount, lang }) {
   const cfmt = (v) => (v === null ? "—" : formatCurrency(v, lang));
   const nfmt = (v) => (v === null ? "—" : formatNumber(v, lang));
   return (
-    <div className="flex items-center justify-between py-1.5 border-b border-slate-100 last:border-0">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between py-1.5 border-b border-slate-100 last:border-0 gap-0.5">
       <span className="text-sm text-slate-600">{label}</span>
-      <div className="flex items-center gap-3">
-        <span className="text-xs text-slate-400">{nfmt(qty)} × €{rate}</span>
-        <span className="text-sm font-semibold text-emerald-600 w-20 text-right">{cfmt(amount)}</span>
+      <div className="flex sm:items-center gap-0 sm:gap-3 sm:shrink-0 sm:ml-2">
+        <span className="text-xs text-slate-400 sm:text-right">{nfmt(qty)} × €{rate}</span>
+        <span className="text-sm font-semibold text-emerald-600 sm:w-20 text-right">{cfmt(amount)}</span>
       </div>
     </div>
   );
@@ -33,24 +33,24 @@ export default function ActivationSummarySection({ statement }) {
   const cfmt = (v) => (v === null ? "—" : formatCurrency(v, lang));
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-5">
+    <div className="bg-white rounded-xl border border-slate-200 p-4 md:p-5">
       <h3 className="text-sm font-semibold text-slate-800 mb-4" style={{ borderLeft: "3px solid #21264e", paddingLeft: 8 }}>
         {t("activation_summary")}
       </h3>
 
       {/* Total Activations */}
-      <div className="grid grid-cols-3 gap-3 mb-5">
-        <div className="rounded-lg p-3" style={{ backgroundColor: "#eef0f7" }}>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+        <div className="rounded-lg p-3 md:p-3" style={{ backgroundColor: "#eef0f7" }}>
           <p className="text-xs text-slate-500">{t("total_noofactivations")}</p>
-          <p className="text-2xl font-bold text-slate-800 mt-0.5">{nfmt(a.totalActivations)}</p>
+          <p className="text-xl md:text-2xl font-bold text-slate-800 mt-0.5">{nfmt(a.totalActivations)}</p>
         </div>
-        <div className="rounded-lg p-3" style={{ backgroundColor: "#fdeae3" }}>
+        <div className="rounded-lg p-3 md:p-3" style={{ backgroundColor: "#fdeae3" }}>
           <p className="text-xs text-slate-500">{t("blocked_noofactivations")}</p>
-          <p className="text-2xl font-bold" style={{ color: "#b04a30", marginTop: 2 }}>{nfmt(a.blocked)}</p>
+          <p className="text-xl md:text-2xl font-bold" style={{ color: "#b04a30", marginTop: 2 }}>{nfmt(a.blocked)}</p>
         </div>
-        <div className="rounded-lg p-3" style={{ backgroundColor: "#e3faf0" }}>
+        <div className="rounded-lg p-3 md:p-3" style={{ backgroundColor: "#e3faf0" }}>
           <p className="text-xs text-slate-500">{t("total_eligible_activations")}</p>
-          <p className="text-2xl font-bold" style={{ color: "#087a4a", marginTop: 2 }}>
+          <p className="text-xl md:text-2xl font-bold" style={{ color: "#087a4a", marginTop: 2 }}>
             {nfmt(a.eligible)}
           </p>
         </div>

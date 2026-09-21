@@ -34,15 +34,15 @@ const StatementPreview = forwardRef(({ row }, ref) => {
     <div ref={ref} className="bg-white" style={{ width: "100%" }}>
       {/* Section 1: header + summary + breakdown (first page) */}
       <div data-pdf-section>
-        <div className="px-8 py-6 flex items-center justify-between" style={{ backgroundColor: "#21264e" }}>
-          <img src="/logo.png" alt="Logo" crossOrigin="anonymous" className="h-9" />
+        <div className="px-4 py-5 md:px-8 md:py-6 flex items-center justify-between" style={{ backgroundColor: "#21264e" }}>
+          <img src="/logo.png" alt="Logo" crossOrigin="anonymous" className="h-7 md:h-9" />
           <div className="text-right text-white">
-            <p className="text-xs uppercase tracking-widest text-white/60">{t("appSubtitle")}</p>
-            <p className="text-sm font-semibold">{t("retailer_incentive_statement")}</p>
+            <p className="text-[10px] md:text-xs uppercase tracking-widest text-white/60">{t("appSubtitle")}</p>
+            <p className="text-xs md:text-sm font-semibold">{t("retailer_incentive_statement")}</p>
           </div>
         </div>
-        <div className="px-8 py-6 max-w-5xl mx-auto">
-          <div className="statement-meta-grid mb-2 grid grid-cols-2 gap-2 md:grid-cols-5">
+        <div className="px-4 py-5 md:px-8 md:py-6 max-w-5xl mx-auto">
+          <div className="statement-meta-grid mb-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-2 md:gap-2">
             <InfoBlock label={t("retailer_id")} value={statement.retailerId} />
             <InfoBlock label="Branch" value={statement.accmgId} />
             <InfoBlock label="Zone" value={statement.hotspotId} />
@@ -59,7 +59,7 @@ const StatementPreview = forwardRef(({ row }, ref) => {
         </div>
       </div>
 
-      <div className="px-8 py-6 max-w-5xl mx-auto">
+      <div className="px-4 py-5 md:px-8 md:py-6 max-w-5xl mx-auto">
         {/* Section 2: activation + renewal + usage + port-out (same page) */}
         <div data-pdf-section>
           <SectionTitle color="#006AE0">{t("activation_analysis")}</SectionTitle>
@@ -95,9 +95,9 @@ const StatementPreview = forwardRef(({ row }, ref) => {
             <p className="text-xs text-slate-500 leading-relaxed">{t("disclaimer_text")}</p>
             <p className="text-xs text-slate-400 mt-2">{t("data_note")}</p>
           </div>
-          <div className="mt-4 pt-4 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2">
+          <div className="mt-4 pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
             <p className="text-xs text-slate-400">{t("footer_support")}: <span className="text-[#006AE0] font-medium">{t("footer_email")}</span></p>
-            <img src="/logo_b.webp" alt="Logo" className="h-6" />
+            <img src="/logo_b.webp" alt="Logo" className="h-5 md:h-6" />
           </div>
         </div>
       </div>
@@ -107,9 +107,9 @@ const StatementPreview = forwardRef(({ row }, ref) => {
 
 function InfoBlock({ label, value }) {
   return (
-    <div className="bg-slate-50 rounded-lg p-3">
-      <p className="text-xs text-slate-500 uppercase tracking-wide">{label}</p>
-      <p className="text-sm font-semibold text-slate-800 mt-0.5">{value || "—"}</p>
+    <div className="bg-slate-50 rounded-lg p-2.5 md:p-3">
+      <p className="text-[10px] md:text-xs text-slate-500 uppercase tracking-wide">{label}</p>
+      <p className="text-xs md:text-sm font-semibold text-slate-800 mt-0.5 break-words">{value || "—"}</p>
     </div>);
 
 }
