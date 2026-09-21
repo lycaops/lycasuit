@@ -58,11 +58,11 @@ export default function SummarySection({ statement }) {
       {/* Deductions */}
       <div className="rounded-xl p-5" style={{ backgroundColor: "#46286e" }}>
         <h3 className="text-sm font-semibold text-white/90 mb-3 flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-[#ffc8b2]" /> {t("deductions_adjustments")}
+          <span className="w-2 h-2 rounded-full bg-[#D6EEFF]" /> {t("deductions_adjustments")}
         </h3>
-        <MetricRow label={t("portout_deduction")} value={fmt(s.portoutDeduction)} color="#ffc8b2" />
-        <MetricRow label={t("usage_clawback")} value={s.appliesClawback ? fmt(s.usageClawback) : "—"} color="#ffc8b2" />
-        <MetricRow label={t("total_deductions_label")} value={fmt(s.deductions)} color="#ffc8b2" bold />
+        <MetricRow label={t("portout_deduction")} value={fmt(s.portoutDeduction)} color="#D6EEFF" />
+        <MetricRow label={t("usage_clawback")} value={s.appliesClawback ? fmt(s.usageClawback) : "—"} color="#D6EEFF" />
+        <MetricRow label={t("total_deductions_label")} value={fmt(s.deductions)} color="#D6EEFF" bold />
         <MetricRow label={t("calculated_value")} value={fmt(s.calculatedTotal)} color="#fff" bold />
       </div>
 

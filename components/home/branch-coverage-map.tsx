@@ -133,7 +133,7 @@ const BRANCH_PALETTE: Record<string, { base: string }> = {
   "LMIT-HS-TORINO": { base: "#21264E" },
   "LMIT-HS-MILAN": { base: "#245BC1" },
   "LMIT-HS-PADOVA": { base: "#08DC7D" },
-  "LMIT-HS-BOLOGNA": { base: "#FFC8B2" },
+  "LMIT-HS-BOLOGNA": { base: "#D6EEFF" },
   "LMIT-HS-ROME": { base: "#FFDD64" },
   "LMIT-HS-NAPLES": { base: "#00D7FF" },
   "LMIT-HS-PALERMO": { base: "#46286E" },

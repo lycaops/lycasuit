@@ -13,7 +13,7 @@ import Loader from '@/components/Loader';
 
 const ROLES: { value: RpaUser['role']; label: string; color: string }[] = [
   { value: 'HS-ADMIN', label: 'HS Admin', color: 'bg-[#46286E] text-white' },
-  { value: 'COUNTRY-MANAGER', label: 'Country Manager', color: 'bg-[#FFC8B2] text-[#21264E]' },
+  { value: 'COUNTRY-MANAGER', label: 'Country Manager', color: 'bg-[#D6EEFF] text-[#21264E]' },
   { value: 'UK-ADMIN', label: 'UK Admin', color: 'bg-[#1E3A8A] text-white' },
   { value: 'ADMIN', label: 'Admin', color: 'bg-[#0EA5E9] text-white' },
   { value: 'RSM', label: 'Regional Manager', color: 'bg-[#006AE0] text-white' },

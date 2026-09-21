@@ -626,7 +626,7 @@ export default function RetailerAnalysis({ summary, monthlyData }: Props) {
             { label: 'Total Incentive', value: fmt(allTimeTotals.incentive), color: '#006AE0' },
             { label: 'GA Activations', value: fmtN(allTimeTotals.ga_cnt), color: '#08DC7D' },
             { label: 'Port-In Total', value: fmtN(allTimeTotals.port_in), color: '#00D7FF' },
-            { label: 'Port in Incentive', value: fmt(allTimeTotals.pi_raw), color: '#FFC8B2' },
+            { label: 'Port in Incentive', value: fmt(allTimeTotals.pi_raw), color: '#D6EEFF' },
             { label: 'Gara bonus', value: fmt(allTimeTotals.add_gara), color: '#FFD54F' },
             { label: 'Total Port in bonus', value: fmt(allTimeTotals.pi_total), color: '#46286E' },
           ].map((kpi, i) => (
@@ -838,7 +838,7 @@ export default function RetailerAnalysis({ summary, monthlyData }: Props) {
             <YAxis tickFormatter={fmtShort} tick={{ fill: '#21264E', fontSize: 11 }} />
             <Tooltip content={<CTooltip />} />
             <Legend />
-            <Bar dataKey="pi_raw" name="Port in Incentive" stackId="a" fill="#FFC8B2" radius={[4, 4, 0, 0]} isAnimationActive={false} />
+            <Bar dataKey="pi_raw" name="Port in Incentive" stackId="a" fill="#D6EEFF" radius={[4, 4, 0, 0]} isAnimationActive={false} />
             <Bar dataKey="add_gara" name="Gara bonus" stackId="a" fill="#FFD54F" radius={[4, 4, 0, 0]} isAnimationActive={false} />
           </BarChart>
         </ResponsiveContainer>

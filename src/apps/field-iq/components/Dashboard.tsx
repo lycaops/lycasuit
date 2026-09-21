@@ -738,7 +738,7 @@ export default function Dashboard() {
      'bg-[#08DC7D]';
 
   return (
-    <div className="flex h-screen bg-[#f4f7fb] overflow-hidden relative">
+    <div className="flex h-screen bg-[#F4FAFF] overflow-hidden relative">
       {/* Mobile Sidebar Overlay */}
       {mobileMenuOpen && (
         <div 
@@ -1310,8 +1310,8 @@ export default function Dashboard() {
                         setRetailerSearch(r.retailer_id);
                         setShowRetailerDropdown(false);
                       }}
-                      className={`w-full text-left px-4 py-2.5 text-sm hover:bg-[#eff8ff] transition flex items-center justify-between ${
-                        r.retailer_id === selectedRetailerId ? 'bg-[#fff7f2] font-medium' : ''
+                      className={`w-full text-left px-4 py-2.5 text-sm hover:bg-[#F4FAFF] transition flex items-center justify-between ${
+                        r.retailer_id === selectedRetailerId ? 'bg-[#E8F4FE] font-medium' : ''
                       }`}
                     >
                       <span className="text-[#21264E]">{r.retailer_id}</span>

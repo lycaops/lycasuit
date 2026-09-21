@@ -535,7 +535,7 @@ export async function generatePDF(summary: RetailerSummary, monthly: RetailerMon
     y += 10; setProgress?.(88);
     await addChartToPDF(pdf, 'cPII', M, y, HW, HR, 'PI Incentive + Gara Monthly', {
       legend: [
-        { label: 'Port in Incentive', color: '#FFC8B2' },
+        { label: 'Port in Incentive', color: '#D6EEFF' },
         { label: 'Gara bonus', color: '#FFD54F' }
       ]
     });

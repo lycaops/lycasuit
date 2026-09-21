@@ -7,7 +7,7 @@ export default function NoAccessPage() {
   return (
     <Card className="w-full">
       <CardContent className="flex flex-col items-center gap-4 pt-6 text-center">
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#ffc8b2] text-[#21264e]">
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#D6EEFF] text-[#21264e]">
           <ShieldAlert className="h-6 w-6" aria-hidden="true" />
         </div>
         <h1 className="text-xl font-semibold">No profile configured</h1>

@@ -5,7 +5,7 @@ import { formatCurrency, formatPercent } from "@incentive/lib/csvUtils";
 
 function Gauge({ pct }) {
   const v = pct === null ? 0 : Math.min(100, Math.max(0, pct));
-  const color = v >= 90 ? "#08dc7d" : v >= 70 ? "#FFDD64" : "#ffc8b2";
+  const color = v >= 90 ? "#08dc7d" : v >= 70 ? "#FFDD64" : "#D6EEFF";
   return (
     <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
       <div className="h-full rounded-full transition-all" style={{ width: `${v}%`, backgroundColor: color }} />

@@ -10,7 +10,7 @@ const YEAR_COLORS: Record<string, string> = {
   '2024': '#245bc1',
   '2025': '#08dc7d',
   '2026': '#FFDD64',
-  '2023': '#ffc8b2',
+  '2023': '#D6EEFF',
   '2022': '#46286E'
 };
 
@@ -253,7 +253,7 @@ const avgRenewalRate = hasAggregatedData && yearlyZoneData
     return retailers.length;
   }, [hasAggregatedData, yearlyZoneData, retailers]);
 
-  const COLORS = ['#245bc1', '#08dc7d', '#ffc8b2', '#FFDD64', '#00D7FF', '#46286E'];
+  const COLORS = ['#245bc1', '#08dc7d', '#D6EEFF', '#FFDD64', '#00D7FF', '#46286E'];
 
   const StatCard = ({ 
     icon: Icon, 

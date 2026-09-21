@@ -7,7 +7,7 @@ import {
 } from "recharts";
 import { getNumber, normalizePercent } from "@incentive/lib/csvUtils";
 
-const COLORS = ["#21264e", "#006AE0", "#08dc7d", "#FFDD64", "#00D7FF", "#46286e", "#ffc8b2"];
+const COLORS = ["#21264e", "#006AE0", "#08dc7d", "#FFDD64", "#00D7FF", "#46286e", "#D6EEFF"];
 
 function ChartCard({ title, children }) {
   return (
