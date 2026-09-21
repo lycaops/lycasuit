@@ -86,9 +86,6 @@ export default function Dashboard() {
             {currentUser?.role}
           </span>
           <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/10 text-white">
-            {currentUser?.designation}
-          </span>
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/10 text-white">
             {currentUser?.territory}
           </span>
         </div>

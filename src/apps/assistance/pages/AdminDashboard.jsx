@@ -98,9 +98,6 @@ export default function AdminDashboard() {
             {currentUser?.role}
           </span>
           <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/10">
-            {currentUser?.designation}
-          </span>
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/10">
             {currentUser?.territory}
           </span>
         </div>

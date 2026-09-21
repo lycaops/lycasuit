@@ -162,8 +162,6 @@ export default function AllTickets() {
                   <th className="text-left px-4 py-3 font-medium">Ticket ID</th>
                   <th className="text-left px-4 py-3 font-medium">Subject</th>
                   <th className="text-left px-4 py-3 font-medium">Reported By</th>
-                  <th className="text-left px-4 py-3 font-medium">Role</th>
-                  <th className="text-left px-4 py-3 font-medium">Territory</th>
                   <th className="text-left px-4 py-3 font-medium">Category</th>
                   <th className="text-left px-4 py-3 font-medium">Impact</th>
                   <th className="text-left px-4 py-3 font-medium">Urgency</th>
@@ -181,8 +179,6 @@ export default function AllTickets() {
                     <td className="px-4 py-3 font-mono text-xs font-semibold text-[#245bc1] whitespace-nowrap">{t.ticket_number}</td>
                     <td className="px-4 py-3 font-medium text-foreground max-w-xs truncate">{t.subject}</td>
                     <td className="px-4 py-3 text-foreground/70 whitespace-nowrap">{t.reporter_name}</td>
-                    <td className="px-4 py-3 text-foreground/70 text-xs">{t.reporter_role}</td>
-                    <td className="px-4 py-3 text-foreground/70 text-xs whitespace-nowrap">{t.reporter_territory}</td>
                     <td className="px-4 py-3 text-foreground/70 text-xs">{t.category}</td>
                     <td className="px-4 py-3 text-xs text-foreground/70">{t.impact}</td>
                     <td className="px-4 py-3"><UrgencyBadge level={t.urgency} /></td>

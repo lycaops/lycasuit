@@ -9,7 +9,7 @@
    - Base          #eff8ff  (warm off-white background)
    - Accent Blue   #245bc1  (primary action)
    - Accent Green  #08dc7d  (positive / signed)
-   - Accent Peach  #ffc8b2  (highlight / subtle accent)
+   - Accent Blue   #D6EEFF  (highlight / subtle accent)
    ================================================= */
 
 :root {
@@ -37,7 +37,7 @@
   --muted: #f2ebe6;
   --muted-foreground: #5a5f7a;
 
-  --accent: #ffc8b2;
+  --accent: #D6EEFF;
   --accent-foreground: #21264e;
 
   --destructive: #d64545;
@@ -52,7 +52,7 @@
 
   --chart-1: #245bc1;
   --chart-2: #08dc7d;
-  --chart-3: #ffc8b2;
+  --chart-3: #D6EEFF;
   --chart-4: #21264e;
   --chart-5: #5a5f7a;
 
@@ -81,7 +81,7 @@
   --secondary-foreground: #f4f7fb;
   --muted: #2b315c;
   --muted-foreground: #c8cbe0;
-  --accent: #ffc8b2;
+  --accent: #D6EEFF;
   --accent-foreground: #21264e;
   --destructive: #d64545;
   --destructive-foreground: #ffffff;
@@ -90,7 +90,7 @@
   --ring: #245bc1;
   --chart-1: #245bc1;
   --chart-2: #08dc7d;
-  --chart-3: #ffc8b2;
+  --chart-3: #D6EEFF;
   --chart-4: #fff7f2;
   --chart-5: #c8cbe0;
   --sidebar: #21264e;
@@ -153,7 +153,7 @@
   --color-brand-cream: #fff7f2;
   --color-brand-blue: #245bc1;
   --color-brand-green: #08dc7d;
-  --color-brand-peach: #ffc8b2;
+  --color-brand-peach: #D6EEFF;
 }
 
 @layer base {
