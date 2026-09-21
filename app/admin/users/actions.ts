@@ -16,7 +16,9 @@ const SOUTH_BRANCHES = ["LMIT-HS-BARI", "LMIT-HS-NAPLES", "LMIT-HS-PALERMO", "LM
 // Designation values allowed by the `app_users_designation_check` constraint
 // (see supabase/migrations/20260918000001_unified_core.sql). Anything else
 // written to app_users.designation violates the check and fails the insert.
-export const DESIGNATION_VALUES = [
+// NOTE: must NOT be exported — "use server" modules may only export async
+// functions, and exporting anything else crashes the server at runtime.
+const DESIGNATION_VALUES = [
   "Zone Manager",
   "Office Manager",
   "Region Manager",
