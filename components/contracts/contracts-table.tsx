@@ -183,7 +183,7 @@ function StatusBadge({ status, t }: { status: Contract["status"]; t: any }) {
     )
   if (status === "PENDING")
     return (
-      <Badge className="bg-[#ffc8b2] text-[#21264e] hover:bg-[#ffc8b2]">{t("pendingContracts")}</Badge>
+      <Badge className="bg-[#D6EEFF] text-[#21264e] hover:bg-[#D6EEFF]">{t("pendingContracts")}</Badge>
     )
   return <Badge variant="secondary">{t("generated")}</Badge>
 }

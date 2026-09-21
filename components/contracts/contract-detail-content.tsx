@@ -30,7 +30,7 @@ export function ContractDetailContent({ contract, user, isEdit }: ContractDetail
     contract.status === "SIGNED"
       ? "bg-[#08dc7d] text-[#21264e] hover:bg-[#08dc7d]"
       : contract.status === "PENDING"
-        ? "bg-[#ffc8b2] text-[#21264e] hover:bg-[#ffc8b2]"
+        ? "bg-[#D6EEFF] text-[#21264e] hover:bg-[#D6EEFF]"
         : "bg-muted"
 
   const statusLabel = 

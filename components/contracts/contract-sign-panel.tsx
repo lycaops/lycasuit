@@ -243,12 +243,12 @@ export function ContractSignPanel({ contractId }: { contractId: string }) {
   }
 
   return (
-    <Card className="border-2 shadow-lg">
-      <CardHeader className="border-b bg-muted/30">
+    <Card className="border-2 border-[#E8F4FE] shadow-lg overflow-hidden">
+      <CardHeader className="border-b border-[#E8F4FE] bg-[#F4FAFF] p-4 sm:p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
-            <CardTitle className="text-xl">{t("contractFinalization")}</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-lg sm:text-xl">{t("contractFinalization")}</CardTitle>
+            <CardDescription className="text-xs sm:text-sm">
               {step === 1
                 ? t("stepRetailerSignature")
                 : step === 2
@@ -263,14 +263,14 @@ export function ContractSignPanel({ contractId }: { contractId: string }) {
           </div>
         </div>
       </CardHeader>
-      <CardContent className="pt-6">
-        <div className="flex flex-col gap-6">
-          <div className={step === 1 ? "flex flex-col gap-6" : "hidden"}>
-            <div className="rounded-lg border bg-muted/30 p-4">
+      <CardContent className="pt-4 sm:pt-6 p-4 sm:p-6">
+        <div className="flex flex-col gap-5 sm:gap-6">
+          <div className={step === 1 ? "flex flex-col gap-5 sm:gap-6" : "hidden"}>
+            <div className="rounded-lg border border-[#E8F4FE] bg-[#F4FAFF] p-3 sm:p-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0">
                   <div className="text-sm font-semibold text-brand-navy">{t("remoteSigningLinkLabel")}</div>
-                  <div className="mt-1 text-sm text-slate-600">
+                  <div className="mt-1 text-xs sm:text-sm text-slate-600">
                     {t("remoteSigningLinkDesc")}
                   </div>
                 </div>
@@ -279,7 +279,7 @@ export function ContractSignPanel({ contractId }: { contractId: string }) {
                   variant="outline"
                   onClick={onSendRemoteLink}
                   disabled={pending}
-                  className="w-full sm:w-auto"
+                  className="w-full sm:w-auto border-[#D6EEFF] text-brand-navy hover:bg-[#D6EEFF]"
                 >
                   <Link2 className="mr-2 h-4 w-4" />
                   {t("sendLink")}
@@ -287,9 +287,9 @@ export function ContractSignPanel({ contractId }: { contractId: string }) {
               </div>
 
               {remoteLink ? (
-                <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
-                  <Input readOnly value={remoteLink} />
-                  <div className="flex gap-2">
+                <div className="mt-3 sm:mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
+                  <Input readOnly value={remoteLink} className="text-xs sm:text-sm" />
+                  <div className="flex gap-2 w-full sm:w-auto">
                     <Button
                       type="button"
                       variant="outline"
@@ -301,7 +301,7 @@ export function ContractSignPanel({ contractId }: { contractId: string }) {
                           toast.error(t("linkCopyError"))
                         }
                       }}
-                      className="w-full sm:w-auto"
+                      className="flex-1 sm:flex-none sm:w-auto border-[#E8F4FE]"
                     >
                       <Copy className="mr-2 h-4 w-4" />
                       {t("copy")}
@@ -310,7 +310,7 @@ export function ContractSignPanel({ contractId }: { contractId: string }) {
                       type="button"
                       variant="outline"
                       onClick={() => window.open(remoteLink, "_blank", "noreferrer")}
-                      className="w-full sm:w-auto"
+                      className="flex-1 sm:flex-none sm:w-auto border-[#E8F4FE]"
                     >
                       <ExternalLink className="mr-2 h-4 w-4" />
                       {t("open")}
@@ -326,14 +326,14 @@ export function ContractSignPanel({ contractId }: { contractId: string }) {
               description={t("retailerSignatureDesc")}
             />
 
-            <p className="text-sm text-slate-600">
+            <p className="text-xs sm:text-sm text-slate-600">
               La sottoscrizione del presente Contratto è confermata tramite verifica OTP.
             </p>
 
-            <label className="flex items-start gap-3 rounded-lg border-2 border-brand-blue/10 bg-brand-blue/5 p-4 text-sm transition-colors hover:bg-brand-blue/10">
+            <label className="flex items-start gap-3 rounded-lg border-2 border-[#245bc1]/10 bg-[#F4FAFF] p-3 sm:p-4 text-xs sm:text-sm transition-colors hover:bg-[#E8F4FE]">
               <input
                 type="checkbox"
-                className="mt-0.5 h-5 w-5 rounded border-gray-300 text-brand-blue focus:ring-brand-blue"
+                className="mt-0.5 h-5 w-5 rounded border-gray-300 text-brand-blue focus:ring-brand-blue flex-shrink-0"
                 checked={ack}
                 onChange={(e) => setAck(e.target.checked)}
               />
@@ -342,10 +342,10 @@ export function ContractSignPanel({ contractId }: { contractId: string }) {
               </span>
             </label>
 
-            <label className="flex items-start gap-3 rounded-lg border-2 border-brand-green/10 bg-brand-green/5 p-4 text-sm transition-colors hover:bg-brand-green/10">
+            <label className="flex items-start gap-3 rounded-lg border-2 border-[#08dc7d]/10 bg-[#F0FFF7] p-3 sm:p-4 text-xs sm:text-sm transition-colors hover:bg-[#DCFCE7]">
               <input
                 type="checkbox"
-                className="mt-0.5 h-5 w-5 rounded border-gray-300 text-brand-green focus:ring-brand-green"
+                className="mt-0.5 h-5 w-5 rounded border-gray-300 text-brand-green focus:ring-brand-green flex-shrink-0"
                 checked={gdpr}
                 onChange={(e) => setGdpr(e.target.checked)}
               />
@@ -354,28 +354,30 @@ export function ContractSignPanel({ contractId }: { contractId: string }) {
               </span>
             </label>
 
-            <div className="flex flex-col pt-2 sm:flex-row sm:justify-end">
+            <div className="flex flex-col pt-1 sm:pt-2 sm:flex-row sm:justify-end">
               <Button
                 onClick={onNext}
                 disabled={pending}
-                className="w-full bg-brand-navy hover:bg-brand-navy/90 sm:w-auto sm:px-8"
+                className="w-full bg-brand-navy hover:bg-brand-navy/90 sm:w-auto sm:px-8 min-h-[44px] overflow-hidden"
               >
-                {pending ? <Loader size={18} weight={26} inherit label="Saving signature" /> : null}
-                {t("next")}
-                <ArrowRight className="ml-2 h-4 w-4" />
+                <div className="flex items-center justify-center shrink-0">
+                  {pending ? <Loader size={18} weight={26} inherit label="Saving signature" /> : null}
+                  {!pending && t("next")}
+                  {!pending && <ArrowRight className="ml-2 h-4 w-4" />}
+                </div>
               </Button>
             </div>
           </div>
 
-          <div className={step === 2 ? "flex flex-col gap-6" : "hidden"}>
-            <div className="rounded-lg border bg-green-50 p-4 text-green-800 flex items-center gap-3">
-              <CheckCircle2 className="h-5 w-5 text-green-600" />
-              <span className="text-sm font-medium">{t("retailerSignedAccepted")}</span>
+          <div className={step === 2 ? "flex flex-col gap-5 sm:gap-6" : "hidden"}>
+            <div className="rounded-lg border border-green-200 bg-green-50 p-3 sm:p-4 text-green-800 flex items-center gap-3">
+              <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0" />
+              <span className="text-xs sm:text-sm font-medium">{t("retailerSignedAccepted")}</span>
             </div>
 
-            <div className="rounded-lg border bg-muted/30 p-4">
+            <div className="rounded-lg border border-[#E8F4FE] bg-[#F4FAFF] p-3 sm:p-4 overflow-hidden">
               <div className="text-sm font-semibold text-brand-navy">{t("otpVerification")}</div>
-              <div className="mt-1 text-sm text-slate-600">
+              <div className="mt-1 text-xs sm:text-sm text-slate-600">
                 {t("otpVerificationDesc").replace("{email}", otpSentTo ?? "the retailer email")}
               </div>
               {autoRefreshActive ? (
@@ -383,7 +385,7 @@ export function ContractSignPanel({ contractId }: { contractId: string }) {
                   {t("waitingForRetailer")}
                 </div>
               ) : null}
-              <div className="mt-4 flex justify-center">
+              <div className="mt-3 sm:mt-4 flex justify-center">
                 <InputOTP
                   maxLength={6}
                   value={otp}
@@ -404,7 +406,7 @@ export function ContractSignPanel({ contractId }: { contractId: string }) {
                 </InputOTP>
               </div>
 
-              <div className="mt-4 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="mt-3 sm:mt-4 flex flex-col gap-3">
                 <Button
                   variant="outline"
                   onClick={() => {
@@ -414,33 +416,51 @@ export function ContractSignPanel({ contractId }: { contractId: string }) {
                     setStep(1)
                   }}
                   disabled={pending}
-                  className="w-full sm:w-auto"
+                  className="w-full sm:hidden border-[#E8F4FE]"
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   {t("backToRetailer")}
                 </Button>
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                  <Button variant="outline" onClick={onResendOtp} disabled={pending} className="w-full sm:w-auto">
-                    {t("resendOtp")}
-                  </Button>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <Button
-                    onClick={onVerifyOtp}
-                    disabled={pending || otp.replace(/\\s+/g, "").length !== 6}
-                    className="w-full bg-brand-navy hover:bg-brand-navy/90 sm:w-auto sm:px-8"
+                    variant="outline"
+                    onClick={() => {
+                      setOtp("")
+                      setOtpSentTo(null)
+                      setOtpVerifiedAt(null)
+                      setStep(1)
+                    }}
+                    disabled={pending}
+                    className="hidden sm:w-auto sm:inline-flex border-[#E8F4FE]"
                   >
-                    {pending ? <Loader size={18} weight={26} inherit label="Verifying code" /> : null}
-                    {t("verifyOtp")}
-                    <ArrowRight className="ml-2 h-4 w-4" />
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    {t("backToRetailer")}
                   </Button>
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                    <Button variant="outline" onClick={onResendOtp} disabled={pending} className="w-full sm:w-auto border-[#E8F4FE]">
+                      {t("resendOtp")}
+                    </Button>
+                    <Button
+                      onClick={onVerifyOtp}
+                      disabled={pending || otp.replace(/\\s+/g, "").length !== 6}
+                      className="w-full bg-brand-navy hover:bg-brand-navy/90 sm:w-auto sm:px-8 min-h-[44px] overflow-hidden"
+                    >
+                      <div className="flex items-center justify-center shrink-0">
+                        {pending ? <Loader size={18} weight={26} inherit label="Verifying code" /> : null}
+                        {!pending && t("verifyOtp")}
+                        {!pending && <ArrowRight className="ml-2 h-4 w-4" />}
+                      </div>
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className={step === 3 ? "flex flex-col gap-6" : "hidden"}>
-            <div className="rounded-lg border bg-green-50 p-4 text-green-800 flex items-center gap-3">
-              <CheckCircle2 className="h-5 w-5 text-green-600" />
-              <span className="text-sm font-medium">{t("retailerSignedOtpVerified")}</span>
+          <div className={step === 3 ? "flex flex-col gap-5 sm:gap-6" : "hidden"}>
+            <div className="rounded-lg border border-green-200 bg-green-50 p-3 sm:p-4 text-green-800 flex items-center gap-3">
+              <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0" />
+              <span className="text-xs sm:text-sm font-medium">{t("retailerSignedOtpVerified")}</span>
             </div>
 
             <SignaturePad
@@ -449,18 +469,20 @@ export function ContractSignPanel({ contractId }: { contractId: string }) {
               description={t("staffSignatureDesc")}
             />
 
-            <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
-              <Button variant="outline" onClick={() => setStep(2)} disabled={pending} className="w-full sm:w-auto">
+            <div className="flex flex-col-reverse gap-3 pt-1 sm:pt-2 sm:flex-row sm:items-center sm:justify-between">
+              <Button variant="outline" onClick={() => setStep(2)} disabled={pending} className="w-full sm:w-auto border-[#E8F4FE]">
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 {t("backToOtp")}
               </Button>
               <Button
                 onClick={onSubmit}
                 disabled={pending}
-                className="w-full bg-brand-green font-bold text-brand-navy hover:bg-brand-green/90 sm:w-auto sm:px-8"
+                className="w-full bg-brand-green font-bold text-brand-navy hover:bg-brand-green/90 sm:w-auto sm:px-8 min-h-[44px] overflow-hidden"
               >
-                {pending ? <Loader size={18} weight={26} inherit label="Generating contract" /> : null}
-                {t("completeAndGeneratePdf")}
+                <div className="flex items-center justify-center shrink-0">
+                  {pending ? <Loader size={18} weight={26} inherit label="Generating contract" /> : null}
+                  {!pending && t("completeAndGeneratePdf")}
+                </div>
               </Button>
             </div>
           </div>

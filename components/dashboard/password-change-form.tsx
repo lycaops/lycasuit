@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import Loader from "@/components/Loader"
 import { createClient } from "@/lib/supabase/client"
 
-export function PasswordChangeForm() {
+export function PasswordChangeForm({ onSuccess }: { onSuccess?: () => void }) {
   const [pending, startTransition] = useTransition()
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
@@ -44,6 +44,7 @@ export function PasswordChangeForm() {
         if (!error) {
           toast.success("Password updated successfully")
           setFormData({ password: "", confirmPassword: "" })
+          onSuccess?.()
           return
         }
 

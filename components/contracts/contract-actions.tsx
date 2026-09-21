@@ -160,14 +160,14 @@ export function ContractActions({
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-3">
+    <div className="flex flex-col w-full gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
       {status !== "SIGNED" && (
         <>
           <Button
             onClick={downloadDraft}
             variant="outline"
             disabled={pendingDraft}
-            className="border-brand-navy text-brand-navy hover:bg-brand-navy/5"
+            className="w-full sm:w-auto border-[#D6EEFF] text-brand-navy hover:bg-[#F4FAFF]"
           >
             {pendingDraft ? (
               <Loader size={18} weight={26} inherit label="Downloading draft" />
@@ -181,7 +181,7 @@ export function ContractActions({
               <Button
                 variant="outline"
                 disabled={pendingDraftShare}
-                className="border-brand-navy text-brand-navy hover:bg-brand-navy/5"
+                className="w-full sm:w-auto border-[#D6EEFF] text-brand-navy hover:bg-[#F4FAFF]"
               >
                 {pendingDraftShare ? (
                   <Loader size={18} weight={26} inherit label="Sharing draft" />
@@ -211,7 +211,7 @@ export function ContractActions({
           </DropdownMenu>
         </>
       )}
-      <Button onClick={download} disabled={disabled || pendingDownload}>
+      <Button onClick={download} disabled={disabled || pendingDownload} className="w-full sm:w-auto">
         {pendingDownload ? (
           <Loader size={18} weight={26} inherit label="Downloading contract" />
         ) : (
@@ -223,6 +223,7 @@ export function ContractActions({
         onClick={email}
         variant="outline"
         disabled={disabled || pendingEmail}
+        className="w-full sm:w-auto border-[#E8F4FE]"
       >
         {pendingEmail ? (
           <Loader size={18} weight={26} inherit label="Sending email" />

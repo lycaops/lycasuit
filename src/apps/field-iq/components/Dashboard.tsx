@@ -42,48 +42,11 @@ export default function Dashboard() {
   const [pdfProgress, setPdfProgress] = useState(0);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [passwordError, setPasswordError] = useState('');
 
   const hasAllBranchAccess = user?.role === 'HS-ADMIN' || user?.role === 'COUNTRY-MANAGER' || user?.role === 'UK-ADMIN';
   const isZoneManager = user?.role === 'ZONE-MANAGER';
-  const [passwordSuccess, setPasswordSuccess] = useState('');
-  const [changingPassword, setChangingPassword] = useState(false);
-
-  // KPI-specific filters (independent from dashboard)
   const [kpiBranch, setKpiBranch] = useState('');
   const [kpiRegion, setKpiRegion] = useState('ITALY');
-
-  const handleChangePassword = async () => {
-    setPasswordError('');
-
-    if (!newPassword.trim()) {
-      setPasswordError('New password is required');
-      return;
-    }
-    if (newPassword.length < 6) {
-      setPasswordError('Password must be at least 6 characters');
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      setPasswordError('Passwords do not match');
-      return;
-    }
-
-    setChangingPassword(true);
-    const { error } = await supabase.auth.updateUser({ password: newPassword });
-    if (error) {
-      setPasswordError(error.message || 'Failed to update password');
-    } else {
-      setPasswordSuccess('Password changed successfully');
-      setShowPasswordModal(false);
-      setNewPassword('');
-      setConfirmPassword('');
-    }
-    setChangingPassword(false);
-  };
   const [kpiZone, setKpiZone] = useState('');
   const [kpiZones, setKpiZones] = useState<string[]>([]);
   const [kpiBranches, setKpiBranches] = useState<string[]>([]);
@@ -767,7 +730,7 @@ export default function Dashboard() {
 
   const roleBadgeColor = 
      user?.role === 'HS-ADMIN' ? 'bg-[#46286E]' : 
-     user?.role === 'COUNTRY-MANAGER' ? 'bg-[#FFC8B2] text-[#21264E]' :
+     user?.role === 'COUNTRY-MANAGER' ? 'bg-[#D6EEFF] text-[#21264E]' :
      user?.role === 'UK-ADMIN' ? 'bg-[#1E3A8A]' :
      user?.role === 'ADMIN' ? 'bg-[#0EA5E9]' :
      user?.role === 'RSM' ? 'bg-[#006AE0]' : 
@@ -914,16 +877,6 @@ export default function Dashboard() {
               </div>
             </>
           )}
-           <button
-             onClick={() => {
-               setPasswordError('');
-               setShowPasswordModal(true);
-             }}
-             className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-white/60 hover:text-white hover:bg-white/10 rounded-lg transition mb-1"
-           >
-             <User size={16} />
-             {(!sidebarCollapsed || mobileMenuOpen) && 'Change Password'}
-           </button>
            <button
              onClick={signOut}
              className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-white/60 hover:text-white hover:bg-white/10 rounded-lg transition"
@@ -1391,80 +1344,6 @@ export default function Dashboard() {
             </button>
           )}
          </header>
-
-        {passwordSuccess && (
-          <div className="mx-4 mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-            {passwordSuccess}
-          </div>
-        )}
-
-        {showPasswordModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#21264E]/40 backdrop-blur-sm">
-            <div className="bg-white rounded-3xl w-full max-w-md p-6 shadow-2xl">
-              <div className="flex items-start justify-between gap-4 mb-5">
-                <div>
-                  <h2 className="text-lg font-bold text-[#21264E]">Change Password</h2>
-                  <p className="text-sm text-gray-500 mt-1">Update the password for your account.</p>
-                </div>
-                <button
-                  onClick={() => setShowPasswordModal(false)}
-                  className="p-2 text-gray-400 hover:text-[#21264E] rounded-full transition"
-                >
-                  <X size={20} />
-                </button>
-              </div>
-
-              {passwordError && (
-                <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                  {passwordError}
-                </div>
-              )}
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-xs font-semibold text-[#21264E]/70 uppercase tracking-wider mb-1.5">
-                    New Password
-                  </label>
-                  <input
-                    type="password"
-                    value={newPassword}
-                    onChange={e => setNewPassword(e.target.value)}
-                    placeholder="Enter new password"
-                    className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl text-[#21264E] placeholder:text-gray-400 focus:ring-2 focus:ring-[#245bc1] outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-[#21264E]/70 uppercase tracking-wider mb-1.5">
-                    Confirm Password
-                  </label>
-                  <input
-                    type="password"
-                    value={confirmPassword}
-                    onChange={e => setConfirmPassword(e.target.value)}
-                    placeholder="Confirm password"
-                    className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl text-[#21264E] placeholder:text-gray-400 focus:ring-2 focus:ring-[#245bc1] outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="mt-6 flex flex-col sm:flex-row sm:justify-end gap-3">
-                <button
-                  onClick={() => setShowPasswordModal(false)}
-                  className="w-full sm:w-auto px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleChangePassword}
-                  disabled={changingPassword}
-                  className="w-full sm:w-auto px-4 py-2.5 bg-[#21264E] hover:bg-[#245bc1] text-white text-sm font-semibold rounded-xl transition disabled:opacity-50"
-                >
-                  {changingPassword ? 'Saving...' : 'Save Password'}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Click-away listener for dropdown */}
         {showRetailerDropdown && (

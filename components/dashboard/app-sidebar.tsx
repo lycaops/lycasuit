@@ -75,7 +75,7 @@ export function AppSidebar({ user }: { user: SidebarUser }) {
               </div>
               <div className="flex min-w-0 flex-col gap-0.5 overflow-hidden leading-tight group-data-[collapsible=icon]:hidden">
                 <span className="truncate text-sm font-bold text-white">RCM - LycaOps</span>
-                <span className="truncate text-xs text-[#ffc8b2]">{t("contractManager")}</span>
+                <span className="truncate text-xs text-[#D6EEFF]">{t("contractManager")}</span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -114,7 +114,7 @@ export function AppSidebar({ user }: { user: SidebarUser }) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" className="pointer-events-none group-data-[collapsible=icon]:!p-0 group-data-[collapsible=icon]:justify-center">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#ffc8b2] text-[11px] font-semibold text-[#21264e]">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#D6EEFF] text-[11px] font-semibold text-[#21264e]">
                 {user.full_name
                   .split(" ")
                   .map((s) => s[0])

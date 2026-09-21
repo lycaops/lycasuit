@@ -2,11 +2,20 @@
 
 import Link from "next/link"
 import { useState, type ReactNode } from "react"
-import { ArrowRight, BarChart3, FileSignature, Home, LayoutGrid, LifeBuoy, Menu, Receipt, Users, X } from "lucide-react"
+import { ArrowRight, BarChart3, FileSignature, Home, LayoutGrid, LifeBuoy, Menu, Receipt, Users, X, KeyRound } from "lucide-react"
 import { useI18n } from "@/lib/i18n/i18n-context"
 import { HomeHeader } from "@/components/home/home-header"
 import { MobileToolNav } from "@/components/dashboard/mobile-tool-nav"
 import type { PlatformTool } from "@/lib/auth"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { PasswordChangeForm } from "@/components/dashboard/password-change-form"
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   BarChart3,
@@ -48,6 +57,7 @@ export function HomeContent({
 }) {
   const { t } = useI18n()
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
+  const [pwdDialogOpen, setPwdDialogOpen] = useState(false)
   const firstName = user.full_name?.split(" ")[0] ?? "there"
 
   return (
@@ -93,6 +103,23 @@ export function HomeContent({
                   <Users className="h-4 w-4" /> {t("userManagement")}
                 </Link>
               )}
+              <Dialog open={pwdDialogOpen} onOpenChange={setPwdDialogOpen}>
+                <DialogTrigger asChild>
+                  <button
+                    type="button"
+                    className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-white/65 transition hover:bg-white/10 hover:text-white text-left ${admin ? "mt-1" : "mt-3"}`}
+                  >
+                    <KeyRound className="h-4 w-4" /> Change Password
+                  </button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Change Password</DialogTitle>
+                    <DialogDescription>Update the password for your account.</DialogDescription>
+                  </DialogHeader>
+                  <PasswordChangeForm onSuccess={() => { setPwdDialogOpen(false); setMobileSidebarOpen(false); }} />
+                </DialogContent>
+              </Dialog>
             </nav>
             <div className="mt-auto shrink-0 border-t border-white/10 pt-5">
               <p className="truncate text-sm font-medium">{user.full_name}</p>
@@ -124,6 +151,23 @@ export function HomeContent({
               <Users className="h-4 w-4" /> {t("userManagement")}
             </Link>
           )}
+          <Dialog open={pwdDialogOpen} onOpenChange={setPwdDialogOpen}>
+            <DialogTrigger asChild>
+              <button
+                type="button"
+                className={`mb-4 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-white/70 transition hover:bg-white/10 hover:text-white text-left`}
+              >
+                <KeyRound className="h-4 w-4" /> Change Password
+              </button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Change Password</DialogTitle>
+                <DialogDescription>Update the password for your account.</DialogDescription>
+              </DialogHeader>
+              <PasswordChangeForm onSuccess={() => setPwdDialogOpen(false)} />
+            </DialogContent>
+          </Dialog>
           <p className="truncate text-sm font-medium">{user.full_name}</p>
           <p className="mt-1 truncate text-xs text-white/45">{user.role}</p>
           <HomeHeader user={user} sidebarMode />
