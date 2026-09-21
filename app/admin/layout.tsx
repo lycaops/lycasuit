@@ -2,7 +2,7 @@ import type { ReactNode } from "react"
 import dynamic from "next/dynamic"
 import { getMyTools, requirePlatformAdmin } from "@/lib/auth"
 
-const HomeSidebar = dynamic(() => import("@/components/home/home-sidebar").then((m) => m.HomeSidebar), {
+const HomeSidebar = dynamic(() => import("@/components/home/home-sidebar"), {
   ssr: false,
 })
 

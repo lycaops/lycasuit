@@ -12,7 +12,7 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   LifeBuoy,
 }
 
-export function HomeSidebar({
+function HomeSidebar({
   user,
   tools,
   admin = false,
@@ -63,3 +63,6 @@ export function HomeSidebar({
     </aside>
   )
 }
+
+export { HomeSidebar }
+export default HomeSidebar

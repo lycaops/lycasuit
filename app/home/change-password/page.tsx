@@ -5,7 +5,7 @@ import { getMyTools, isPlatformAdmin, requirePlatformUser } from "@/lib/auth"
 import { PasswordChangeForm } from "@/components/dashboard/password-change-form"
 import { MobileToolNav } from "@/components/dashboard/mobile-tool-nav"
 
-const HomeSidebar = dynamic(() => import("@/components/home/home-sidebar").then((m) => m.HomeSidebar), {
+const HomeSidebar = dynamic(() => import("@/components/home/home-sidebar"), {
   ssr: false,
 })
 
