@@ -13,16 +13,50 @@ export interface ActionResult {
 const NORTH_BRANCHES = ["LMIT-HS-BOLOGNA", "LMIT-HS-MILAN", "LMIT-HS-PADOVA", "LMIT-HS-TORINO"]
 const SOUTH_BRANCHES = ["LMIT-HS-BARI", "LMIT-HS-NAPLES", "LMIT-HS-PALERMO", "LMIT-HS-ROME"]
 
-async function computeDesignation(
-  supabase: ReturnType<typeof createClient> | ReturnType<typeof createAdminClient>,
-  roleCode: string,
-): Promise<string | null> {
-  const { data } = await supabase
-    .from("app_roles")
-    .select("label")
-    .eq("code", roleCode)
-    .maybeSingle()
-  return data?.label ?? null
+// Designation values allowed by the `app_users_designation_check` constraint
+// (see supabase/migrations/20260918000001_unified_core.sql). Anything else
+// written to app_users.designation violates the check and fails the insert.
+export const DESIGNATION_VALUES = [
+  "Zone Manager",
+  "Office Manager",
+  "Region Manager",
+  "Admin",
+  "CS",
+  "Retailer Support",
+  "Admin-UK",
+  "Admin-IN",
+] as const
+
+type Designation = (typeof DESIGNATION_VALUES)[number]
+
+/**
+ * Map a canonical app_roles code to a designation that satisfies the
+ * `app_users_designation_check` constraint. Unlike app_roles.label, these
+ * values come from the Market Assistance vocabulary the constraint enforces.
+ * Roles without a natural designation resolve to null (allowed by the check).
+ */
+const DESIGNATION_BY_ROLE: Record<string, Designation | null> = {
+  "SUPER-ADMIN": "Admin",
+  "HS-ADMIN": "Admin",
+  "PM-ADMIN": "Admin",
+  "COUNTRY-MANAGER": "Admin",
+  "UK-ADMIN": "Admin-UK",
+  "CS-ADMIN": "CS",
+  RSM: "Region Manager",
+  "ZONE-MANAGER": "Zone Manager",
+  ASM: "Office Manager",
+  FSE: null,
+  VIEWER: null,
+}
+
+/** Keep only designation values the database check constraint allows. */
+function sanitizeDesignation(value: string | null | undefined): string | null {
+  if (value == null) return null
+  return (DESIGNATION_VALUES as readonly string[]).includes(value) ? value : null
+}
+
+function computeDesignation(roleCode: string): Designation | null {
+  return sanitizeDesignation(DESIGNATION_BY_ROLE[roleCode] ?? null)
 }
 
 async function computeTerritory(
@@ -123,7 +157,7 @@ export async function createPlatformUser(input: {
     return { ok: false, error: authError?.message ?? "Could not create the login." }
   }
 
-  const designation = input.designation ?? (await computeDesignation(admin, input.role))
+  const designation = sanitizeDesignation(input.designation) ?? computeDesignation(input.role)
   const territory = input.territory ?? (await computeTerritory(admin, input.role, {
     branches: input.branches,
     branch: input.branch,
@@ -179,7 +213,7 @@ export async function updatePlatformUser(
   await requirePlatformAdmin()
   const supabase = await createClient()
 
-  let designation = patch.designation
+  let designation = patch.designation !== undefined ? sanitizeDesignation(patch.designation) : undefined
   let territory = patch.territory
   const needsRoleRecompute = (patch.role !== undefined || patch.branches !== undefined || patch.branch !== undefined || patch.zone !== undefined)
   if (needsRoleRecompute) {
@@ -199,7 +233,7 @@ export async function updatePlatformUser(
       zone = zone ?? (existing as any)?.zone
     }
     if (role && designation === undefined) {
-      designation = await computeDesignation(supabase, role)
+      designation = computeDesignation(role)
     }
     if (role && territory === undefined) {
       territory = await computeTerritory(supabase, role, { branches, branch, zone })
