@@ -1,9 +1,13 @@
 import Link from "next/link"
+import dynamic from "next/dynamic"
 import { ArrowLeft, KeyRound } from "lucide-react"
 import { getMyTools, isPlatformAdmin, requirePlatformUser } from "@/lib/auth"
-import { HomeSidebar } from "@/components/home/home-sidebar"
 import { PasswordChangeForm } from "@/components/dashboard/password-change-form"
 import { MobileToolNav } from "@/components/dashboard/mobile-tool-nav"
+
+const HomeSidebar = dynamic(() => import("@/components/home/home-sidebar").then((m) => m.HomeSidebar), {
+  ssr: false,
+})
 
 export default async function ChangePasswordPage() {
   const user = await requirePlatformUser()

@@ -1,6 +1,10 @@
 import type { ReactNode } from "react"
+import dynamic from "next/dynamic"
 import { getMyTools, requirePlatformAdmin } from "@/lib/auth"
-import { HomeSidebar } from "@/components/home/home-sidebar"
+
+const HomeSidebar = dynamic(() => import("@/components/home/home-sidebar").then((m) => m.HomeSidebar), {
+  ssr: false,
+})
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   const user = await requirePlatformAdmin()
