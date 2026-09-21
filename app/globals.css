@@ -6,7 +6,7 @@
 /* =================================================
    Brand palette (max 5 colors in use):
    - Ink           #21264e  (deep navy, primary surface / sidebar)
-   - Base          #fff7f2  (warm off-white background)
+   - Base          #eff8ff  (warm off-white background)
    - Accent Blue   #245bc1  (primary action)
    - Accent Green  #08dc7d  (positive / signed)
    - Accent Peach  #ffc8b2  (highlight / subtle accent)
@@ -180,7 +180,7 @@
     main,
     [data-slot="sidebar-inset"] {
       -webkit-overflow-scrolling: touch;
-      overscroll-behavior-y: contain;
+
     }
   }
   button,

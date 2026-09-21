@@ -275,7 +275,7 @@ export default function DataImport({ user: propUser }: DataImportProps) {
           </label>
         ) : (
           <div>
-            <div className="flex items-center justify-between bg-[#fff7f2] rounded-lg p-4 mb-4">
+            <div className="flex items-center justify-between bg-[#eff8ff] rounded-lg p-4 mb-4">
               <div className="flex items-center gap-3">
                 <FileText size={24} className="text-[#21264E]" />
                 <div>

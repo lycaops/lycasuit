@@ -755,7 +755,7 @@ export default function PlanActivationReport({ region, branch, zone, user }: Pla
               <p className="text-[11px] uppercase tracking-[0.18em] text-white/70">Region</p>
               <p className="mt-2 text-sm font-semibold">{region || 'ITALY'}</p>
             </div>
-            <div className="rounded-2xl bg-[#fff7f2] px-4 py-3 text-[#21264E] shadow-sm border border-[#21264E]/10">
+            <div className="rounded-2xl bg-[#eff8ff] px-4 py-3 text-[#21264E] shadow-sm border border-[#21264E]/10">
               <p className="text-[11px] uppercase tracking-[0.18em] text-[#21264E]/70">Branch</p>
               <p className="mt-2 text-sm font-semibold">{branch || 'All Branches'}</p>
             </div>

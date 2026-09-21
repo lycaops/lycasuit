@@ -597,7 +597,7 @@ export default function RetailerAnalysis({ summary, monthlyData }: Props) {
                 { label: 'Total Port in bonus', key: 'pi_total', format: fmt },
                 { label: 'Avg Renewal Rate', key: 'renewal_rate', format: fmtP },
               ].map(row => (
-                <tr key={row.key} className="border-b border-gray-50 hover:bg-[#fff7f2] transition">
+                <tr key={row.key} className="border-b border-gray-50 hover:bg-[#eff8ff] transition">
                   <td className="py-2 px-3 text-[#21264E] font-medium">{row.label}</td>
                   {yearlyTotals.map(yt => {
                     const val = yt[row.key as keyof typeof yt] as number;

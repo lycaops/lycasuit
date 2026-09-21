@@ -303,7 +303,7 @@ const avgRenewalRate = hasAggregatedData && yearlyZoneData
   );
 
   return (
-    <div className="p-6 overflow-y-auto bg-[#fff7f2]">
+    <div className="p-6 overflow-y-auto bg-[#eff8ff]">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-[#21264E] mb-2">Retailer Performance Overview</h1>

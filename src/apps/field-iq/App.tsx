@@ -15,7 +15,7 @@ function AppContent() {
     );
   }
 
-  if (!user) return <Login />;
+  if (!user) return null;
   return <Dashboard />;
 }
 

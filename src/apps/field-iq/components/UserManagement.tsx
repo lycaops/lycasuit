@@ -481,7 +481,7 @@ export default function UserManagement() {
                 </thead>
                 <tbody className="divide-y divide-gray-50">
                   {filteredUsers.map(u => (
-                    <tr key={u.id} className={`hover:bg-[#fff7f2]/60 transition ${!u.is_active ? 'opacity-50' : ''}`}>
+                    <tr key={u.id} className={`hover:bg-[#eff8ff]/60 transition ${!u.is_active ? 'opacity-50' : ''}`}>
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-3">
                           <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${

@@ -1357,7 +1357,7 @@ export default function Dashboard() {
                         setRetailerSearch(r.retailer_id);
                         setShowRetailerDropdown(false);
                       }}
-                      className={`w-full text-left px-4 py-2.5 text-sm hover:bg-[#fff7f2] transition flex items-center justify-between ${
+                      className={`w-full text-left px-4 py-2.5 text-sm hover:bg-[#eff8ff] transition flex items-center justify-between ${
                         r.retailer_id === selectedRetailerId ? 'bg-[#fff7f2] font-medium' : ''
                       }`}
                     >

@@ -54,7 +54,7 @@ export function DashboardContent({ user, counts, recentRows }: DashboardContentP
       key: "generated",
       value: counts.generated,
       icon: FilePlus2,
-      tone: "bg-[#21264e] text-[#fff7f2]",
+      tone: "bg-[#21264e] text-[#eff8ff]",
     },
   ]
 

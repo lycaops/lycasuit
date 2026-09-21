@@ -187,7 +187,7 @@ export default function ResetPasswordPage() {
     <Card className="w-full">
       <CardContent className="flex flex-col gap-4 pt-6">
         <div className="flex items-center gap-2">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#21264e] text-[#fff7f2]">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#21264e] text-[#eff8ff]">
             <Shield className="h-5 w-5" aria-hidden="true" />
           </div>
           <div className="flex flex-col">
