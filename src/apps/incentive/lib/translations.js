@@ -42,6 +42,9 @@ export const translations = {
     all_branches: "All Branches",
     all_zones: "All Zones",
     clear_filters: "Clear filters",
+    incentive_group_all: "All",
+    incentive_group_normal: "Normal",
+    incentive_group_special: "Special",
 
     // Statement
     retailer_incentive_statement: "Retailer Incentive Statement",
@@ -260,6 +263,9 @@ export const translations = {
     all_branches: "Tutte le Filiali",
     all_zones: "Tutte le Zone",
     clear_filters: "Cancella filtri",
+    incentive_group_all: "Tutti",
+    incentive_group_normal: "Normali",
+    incentive_group_special: "Speciali",
 
     retailer_incentive_statement: "Estratto Incentivi Rivenditore",
     statement_period: "Periodo di Riferimento",

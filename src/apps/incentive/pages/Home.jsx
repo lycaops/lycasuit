@@ -39,6 +39,7 @@ export default function Home() {
   const [query, setQuery] = useState('');
   const [branchFilter, setBranchFilter] = useState('');
   const [zoneFilter, setZoneFilter] = useState('');
+  const [groupFilter, setGroupFilter] = useState('');
 
   const handleSelect = (row) => {
     if (row?._scheme) setScheme(row._scheme);
@@ -58,6 +59,16 @@ export default function Home() {
   const hasBranchData = filterOptions.branches.length > 0;
   const hasZoneData = filterOptions.zones.length > 0;
   const showFilters = hasBranchData || hasZoneData;
+
+  const groupOptions = [
+    { value: '', label: t('incentive_group_all') },
+    { value: 'normal', label: t('incentive_group_normal') },
+    { value: 'special', label: t('incentive_group_special') },
+  ];
+
+  const filteredRecords = groupFilter
+    ? records.filter((r) => r._incentiveGroup === groupFilter)
+    : records;
 
   return (
     <Layout>
@@ -94,6 +105,7 @@ export default function Home() {
                   setQuery('');
                   setBranchFilter('');
                   setZoneFilter('');
+                  setGroupFilter('');
                 }}
                 className="w-full sm:w-auto rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-[#006AE0] bg-white sm:min-w-[180px]"
               >
@@ -173,10 +185,33 @@ export default function Home() {
               <>
                 <Dashboard records={records} />
                 <div>
-                  <h2 className="text-sm font-semibold text-slate-700 mb-3">
-                    {t('search_retailer')} ({records.length} / 1000)
-                  </h2>
-                  <RetailerTable records={records} onSelect={handleSelect} />
+                  <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+                    <h2 className="text-sm font-semibold text-slate-700">
+                      {t('search_retailer')} ({records.length} / 1000)
+                    </h2>
+                    <div className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white p-1">
+                      {groupOptions.map((opt) => (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => setGroupFilter(opt.value)}
+                          className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                            groupFilter === opt.value
+                              ? 'bg-[#006AE0] text-white'
+                              : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'
+                          }`}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <RetailerTable records={filteredRecords} onSelect={handleSelect} />
+                  {filteredRecords.length === 0 && (
+                    <div className="rounded-[12px] border border-[#E4E9F1] bg-white p-8 text-center text-sm text-slate-400">
+                      {t('no_results')}
+                    </div>
+                  )}
                 </div>
               </>
             )}

@@ -20,7 +20,7 @@ export default function RetailerTable({ onSelect, records: recs }) {
   if (records.length === 0) return null;
 
   return (
-    <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+    <div className="grid grid-cols-1 gap-3">
       {shown.map((r, i) => {
         const totalPaid = getNumber(r, "TOTAL PAID (SBT+BT+VOU)");
         return (
