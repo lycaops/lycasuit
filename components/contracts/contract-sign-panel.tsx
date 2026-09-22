@@ -4,7 +4,7 @@ import { useRef, useState, useTransition, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, ArrowLeft, CheckCircle2, Copy, Link2, ExternalLink } from "lucide-react"
+import { ArrowRight, ArrowLeft, CheckCircle2, Copy, Link2, ExternalLink, Mail, PenTool } from "lucide-react"
 import {
   Card,
   CardContent,
@@ -35,6 +35,7 @@ export function ContractSignPanel({ contractId }: { contractId: string }) {
   const [ack, setAck] = useState(false)
   const [gdpr, setGdpr] = useState(false)
   const [step, setStep] = useState<1 | 2 | 3>(1)
+  const [method, setMethod] = useState<null | "remote" | "device">(null)
   const [retailerSig, setRetailerSig] = useState<string | null>(null)
   const [otp, setOtp] = useState("")
   const [otpSentTo, setOtpSentTo] = useState<string | null>(null)
@@ -268,7 +269,37 @@ export function ContractSignPanel({ contractId }: { contractId: string }) {
       <CardContent className="pt-4 sm:pt-6 p-4 sm:p-6">
         <div className="flex flex-col gap-5 sm:gap-6">
           <div className={step === 1 ? "flex flex-col gap-5 sm:gap-6" : "hidden"}>
-            <div className="rounded-lg border border-[#E8F4FE] bg-[#F4FAFF] p-3 sm:p-4">
+            {method === null ? (
+              <div className="rounded-lg border border-[#E8F4FE] bg-[#F4FAFF] p-4 sm:p-5">
+                <div className="text-sm font-semibold text-brand-navy">{t("chooseRetailerMethod")}</div>
+                <div className="mt-1 text-xs sm:text-sm text-slate-600">{t("chooseRetailerMethodDesc")}</div>
+                <div className="mt-4 flex flex-col gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setMethod("remote")}
+                    className="flex items-start gap-3 rounded-lg border-2 border-[#E8F4FE] bg-white p-3 sm:p-4 text-left transition-colors hover:border-[#245bc1]/40 hover:bg-[#F4FAFF]"
+                  >
+                    <Mail className="mt-0.5 h-5 w-5 shrink-0 text-[#245bc1]" />
+                    <span className="min-w-0">
+                      <span className="block text-sm font-semibold text-brand-navy">{t("methodEmailTitle")}</span>
+                      <span className="mt-0.5 block text-xs sm:text-sm text-slate-600">{t("methodEmailDesc")}</span>
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMethod("device")}
+                    className="flex items-start gap-3 rounded-lg border-2 border-[#E8F4FE] bg-white p-3 sm:p-4 text-left transition-colors hover:border-[#245bc1]/40 hover:bg-[#F4FAFF]"
+                  >
+                    <PenTool className="mt-0.5 h-5 w-5 shrink-0 text-[#245bc1]" />
+                    <span className="min-w-0">
+                      <span className="block text-sm font-semibold text-brand-navy">{t("methodDeviceTitle")}</span>
+                      <span className="mt-0.5 block text-xs sm:text-sm text-slate-600">{t("methodDeviceDesc")}</span>
+                    </span>
+                  </button>
+                </div>
+              </div>
+            ) : method === "remote" ? (
+              <div className="rounded-lg border border-[#E8F4FE] bg-[#F4FAFF] p-3 sm:p-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0">
                   <div className="text-sm font-semibold text-brand-navy">{t("remoteSigningLinkLabel")}</div>
@@ -320,7 +351,40 @@ export function ContractSignPanel({ contractId }: { contractId: string }) {
                   </div>
                 </div>
               ) : null}
-            </div>
+
+                <div className="mt-3 sm:mt-4 flex justify-start border-t border-[#E8F4FE] pt-3">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setMethod(null)}
+                    disabled={pending}
+                    className="text-[#245bc1] hover:bg-[#E8F4FE] hover:text-[#245bc1]"
+                  >
+                    <ArrowLeft className="mr-1.5 h-4 w-4" />
+                    {t("changeMethod")}
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-5 sm:gap-6">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-lg border border-[#E8F4FE] bg-[#F4FAFF] p-3 sm:p-4">
+                  <div className="min-w-0">
+                    <div className="text-sm font-semibold text-brand-navy">{t("methodDeviceTitle")}</div>
+                    <div className="mt-1 text-xs sm:text-sm text-slate-600">{t("methodDeviceDesc")}</div>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setMethod(null)}
+                    disabled={pending}
+                    className="w-full sm:w-auto shrink-0 text-[#245bc1] hover:bg-[#E8F4FE] hover:text-[#245bc1]"
+                  >
+                    <ArrowLeft className="mr-1.5 h-4 w-4" />
+                    {t("changeMethod")}
+                  </Button>
+                </div>
 
             <SignaturePad
               ref={retailerRef}
@@ -369,6 +433,8 @@ export function ContractSignPanel({ contractId }: { contractId: string }) {
                 </div>
               </Button>
             </div>
+            </div>
+            )}
           </div>
 
           <div className={step === 2 ? "flex flex-col gap-5 sm:gap-6" : "hidden"}>
