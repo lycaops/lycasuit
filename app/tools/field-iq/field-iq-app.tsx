@@ -9,7 +9,7 @@ import Loader from "@/components/Loader"
 const App = dynamic(() => import("@fieldiq/App"), {
   ssr: false,
   loading: () => (
-    <div className="flex min-h-[60vh] items-center justify-center">
+    <div className="lo-screen">
       <Loader size={128} />
     </div>
   ),

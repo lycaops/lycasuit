@@ -88,8 +88,8 @@ export default function Home() {
           </div>
         )}
 
-        {loadingRecords && records.length === 0 && (
-          <div className="flex items-center justify-center py-12">
+        {loadingRecords && (
+          <div className="lo-screen" style={{ '--lo-screen-bg': 'rgba(244, 247, 251, 0.75)' }}>
             <Loader size={64} weight={8} />
           </div>
         )}
@@ -185,25 +185,27 @@ export default function Home() {
               <>
                 <Dashboard records={records} />
                 <div>
-                  <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-                    <h2 className="text-sm font-semibold text-slate-700">
-                      {t('search_retailer')} ({records.length} / 1000)
-                    </h2>
-                    <div className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white p-1">
-                      {groupOptions.map((opt) => (
-                        <button
-                          key={opt.value}
-                          type="button"
-                          onClick={() => setGroupFilter(opt.value)}
-                          className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
-                            groupFilter === opt.value
-                              ? 'bg-[#006AE0] text-white'
-                              : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'
-                          }`}
-                        >
-                          {opt.label}
-                        </button>
-                      ))}
+                  <div className="sticky top-[calc(3.5rem_+_env(safe-area-inset-top))] z-20 -mx-3 mb-3 border-b border-[#E4E9F1] bg-[#f4f7fb]/95 px-3 py-2.5 backdrop-blur-sm md:top-0 md:-mx-8 md:px-8">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <h2 className="text-sm font-semibold text-slate-700">
+                        {t('search_retailer')} ({records.length} / 1000)
+                      </h2>
+                      <div className="inline-flex items-center gap-1 rounded-lg bg-[#21254F] p-1">
+                        {groupOptions.map((opt) => (
+                          <button
+                            key={opt.value}
+                            type="button"
+                            onClick={() => setGroupFilter(opt.value)}
+                            className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                              groupFilter === opt.value
+                                ? 'bg-[#006AE0] text-white'
+                                : 'text-white/75 hover:bg-white/10 hover:text-white'
+                            }`}
+                          >
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
                   <RetailerTable records={filteredRecords} onSelect={handleSelect} />
