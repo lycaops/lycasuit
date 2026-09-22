@@ -4,6 +4,7 @@ import supabase from '@incentive/api/supabaseClient';
 import { safeReturnTo } from '@incentive/lib/authReturnTo';
 
 const AuthContext = createContext();
+const ADMIN_ROLE_CODES = ['admin', 'HS-ADMIN', 'PM-ADMIN', 'CS-ADMIN', 'COUNTRY-MANAGER', 'UK-ADMIN'];
 
 async function fetchProfile(uid) {
   if (!uid) return null;
@@ -15,7 +16,24 @@ async function fetchProfile(uid) {
     .select('id, email, full_name, role, is_disabled, is_active, branch_id, zone_id, branches, branch, zone, territory, designation, created_at, updated_at')
     .eq('id', uid)
     .maybeSingle();
-  if (error || !data) return null;
+  let profile = data;
+
+  // Match FIELD IQ's unified-auth fallback for profiles created before the
+  // platform started using the Supabase auth user id as the profile id.
+  if ((error || !profile) && uid) {
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+    if (authUser?.email) {
+      const { data: emailMatch, error: emailError } = await supabase
+        .from('profiles')
+        .select('id, email, full_name, role, is_disabled, is_active, branch_id, zone_id, branches, branch, zone, territory, designation, created_at, updated_at')
+        .ilike('email', authUser.email)
+        .maybeSingle();
+
+      if (!emailError && emailMatch) profile = emailMatch;
+    }
+  }
+
+  if (!profile) return null;
 
   // The effective scope (role + branches + zone with display names) is resolved
   // by the database, so the tool and FIELD IQ can never drift apart.
@@ -27,47 +45,47 @@ async function fetchProfile(uid) {
   let branch = null;
   let zone = null;
   if (!scope) {
-    if (data.branch_id) {
+    if (profile.branch_id) {
       const { data: b } = await supabase
-        .from('branches').select('name, code').eq('id', data.branch_id).maybeSingle();
+        .from('branches').select('name, code').eq('id', profile.branch_id).maybeSingle();
       branch = b || null;
     }
-    if (data.zone_id) {
+    if (profile.zone_id) {
       const { data: z } = await supabase
-        .from('zones').select('name, code').eq('id', data.zone_id).maybeSingle();
+        .from('zones').select('name, code').eq('id', profile.zone_id).maybeSingle();
       zone = z || null;
     }
   }
 
-  const assignedBranches = data.branches || [];
+  const assignedBranches = profile.branches || [];
   const branchNames = scope?.branch_names?.length
     ? scope.branch_names
     : assignedBranches.length > 0
       ? assignedBranches
       : [branch?.name].filter(Boolean);
-  const isAdmin = ADMIN_ROLE_CODES.includes(data.role);
+  const isAdmin = ADMIN_ROLE_CODES.includes(profile.role);
 
   return {
-    id: data.id,
-    email: data.email,
-    full_name: data.full_name,
-    role: data.role,
-    is_disabled: data.is_disabled,
-    is_active: data.is_active,
+    id: profile.id,
+    email: profile.email,
+    full_name: profile.full_name,
+    role: profile.role,
+    is_disabled: profile.is_disabled,
+    is_active: profile.is_active,
     is_admin: isAdmin,
-    branch_id: data.branch_id,
-    zone_id: data.zone_id,
+    branch_id: profile.branch_id,
+    zone_id: profile.zone_id,
     branches: assignedBranches,
-    branch: data.branch || null,
-    zone: data.zone || null,
+    branch: profile.branch || null,
+    zone: profile.zone || null,
     branch_names: branchNames,
     branch_name: branchNames.join(', ') || null,
     zone_name: scope?.zone_name || zone?.name || null,
-    territory: data.territory || null,
-    designation: data.designation || null,
+    territory: profile.territory || null,
+    designation: profile.designation || null,
     sees_all_retailers: Boolean(scope?.sees_all ?? (isAdmin && assignedBranches.length === 0)),
-    created_at: data.created_at,
-    updated_at: data.updated_at,
+    created_at: profile.created_at,
+    updated_at: profile.updated_at,
   };
 }
 
@@ -232,7 +250,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const navigateToLogin = useCallback(() => {
-    const dest = '/login?returnTo=' + encodeURIComponent(safeReturnTo());
+    const dest = '/auth/login?returnTo=' + encodeURIComponent('/tools/incentive' + safeReturnTo());
     window.location.href = dest;
   }, []);
 

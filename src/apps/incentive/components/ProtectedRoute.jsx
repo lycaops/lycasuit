@@ -11,6 +11,14 @@ const DefaultFallback = () => (
   </div>
 );
 
+const PlatformLoginRedirect = () => {
+  useEffect(() => {
+    window.location.replace('/auth/login');
+  }, []);
+
+  return <DefaultFallback />;
+};
+
 export default function ProtectedRoute({ fallback = <DefaultFallback />, unauthenticatedElement }) {
   const { isAuthenticated, isLoadingAuth, authChecked, authError, checkUserAuth } = useAuth();
 
@@ -32,7 +40,7 @@ export default function ProtectedRoute({ fallback = <DefaultFallback />, unauthe
   }
 
   if (!isAuthenticated) {
-    return unauthenticatedElement;
+    return <PlatformLoginRedirect />;
   }
 
   return <Outlet />;
