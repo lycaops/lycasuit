@@ -381,13 +381,21 @@ export default function Dashboard() {
           
           setKpiBranches(availableKpiBranches);
           
-          // If the current kpiBranch is not in the filtered list, reset it
-          if (user.role !== 'ZONE-MANAGER' && kpiBranch && !availableKpiBranches.includes(kpiBranch)) {
-            setKpiBranch('');
+          if (user.role === 'ASM') {
+             // ASM users are restricted to their assigned branch by default.
+             const userBranch = user.branches?.[0] ? normalizeBranch(user.branches[0]) : '';
+             if (userBranch && availableKpiBranches.some(b => normalizeBranch(b) === userBranch)) {
+               setKpiBranch(userBranch);
+             }
+          } else {
+            // Keep a selected branch for broader roles only while it remains available.
+            if (user.role !== 'ZONE-MANAGER' && kpiBranch && !availableKpiBranches.includes(kpiBranch)) {
+              setKpiBranch('');
+            }
           }
-          
-          // Default region logic for ASM/RSM - open with region results
-          if (user.role === 'ASM' || user.role === 'RSM') {
+
+          // Default region logic for RSM - open with region results.
+          if (user.role === 'RSM') {
              const userBranch = user.branches?.[0] ? normalizeBranch(user.branches[0]) : '';
              let newRegion = 'ITALY';
              if (NORTH_REGION.includes(userBranch)) newRegion = 'NORTH';
@@ -395,7 +403,6 @@ export default function Dashboard() {
              
              if (newRegion !== kpiRegion) {
                setKpiRegion(newRegion);
-               setKpiBranch(''); // Show all branches in that region by default
              }
           }
         }

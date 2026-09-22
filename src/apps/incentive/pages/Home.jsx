@@ -5,6 +5,7 @@ import Layout from '@incentive/components/Layout';
 import RetailerTable from '@incentive/components/RetailerTable';
 import Dashboard from '@incentive/components/Dashboard';
 import { useApp } from '@incentive/lib/AppContext';
+import { useAuth } from '@incentive/lib/AuthContext';
 import { getNumber } from '@incentive/lib/csvUtils';
 import { Search, Database, Filter, ArrowDownWideNarrow } from 'lucide-react';
 import Loader from '@/components/Loader';
@@ -35,13 +36,21 @@ export default function Home() {
     filterOptions,
     loadFilterOptions,
   } = useApp();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [month, setMonth] = useState('');
   const [query, setQuery] = useState('');
+  const assignedBranch = user?.role === 'ASM'
+    ? String(user.branches?.[0] || user.branch || '')
+    : '';
   const [branchFilter, setBranchFilter] = useState('');
   const [zoneFilter, setZoneFilter] = useState('');
   const [groupFilter, setGroupFilter] = useState('');
   const [sortByTotalPaid, setSortByTotalPaid] = useState(false);
+
+  useEffect(() => {
+    if (assignedBranch) setBranchFilter(assignedBranch);
+  }, [assignedBranch]);
 
   const handleSelect = (row) => {
     if (row?._scheme) setScheme(row._scheme);
@@ -114,7 +123,7 @@ export default function Home() {
                   setMonth(e.target.value);
                   setRecords([]);
                   setQuery('');
-                  setBranchFilter('');
+                  setBranchFilter(assignedBranch);
                   setZoneFilter('');
                   setGroupFilter('');
                 }}
