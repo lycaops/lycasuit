@@ -84,7 +84,8 @@ export function AppProvider({ children }) {
     const stored = window.localStorage.getItem('language');
     return stored === 'it' ? 'it' : 'en';
   });
-  const [scheme, setScheme] = useState('special');
+  // Default scheme when the tool is opened is the Normal scheme.
+  const [scheme, setScheme] = useState('normal');
   const [records, setRecords] = useState([]);
   const [headers, setHeaders] = useState([]);
   const [selectedRetailer, setSelectedRetailer] = useState(getStoredSelectedRetailer);

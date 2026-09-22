@@ -45,6 +45,10 @@ export const translations = {
     incentive_group_all: "All",
     incentive_group_normal: "Normal",
     incentive_group_special: "Special",
+    total_port_in_bonus: "Total Port-in Bonus",
+    port_in_gara_detail: "(Port-in + GARA)",
+    portout_usage_detail: "(Port-out + Usage)",
+    renewal_below_30: "Below 30%",
 
     // Statement
     retailer_incentive_statement: "Retailer Incentive Statement",
@@ -266,6 +270,10 @@ export const translations = {
     incentive_group_all: "Tutti",
     incentive_group_normal: "Normali",
     incentive_group_special: "Speciali",
+    total_port_in_bonus: "Bonus Port-in Totale",
+    port_in_gara_detail: "(Port-in + GARA)",
+    portout_usage_detail: "(Port-out + Utilizzo)",
+    renewal_below_30: "Sotto il 30%",
 
     retailer_incentive_statement: "Estratto Incentivi Rivenditore",
     statement_period: "Periodo di Riferimento",

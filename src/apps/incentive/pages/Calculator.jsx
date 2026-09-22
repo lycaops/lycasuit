@@ -50,7 +50,7 @@ export default function Calculator() {
                 {lang === "it" ? "Stima incentivi Nuove Attivazioni e MNP Port-In sulla stessa pagina." : "Estimate New Activation & MNP Port-In incentives on the same page."}
               </p>
             </div>
-            <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border border-white/20">
+            <div className="flex items-center gap-1.5 rounded-md border border-[#E4E9F1] bg-white p-1">
               <button
                 onClick={() => {
                   setScheme("special");
@@ -58,8 +58,8 @@ export default function Calculator() {
                 }}
                 className={`px-3 py-1.5 text-xs rounded font-medium transition-colors ${
                   scheme === "special"
-                    ? "bg-[#08dc7d] text-[#21264e]"
-                    : "text-white/70 hover:bg-white/10"
+                    ? "bg-[#21264E] text-white"
+                    : "text-[#21264E] hover:bg-[#21264E]/10"
                 }`}
               >
                 {lang === "it" ? "Speciale" : "Special"}
@@ -71,8 +71,8 @@ export default function Calculator() {
                 }}
                 className={`px-3 py-1.5 text-xs rounded font-medium transition-colors ${
                   scheme === "normal"
-                    ? "bg-[#006AE0] text-white"
-                    : "text-white/70 hover:bg-white/10"
+                    ? "bg-[#21264E] text-white"
+                    : "text-[#21264E] hover:bg-[#21264E]/10"
                 }`}
               >
                 {lang === "it" ? "Normale" : "Normal"}

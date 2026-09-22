@@ -2,8 +2,15 @@
 import React, { useState } from "react";
 import { useApp } from "@incentive/lib/AppContext";
 import { formatCurrency, getNumber, getText } from "@incentive/lib/csvUtils";
-import { ChevronRight } from "lucide-react";
+import { AlertTriangle, ChevronRight } from "lucide-react";
 import IncentiveGroupBadge from "./statement/IncentiveGroupBadge";
+
+// Same convention as lib/analysis.js: null when none of the components exist.
+function sumAmounts(values) {
+  const present = values.filter((value) => value !== null && value !== undefined);
+  if (present.length === 0) return null;
+  return present.reduce((total, value) => total + value, 0);
+}
 
 export default function RetailerTable({ onSelect, records: recs }) {
   const { t, lang, setSelectedRetailer, records: ctxRecords } = useApp();
@@ -11,6 +18,7 @@ export default function RetailerTable({ onSelect, records: recs }) {
   const [limit, setLimit] = useState(25);
 
   const shown = records.slice(0, limit);
+  const cfmt = (value) => (value === null ? "—" : formatCurrency(value, lang));
 
   const select = (row) => {
     setSelectedRetailer(row);
@@ -23,13 +31,26 @@ export default function RetailerTable({ onSelect, records: recs }) {
     <div className="grid grid-cols-1 gap-3">
       {shown.map((r, i) => {
         const totalPaid = getNumber(r, "TOTAL PAID (SBT+BT+VOU)");
-        const bonus =
-          (getNumber(r, "QUALITY_BONUS M-1") ?? 0) +
-          (getNumber(r, "VOLUME_BONUS M-1") ?? 0) +
-          (getNumber(r, "T3REN_BONUS") ?? 0);
-        const deductions =
-          (getNumber(r, "PORTOUT DEDUCTION") ?? 0) +
-          (getNumber(r, "USAGE_CLAWBACK") ?? 0);
+        // Desktop (web view) detail: New Activation Bonus = BUNDLE1_COMM
+        const newActivationBonus = getNumber(r, "BUNDLE1_COMM");
+        // Total Port-in Bonus = Port-in + GARA
+        const portInBonus = sumAmounts([
+          getNumber(r, "PORTIN_COMM"),
+          getNumber(r, "GARA_COMM"),
+        ]);
+        // Total Deductions = Port-out deductions + Usage
+        const totalDeductions = sumAmounts([
+          getNumber(r, "PORTOUT DEDUCTION"),
+          getNumber(r, "USAGE_CLAWBACK"),
+        ]);
+        // Renewal rate of the new activations (same formula as lib/analysis.js)
+        const newActCount = getNumber(r, "NEW_ACT_CNT");
+        const newActRenewals = getNumber(r, "NEW_ACT_RENEWAL_CNT");
+        const renewalRate =
+          newActCount !== null && newActCount > 0 && newActRenewals !== null
+            ? (newActRenewals / newActCount) * 100
+            : null;
+        const belowRenewalThreshold = renewalRate !== null && renewalRate < 30;
         return (
           <button
             key={r._id || i}
@@ -41,7 +62,13 @@ export default function RetailerTable({ onSelect, records: recs }) {
               <span className="min-w-0 truncate text-sm font-bold text-slate-900 sm:text-[15px]">
                 {getText(r, "RETAILER ID") || "—"}
               </span>
-              <span className="shrink-0">
+              <span className="flex shrink-0 items-center gap-2">
+                {belowRenewalThreshold && (
+                  <span className="hidden items-center gap-1 rounded-full bg-[#fdeae3] px-2.5 py-1 text-[10px] font-semibold text-[#b04a30] md:inline-flex">
+                    <AlertTriangle className="h-3 w-3" />
+                    {`${t("renewal_rate")}: ${renewalRate.toFixed(1)}% — ${t("renewal_below_30")}`}
+                  </span>
+                )}
                 <IncentiveGroupBadge group={r._incentiveGroup} />
               </span>
             </div>
@@ -52,26 +79,30 @@ export default function RetailerTable({ onSelect, records: recs }) {
 
             <div className="my-2 border-t border-[#E4E9F1]" />
 
+            {/* Desktop-only incentive detail (web view) */}
+            <div className="mb-2 hidden gap-4 md:grid md:grid-cols-3">
+              <div className="min-w-0">
+                <p className="text-[10px] uppercase tracking-wide text-slate-400">{t("new_activation_bonus")}</p>
+                <p className="mt-0.5 truncate text-sm font-semibold text-[#0f9d63]">{cfmt(newActivationBonus)}</p>
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] uppercase tracking-wide text-slate-400">{t("total_port_in_bonus")}</p>
+                <p className="mt-0.5 truncate text-sm font-semibold text-[#0f9d63]">{cfmt(portInBonus)}</p>
+                <p className="text-[10px] text-slate-400">{t("port_in_gara_detail")}</p>
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] uppercase tracking-wide text-slate-400">{t("total_deductions")}</p>
+                <p className="mt-0.5 truncate text-sm font-semibold text-[#46286e]">{cfmt(totalDeductions)}</p>
+                <p className="text-[10px] text-slate-400">{t("portout_usage_detail")}</p>
+              </div>
+            </div>
+
             <div className="flex items-end justify-between gap-3">
               <div className="min-w-0">
                 <p className="text-[10px] uppercase tracking-wide text-slate-400">{t("total_paid")}</p>
                 <p className="mt-0.5 truncate text-base font-bold text-[#21254F]">
-                  {totalPaid === null ? "—" : formatCurrency(totalPaid, lang)}
+                  {cfmt(totalPaid)}
                 </p>
-              </div>
-              <div className="hidden min-w-0 items-end gap-6 md:flex">
-                <div className="min-w-0">
-                  <p className="text-[10px] uppercase tracking-wide text-slate-400">{t("total_bonuses")}</p>
-                  <p className="mt-0.5 truncate text-sm font-semibold text-[#0f9d63]">
-                    {formatCurrency(bonus, lang)}
-                  </p>
-                </div>
-                <div className="min-w-0">
-                  <p className="text-[10px] uppercase tracking-wide text-slate-400">{t("total_deductions")}</p>
-                  <p className="mt-0.5 truncate text-sm font-semibold text-[#46286e]">
-                    {formatCurrency(deductions, lang)}
-                  </p>
-                </div>
               </div>
               <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[#006AE0] px-3 py-1 text-xs font-semibold text-white">
                 {t("view_statement")}

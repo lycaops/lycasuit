@@ -190,7 +190,7 @@ export default function Home() {
                       <h2 className="text-sm font-semibold text-slate-700">
                         {t('search_retailer')} ({filteredRecords.length}{groupFilter ? ` / ${records.length}` : ''})
                       </h2>
-                      <div className="inline-flex items-center gap-1 rounded-lg bg-[#21254F] p-1">
+                      <div className="inline-flex items-center gap-1 rounded-lg border border-[#E4E9F1] bg-white p-1">
                         {groupOptions.map((opt) => (
                           <button
                             key={opt.value}
@@ -198,8 +198,8 @@ export default function Home() {
                             onClick={() => setGroupFilter(opt.value)}
                             className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
                               groupFilter === opt.value
-                                ? 'bg-[#006AE0] text-white'
-                                : 'text-white/75 hover:bg-white/10 hover:text-white'
+                                ? 'bg-[#21264E] text-white'
+                                : 'text-[#21264E] hover:bg-[#21264E]/10'
                             }`}
                           >
                             {opt.label}
