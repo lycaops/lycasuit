@@ -105,13 +105,13 @@ export function computeSummary(row, scheme = "special") {
 
 export function computeBreakdown(row, lang, scheme = "special") {
   const allFields = [
+    "TOTAL PAID (SBT+BT+VOU)",
     ...EARNING_FIELDS,
     ...BREAKDOWN_BONUS_FIELDS,
     ...DEDUCTION_FIELDS,
     ...REFUND_FIELDS,
     "TOTAL_COMM",
     "OPENING BALANCE",
-    "TOTAL PAID (SBT+BT+VOU)",
   ];
   const typeMap = {
     BUNDLE1_COMM: "credit",

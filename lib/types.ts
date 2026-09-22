@@ -8,6 +8,8 @@ export interface AppUser {
   branch: string | null
   branches?: string[] | null
   zone: string | null
+  territory: string | null
+  designation: string | null
   is_active: boolean
   created_at: string
 }

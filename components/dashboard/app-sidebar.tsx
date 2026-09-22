@@ -34,6 +34,7 @@ interface SidebarUser {
   role: string
   branch: string | null
   zone: string | null
+  territory: string | null
 }
 
 export function AppSidebar({ user }: { user: SidebarUser }) {
@@ -127,8 +128,7 @@ export function AppSidebar({ user }: { user: SidebarUser }) {
                   {user.full_name}
                 </span>
                 <span className="truncate text-xs text-sidebar-foreground/70">
-                  {user.role === "ADMIN" ? t("admin") : user.role === "MANAGER" ? t("manager") : t("agent")}
-                  {user.branch ? ` · ${user.branch}` : ""}
+                  Role: {user.role}{user.territory ? ` · Territory: ${user.territory}` : ""}
                 </span>
               </div>
             </SidebarMenuButton>

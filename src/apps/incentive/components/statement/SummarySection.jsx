@@ -42,6 +42,17 @@ export default function SummarySection({ statement }) {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      {/* Payments */}
+      <div className="rounded-xl p-5" style={{ backgroundColor: "#006AE0" }}>
+        <h3 className="text-sm font-semibold text-white/90 mb-3 flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-[#FFDD64]" /> {t("payments")}
+        </h3>
+        <MetricRow label={t("total_paid_label")} value={fmt(s.totalPaid)} color="#FFDD64" bold />
+        <MetricRow label={t("payment_mood")} value={moodLabel} color="#fff" />
+        <MetricRow label={t("opening_balance")} value={fmt(s.openingBalance)} color="#fff" />
+        <MetricRow label={t("net_incentive_position")} value={fmt(s.netPosition)} color="#08dc7d" bold />
+      </div>
+
       {/* Credits */}
       <div className="rounded-xl p-5" style={{ backgroundColor: "#21264e" }}>
         <h3 className="text-sm font-semibold text-white/90 mb-3 flex items-center gap-2">
@@ -64,17 +75,6 @@ export default function SummarySection({ statement }) {
         <MetricRow label={t("usage_clawback")} value={s.appliesClawback ? fmt(s.usageClawback) : "—"} color="#D6EEFF" />
         <MetricRow label={t("total_deductions_label")} value={fmt(s.deductions)} color="#D6EEFF" bold />
         <MetricRow label={t("calculated_value")} value={fmt(s.calculatedTotal)} color="#fff" bold />
-      </div>
-
-      {/* Payments */}
-      <div className="rounded-xl p-5" style={{ backgroundColor: "#006AE0" }}>
-        <h3 className="text-sm font-semibold text-white/90 mb-3 flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-[#FFDD64]" /> {t("payments")}
-        </h3>
-        <MetricRow label={t("payment_mood")} value={moodLabel} color="#fff" />
-        <MetricRow label={t("opening_balance")} value={fmt(s.openingBalance)} color="#fff" />
-        <MetricRow label={t("total_paid_label")} value={fmt(s.totalPaid)} color="#FFDD64" bold />
-        <MetricRow label={t("net_incentive_position")} value={fmt(s.netPosition)} color="#08dc7d" bold />
       </div>
 
       {s.discrepancy && (

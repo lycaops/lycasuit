@@ -36,20 +36,8 @@ export default function Layout({ children }) {
     { to: '/scheme', label: t('nav_scheme'), icon: BookOpen },
   ];
 
-  const roleLabel =
-    user?.role === 'admin'
-      ? 'Admin'
-      : user?.role === 'branch_user'
-        ? 'Branch'
-        : user?.role === 'zone_user'
-          ? 'Zone'
-          : 'Viewer';
-
-  const scopeLabel = profile?.zone_name
-    ? `Zone: ${profile.zone_name}`
-    : profile?.branch_name
-      ? `Branch: ${profile.branch_name}`
-      : '';
+  const roleLabel = `Role: ${user?.role || 'Viewer'}`;
+  const territoryLabel = profile?.territory ? `Territory: ${profile.territory}` : '';
 
   const closeMobileNav = () => setMobileNavOpen(false);
 
@@ -99,12 +87,12 @@ export default function Layout({ children }) {
             </div>
             <div className="min-w-0">
               <p className="truncate text-sm font-medium text-white">{profile?.full_name || user?.email?.split('@')[0] || 'User'}</p>
-              <p className="truncate text-[11px] text-white/50">{roleLabel}{scopeLabel ? ` · ${scopeLabel}` : ''}</p>
+              <p className="truncate text-[11px] text-white/50">{roleLabel}{territoryLabel ? ` · ${territoryLabel}` : ''}</p>
             </div>
           </div>
-          {showSidebarLabels && profile?.branch_name && (
+          {showSidebarLabels && territoryLabel && (
             <div className="px-4 py-1 text-[11px] text-white/50 truncate">
-              {scopeLabel}
+              {territoryLabel}
             </div>
           )}
           {showSidebarLabels && (
@@ -173,7 +161,7 @@ export default function Layout({ children }) {
                   </div>
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium text-white">{profile?.full_name || user?.email?.split('@')[0] || 'User'}</p>
-                    <p className="truncate text-[11px] text-white/50">{roleLabel}{scopeLabel ? ` · ${scopeLabel}` : ''}</p>
+                    <p className="truncate text-[11px] text-white/50">{roleLabel}{territoryLabel ? ` · ${territoryLabel}` : ''}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 text-white/70" aria-label="Language">
