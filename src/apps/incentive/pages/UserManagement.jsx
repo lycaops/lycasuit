@@ -21,24 +21,27 @@ import {
   import Loader from '@/components/Loader';
 
 const ROLES = [
-  { value: "admin", label: "Admin", desc: "Full access to everything" },
-  { value: "branch_user", label: "Branch User", desc: "Sees only their branch's data" },
-  { value: "zone_user", label: "Zone User", desc: "Sees only their zone's data" },
-  { value: "viewer", label: "Viewer", desc: "Read-only access to all data" },
+  { value: "HS-ADMIN", label: "HS Admin", desc: "Full system access", color: "bg-[#46286E] text-white" },
+  { value: "ADMIN", label: "Admin", desc: "Full access", color: "bg-[#0EA5E9] text-white" },
+  { value: "COUNTRY-MANAGER", label: "Country Manager", desc: "All branches", color: "bg-[#D6EEFF] text-[#21264E]" },
+  { value: "UK-ADMIN", label: "UK Admin", desc: "UK branches only", color: "bg-[#1E3A8A] text-white" },
+  { value: "RSM", label: "Regional Manager", desc: "Multiple branches", color: "bg-[#006AE0] text-white" },
+  { value: "ASM", label: "Area Manager", desc: "Single branch", color: "bg-[#08DC7D] text-white" },
+  { value: "ZONE-MANAGER", label: "Zone Manager", desc: "Single zone", color: "bg-[#0891B2] text-white" },
 ];
 
 const roleBadge = (role) => {
-  switch (role) {
-    case "admin":
-      return { bg: "#eef0f7", color: "#21264e", Icon: Shield, text: "Admin" };
-    case "branch_user":
-      return { bg: "#e6f0ff", color: "#006AE0", Icon: Building2, text: "Branch User" };
-    case "zone_user":
-      return { bg: "#fff4e0", color: "#a95f00", Icon: MapPin, text: "Zone User" };
-    case "viewer":
-    default:
-      return { bg: "#e3faf0", color: "#087a4a", Icon: UserIcon, text: "Viewer" };
-  }
+  const r = ROLES.find((x) => x.value === role) || ROLES[5];
+  return { color: r.color, text: r.label, Icon: r.value === "ZONE-MANAGER" ? MapPin : Building2 };
+};
+
+const ROLE_BRANCH_LIMITS = {
+  "HS-ADMIN": null,
+  ADMIN: null,
+  "COUNTRY-MANAGER": null,
+  "UK-ADMIN": null,
+  RSM: 4,
+  ASM: 1,
 };
 
 const invokeAdminApi = async (body) => {
@@ -76,29 +79,26 @@ export default function UserManagement() {
     email: "",
     password: "",
     full_name: "",
-    role: "viewer",
-    branch_id: "",
+    role: "ASM",
+    branches: [],
     zone_id: "",
   });
 
-  const isAdmin = user?.role === "admin";
+  const isAdmin = user?.role === "ADMIN" || user?.role === "HS-ADMIN";
+  const isHSAdmin = user?.role === "HS-ADMIN";
 
   const loadAll = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
       const [uRes, bRes, zRes] = await Promise.all([
-        supabase
+                supabase
           .from("profiles")
-          .select(`
-            id, email, full_name, role, is_disabled, branch_id, zone_id,
-            branches:branch_id(id,name,code),
-            zones:zone_id(id,name,code)
-          `)
-          .order("created_at", { ascending: false })
+          .select("id, email, full_name, role, is_disabled, branches, branch, zone, zone_id")
+                    .order("created_at", { ascending: false })
           .limit(500),
-        supabase.from("branches").select("id,name,code").order("name"),
-        supabase.from("zones").select("id,name,code,branch_id").order("name"),
+        supabase.from("branches").select("id, code, name").order("code"),
+        supabase.from("zones").select("id, code, name, branch_id").order("name"),
       ]);
 
       if (uRes.error) throw uRes.error;
@@ -119,18 +119,65 @@ export default function UserManagement() {
     loadAll();
   }, [loadAll]);
 
-  const filteredZones = useMemo(() => {
-    if (!form.branch_id) return zones;
-    return zones.filter((z) => z.branch_id === form.branch_id);
-  }, [zones, form.branch_id]);
+  // Branch codes are what every tool in the suite stores. The Incentive
+  // Statement used to write branch uuids, which no other tool could resolve, so
+  // anything coming in (uuid, code or name) is normalised to a branch code.
+  const branchCodeOf = useCallback(
+    (value) => {
+      const wanted = String(value || "").trim().toLowerCase();
+      if (!wanted) return null;
+      const match = branches.find((b) =>
+        [b.id, b.code, b.name].some(
+          (candidate) => String(candidate || "").trim().toLowerCase() === wanted
+        )
+      );
+      return match ? match.code : String(value).trim();
+    },
+    [branches]
+  );
+
+  const branchLabel = useCallback(
+    (code) => {
+      const wanted = String(code || "").trim().toLowerCase();
+      const match = branches.find(
+        (b) =>
+          String(b.code || "").trim().toLowerCase() === wanted ||
+          String(b.id || "").trim().toLowerCase() === wanted
+      );
+      return match?.name || match?.code || code;
+    },
+    [branches]
+  );
+
+  const needsBranches = (role) =>
+    role && ["HS-ADMIN", "ADMIN", "COUNTRY-MANAGER", "UK-ADMIN", "RSM", "ASM"].includes(role);
+
+  const needsZone = (role) => role === "ZONE-MANAGER";
+
+  const branchLimit = (role) => {
+    if (role === "RSM") return 4;
+    if (role === "ASM") return 1;
+    return null;
+  };
+
+  // A Zone Manager's zone list is limited to the branch they are responsible
+  // for (one zone only, same rule as FIELD IQ).
+  const zoneOptions = useMemo(() => {
+    const branchCode = (form.branches || [])[0];
+    if (!branchCode) return zones;
+    const branch = branches.find((b) => b.code === branchCode);
+    if (!branch) return zones;
+    const filtered = zones.filter((z) => z.branch_id === branch.id);
+    return filtered.length > 0 ? filtered : zones;
+  }, [branches, zones, form.branches]);
 
   const resetForm = () => {
     setForm({
       email: "",
       password: "",
       full_name: "",
-      role: "viewer",
-      branch_id: "",
+      role: "ASM",
+      branches: [],
       zone_id: "",
     });
     setEditingId(null);
@@ -143,13 +190,20 @@ export default function UserManagement() {
   };
 
   const openEdit = (row) => {
+    const assigned = (row.branches || []).length > 0
+      ? row.branches
+      : row.branch
+        ? [row.branch]
+        : [];
     setEditingId(row.id);
     setForm({
       email: row.email || "",
       password: "",
       full_name: row.full_name || "",
-      role: row.role || "viewer",
-      branch_id: row.branch_id || "",
+      role: row.role || "ASM",
+      // `profiles.branches` holds branch codes (uuid rows written before the
+      // FIELD IQ parity migration are resolved through the branches table).
+      branches: assigned.map((value) => branchCodeOf(value)).filter(Boolean),
       zone_id: row.zone_id || "",
     });
     setOpenForm(true);
@@ -157,18 +211,41 @@ export default function UserManagement() {
 
   const handleFormChange = (field, value) => {
     const next = { ...form, [field]: value };
-    if (field === "branch_id") {
-      next.zone_id = "";
-    }
-    if (
-      field === "role" &&
-      value !== "branch_user" &&
-      value !== "zone_user"
-    ) {
-      next.branch_id = "";
-      next.zone_id = "";
+    if (field === "role") {
+      if (needsBranches(value)) {
+        next.branches = [];
+        next.zone_id = "";
+      } else if (needsZone(value)) {
+        next.branches = [];
+        next.zone_id = "";
+      } else {
+        next.branches = [];
+        next.zone_id = "";
+      }
     }
     setForm(next);
+  };
+
+  const toggleBranch = (branchCode) => {
+    const current = form.branches || [];
+    const exists = current.includes(branchCode);
+    const limit = branchLimit(form.role);
+    let next;
+    if (exists) {
+      next = current.filter((b) => b !== branchCode);
+    } else {
+      if (limit !== null && current.length >= limit) {
+        setError(
+          `Maximum ${limit} branch${limit === 1 ? "" : "es"} allowed for ${
+            ROLES.find((r) => r.value === form.role)?.label
+          } role.`
+        );
+        return;
+      }
+      next = [...current, branchCode];
+    }
+    setForm({ ...form, branches: next });
+    if (error) setError("");
   };
 
   const validateForm = () => {
@@ -184,12 +261,22 @@ export default function UserManagement() {
       setError("Role is required.");
       return false;
     }
-    if (form.role === "branch_user" && !form.branch_id) {
-      setError("Branch is required for Branch User role.");
+    if (["RSM", "ASM"].includes(form.role) && (form.branches || []).length === 0) {
+      const roleLabel = ROLES.find((r) => r.value === form.role)?.label || "this";
+      setError(`At least one branch is required for the ${roleLabel} role.`);
       return false;
     }
-    if (form.role === "zone_user" && !form.zone_id) {
-      setError("Zone is required for Zone User role.");
+    if (needsZone(form.role) && !form.zone_id) {
+      setError("Zone is required for the Zone Manager role.");
+      return false;
+    }
+    const limit = branchLimit(form.role);
+    if (limit !== null && (form.branches || []).length > limit) {
+      setError(
+        `Maximum ${limit} branch${limit === 1 ? "" : "es"} allowed for ${
+          ROLES.find((r) => r.value === form.role)?.label
+        } role.`
+      );
       return false;
     }
     return true;
@@ -201,6 +288,12 @@ export default function UserManagement() {
     setError("");
     setSuccess("");
     try {
+      const branchLimitForRole = branchLimit(form.role);
+      // Branch codes are stored; admin roles may either be restricted to the
+      // branches picked here or, with none picked, keep the whole country.
+      const sendBranches = branchLimitForRole === null
+        ? (form.branches || [])
+        : (form.branches || []).slice(0, branchLimitForRole);
       if (editingId) {
         await invokeAdminApi({
           action: "update",
@@ -208,7 +301,7 @@ export default function UserManagement() {
           email: form.email.trim(),
           full_name: form.full_name.trim() || null,
           role: form.role,
-          branch_id: form.branch_id || null,
+          branches: sendBranches,
           zone_id: form.zone_id || null,
         });
         setSuccess("User updated successfully.");
@@ -218,7 +311,7 @@ export default function UserManagement() {
           password: form.password,
           full_name: form.full_name.trim() || null,
           role: form.role,
-          branch_id: form.branch_id || null,
+          branches: sendBranches,
           zone_id: form.zone_id || null,
         });
         setSuccess("User created and profile assigned successfully.");
@@ -419,27 +512,63 @@ export default function UserManagement() {
                 </div>
               </div>
 
-              {["branch_user", "zone_user", "admin"].includes(form.role) && (
-                <div>
+                            {needsBranches(form.role) && (
+                <div className="md:col-span-2">
                   <label className="text-xs text-slate-500 uppercase tracking-wide">
-                    Branch {form.role === "branch_user" && <span className="text-red-500">*</span>}
+                    Branches{" "}
+                    {["RSM", "ASM"].includes(form.role) && (
+                      <span className="text-red-500">*</span>
+                    )}
+                    {branchLimit(form.role) !== null && (
+                      <span className="text-gray-400 normal-case font-normal ml-2">
+                        ({form.branches?.length || 0}{" "}
+                        {branchLimit(form.role) === 1
+                          ? "selected"
+                          : "selected"}
+                        {branchLimit(form.role) === 1
+                          ? ""
+                          : `, max ${branchLimit(form.role)}`})
+                      </span>
+                    )}
                   </label>
-                  <select
-                    value={form.branch_id}
-                    onChange={(e) => handleFormChange("branch_id", e.target.value)}
-                    className="w-full mt-1 rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[#006AE0] bg-white"
-                  >
-                    <option value="">— None —</option>
-                    {branches.map((b) => (
-                      <option key={b.id} value={b.id}>
-                        {b.name} {b.code ? `(${b.code})` : ""}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mt-2">
+                    {branches.map((b) => {
+                      const checked = (form.branches || []).includes(b.code);
+                      const limit = branchLimit(form.role);
+                      const limitReached =
+                        limit !== null &&
+                        !checked &&
+                        (form.branches || []).length >= limit;
+                      return (
+                        <label
+                          key={b.code}
+                          className={`flex items-center gap-2 p-2 rounded-lg border cursor-pointer transition ${
+                            checked
+                              ? "border-[#006AE0] bg-[#006AE0]/5"
+                              : limitReached
+                              ? "border-slate-200 bg-slate-50 text-slate-300 cursor-not-allowed"
+                              : "border-slate-200 hover:border-slate-300"
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            className="w-3.5 h-3.5 rounded border-gray-300 text-[#006AE0] focus:ring-[#006AE0]"
+                            checked={checked}
+                            disabled={limitReached || submitting}
+                            onChange={() => toggleBranch(b.code)}
+                          />
+                          <span className="text-sm text-slate-700">
+                            {b.name}{" "}
+                            {b.code ? `(${b.code})` : ""}
+                          </span>
+                        </label>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
 
-              {form.role === "zone_user" && (
+              {needsZone(form.role) && (
                 <div>
                   <label className="text-xs text-slate-500 uppercase tracking-wide">
                     Zone <span className="text-red-500">*</span>
@@ -450,17 +579,12 @@ export default function UserManagement() {
                     className="w-full mt-1 rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[#006AE0] bg-white"
                   >
                     <option value="">— None —</option>
-                    {filteredZones.map((z) => (
+                    {zoneOptions.map((z) => (
                       <option key={z.id} value={z.id}>
-                        {z.name} {z.code ? `(${z.code})` : ""}
+                        {z.name}
                       </option>
                     ))}
                   </select>
-                  {!form.branch_id && filteredZones.length === zones.length && (
-                    <p className="text-[11px] text-slate-500 mt-1">
-                      Tip: pick a Branch first to shorten this list.
-                    </p>
-                  )}
                 </div>
               )}
             </div>
@@ -521,8 +645,18 @@ export default function UserManagement() {
                     const badge = roleBadge(u.role);
                     const BadgeIcon = badge.Icon;
                     const isSelf = u.id === user?.id;
-                    const branchName = u.branches?.name;
-                    const zoneName = u.zones?.name;
+                    const assignedBranches = (u.branches || []).length > 0
+                      ? u.branches
+                      : u.branch
+                        ? [u.branch]
+                        : [];
+                    const branchNames = assignedBranches
+                      .map((value) => branchLabel(value))
+                      .filter(Boolean);
+                    // `profiles.zone` holds the zone NAME ("HS MILANO ZONE 1");
+                    // the uuid lookup covers rows written before the parity fix.
+                    const zoneName =
+                      u.zone || zones.find((z) => z.id === u.zone_id)?.name || null;
                     return (
                       <tr key={u.id} className="border-t border-slate-100 hover:bg-slate-50/50">
                         <td className="px-5 py-3">
@@ -533,25 +667,31 @@ export default function UserManagement() {
                         <td className="px-5 py-3 text-slate-600">{u.email || "—"}</td>
                         <td className="px-5 py-3">
                           <span
-                            className="inline-flex items-center gap-1 rounded-full text-xs font-semibold px-2.5 py-0.5"
-                            style={{ backgroundColor: badge.bg, color: badge.color }}
+                            className={`inline-flex items-center gap-1 rounded-full text-xs font-semibold px-2.5 py-0.5 ${badge.color}`}
                           >
                             <BadgeIcon className="w-3 h-3" /> {badge.text}
                           </span>
                         </td>
                         <td className="px-5 py-3">
                           <div className="flex flex-wrap gap-1.5">
-                            {branchName && (
-                              <span className="inline-flex items-center gap-1 rounded-full bg-[#e6f0ff] text-[#006AE0] text-[11px] font-semibold px-2 py-0.5">
-                                <Building2 className="w-3 h-3" /> {branchName}
-                              </span>
+                            {branchNames.length > 0 ? (
+                              branchNames.map((bn, i) => (
+                                <span
+                                  key={i}
+                                  className="inline-flex items-center gap-1 rounded-full bg-[#e6f0ff] text-[#006AE0] text-[11px] font-semibold px-2 py-0.5"
+                                >
+                                  <Building2 className="w-3 h-3" /> {bn}
+                                </span>
+                              ))
+                            ) : needsZone(u.role) ? null : (
+                              <span className="text-[11px] text-slate-400 italic">—</span>
                             )}
                             {zoneName && (
                               <span className="inline-flex items-center gap-1 rounded-full bg-[#fff4e0] text-[#a95f00] text-[11px] font-semibold px-2 py-0.5">
                                 <MapPin className="w-3 h-3" /> {zoneName}
                               </span>
                             )}
-                            {!branchName && !zoneName && (
+                            {!zoneName && !branchNames.length && needsZone(u.role) && (
                               <span className="text-[11px] text-slate-400 italic">—</span>
                             )}
                           </div>

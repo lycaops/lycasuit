@@ -7,27 +7,45 @@ const AuthContext = createContext();
 
 async function fetchProfile(uid) {
   if (!uid) return null;
-  // `profiles` is now a view over the unified app_users table, so the branch /
-  // zone names are resolved with explicit lookups instead of a PostgREST embed.
+  // `profiles` is a view over the unified app_users table and now carries the
+  // same role vocabulary and territory columns as FIELD IQ (branches / branch /
+  // zone), so a user is allocated exactly the same way in both tools.
   const { data, error } = await supabase
     .from('profiles')
-    .select('id, email, full_name, role, is_disabled, branch_id, zone_id, created_at, updated_at')
+    .select('id, email, full_name, role, is_disabled, is_active, branch_id, zone_id, branches, branch, zone, territory, designation, created_at, updated_at')
     .eq('id', uid)
     .maybeSingle();
   if (error || !data) return null;
 
+  // The effective scope (role + branches + zone with display names) is resolved
+  // by the database, so the tool and FIELD IQ can never drift apart.
+  let scope = null;
+  const { data: scopeRows, error: scopeError } = await supabase.rpc('incentive_my_scope');
+  if (!scopeError && Array.isArray(scopeRows) && scopeRows.length > 0) scope = scopeRows[0];
+
+  // Fallback for environments where the scope RPC is not deployed yet.
   let branch = null;
   let zone = null;
-  if (data.branch_id) {
-    const { data: b } = await supabase
-      .from('branches').select('name, code').eq('id', data.branch_id).maybeSingle();
-    branch = b || null;
+  if (!scope) {
+    if (data.branch_id) {
+      const { data: b } = await supabase
+        .from('branches').select('name, code').eq('id', data.branch_id).maybeSingle();
+      branch = b || null;
+    }
+    if (data.zone_id) {
+      const { data: z } = await supabase
+        .from('zones').select('name, code').eq('id', data.zone_id).maybeSingle();
+      zone = z || null;
+    }
   }
-  if (data.zone_id) {
-    const { data: z } = await supabase
-      .from('zones').select('name, code').eq('id', data.zone_id).maybeSingle();
-    zone = z || null;
-  }
+
+  const assignedBranches = data.branches || [];
+  const branchNames = scope?.branch_names?.length
+    ? scope.branch_names
+    : assignedBranches.length > 0
+      ? assignedBranches
+      : [branch?.name].filter(Boolean);
+  const isAdmin = ADMIN_ROLE_CODES.includes(data.role);
 
   return {
     id: data.id,
@@ -35,10 +53,19 @@ async function fetchProfile(uid) {
     full_name: data.full_name,
     role: data.role,
     is_disabled: data.is_disabled,
+    is_active: data.is_active,
+    is_admin: isAdmin,
     branch_id: data.branch_id,
     zone_id: data.zone_id,
-    branch_name: branch?.name || null,
-    zone_name: zone?.name || null,
+    branches: assignedBranches,
+    branch: data.branch || null,
+    zone: data.zone || null,
+    branch_names: branchNames,
+    branch_name: branchNames.join(', ') || null,
+    zone_name: scope?.zone_name || zone?.name || null,
+    territory: data.territory || null,
+    designation: data.designation || null,
+    sees_all_retailers: Boolean(scope?.sees_all ?? (isAdmin && assignedBranches.length === 0)),
     created_at: data.created_at,
     updated_at: data.updated_at,
   };

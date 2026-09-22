@@ -4,152 +4,21 @@ import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { requirePlatformAdmin } from "@/lib/auth"
+import {
+  computeDesignation,
+  computeTerritory,
+  sanitizeDesignation,
+  sanitizeTerritory,
+} from "@/lib/user-roles"
 
 export interface ActionResult {
   ok: boolean
   error?: string
 }
 
-const NORTH_BRANCHES = ["LMIT-HS-BOLOGNA", "LMIT-HS-MILAN", "LMIT-HS-PADOVA", "LMIT-HS-TORINO"]
-const SOUTH_BRANCHES = ["LMIT-HS-BARI", "LMIT-HS-NAPLES", "LMIT-HS-PALERMO", "LMIT-HS-ROME"]
-
-// Designation values allowed by the `app_users_designation_check` constraint
-// (see supabase/migrations/20260918000001_unified_core.sql). Anything else
-// written to app_users.designation violates the check and fails the insert.
-// NOTE: must NOT be exported — "use server" modules may only export async
-// functions, and exporting anything else crashes the server at runtime.
-const DESIGNATION_VALUES = [
-  "Zone Manager",
-  "Office Manager",
-  "Region Manager",
-  "Admin",
-  "CS",
-  "Retailer Support",
-  "Admin-UK",
-  "Admin-IN",
-] as const
-
-type Designation = (typeof DESIGNATION_VALUES)[number]
-
-/**
- * Map a canonical app_roles code to a designation that satisfies the
- * `app_users_designation_check` constraint. Unlike app_roles.label, these
- * values come from the Market Assistance vocabulary the constraint enforces.
- * Roles without a natural designation resolve to null (allowed by the check).
- */
-const DESIGNATION_BY_ROLE: Record<string, Designation | null> = {
-  "SUPER-ADMIN": "Admin",
-  "HS-ADMIN": "Admin",
-  "PM-ADMIN": "Admin",
-  "COUNTRY-MANAGER": "Admin",
-  "UK-ADMIN": "Admin-UK",
-  "CS-ADMIN": "CS",
-  RSM: "Region Manager",
-  "ZONE-MANAGER": "Zone Manager",
-  ASM: "Office Manager",
-  FSE: null,
-  VIEWER: null,
-}
-
-/** Keep only designation values the database check constraint allows. */
-function sanitizeDesignation(value: string | null | undefined): string | null {
-  if (value == null) return null
-  return (DESIGNATION_VALUES as readonly string[]).includes(value) ? value : null
-}
-
-function computeDesignation(roleCode: string): Designation | null {
-  return sanitizeDesignation(DESIGNATION_BY_ROLE[roleCode] ?? null)
-}
-
-// Territory values allowed by the `app_users_territory_check` constraint
-// (see supabase/migrations/20260918000001_unified_core.sql): North Region,
-// Milan, Bologna, Torino, Padova, South Region, Rome, Napoli, Bari, Palermo,
-// ITALY (All). Branch display names like "HS BARI" violate the check.
-const TERRITORY_BY_BRANCH: Record<string, string> = {
-  "LMIT-HS-MILAN": "Milan",
-  "LMIT-HS-BOLOGNA": "Bologna",
-  "LMIT-HS-TORINO": "Torino",
-  "LMIT-HS-PADOVA": "Padova",
-  "LMIT-HS-BARI": "Bari",
-  "LMIT-HS-NAPLES": "Napoli",
-  "LMIT-HS-ROME": "Rome",
-  "LMIT-HS-PALERMO": "Palermo",
-}
-
-const ALLOWED_TERRITORIES = [
-  "North Region",
-  "Milan",
-  "Bologna",
-  "Torino",
-  "Padova",
-  "South Region",
-  "Rome",
-  "Napoli",
-  "Bari",
-  "Palermo",
-  "ITALY (All)",
-] as const
-
-/** Keep only territory values the database check constraint allows. */
-function sanitizeTerritory(value: string | null | undefined): string | null {
-  if (value == null) return null
-  return (ALLOWED_TERRITORIES as readonly string[]).includes(value) ? value : null
-}
-
-async function computeTerritory(
-  supabase: ReturnType<typeof createClient> | ReturnType<typeof createAdminClient>,
-  roleCode: string,
-  opts: { branches?: string[] | null; branch?: string | null; zone?: string | null },
-): Promise<string | null> {
-  const { branches, zone } = opts
-  const chosenBranch = opts.branch ?? branches?.[0] ?? null
-  const assignedBranches = branches && branches.length > 0 ? branches : (chosenBranch ? [chosenBranch] : [])
-
-  switch (roleCode) {
-    case "ZONE-MANAGER": {
-      // Territory must be one of the zones' branch territories allowed by the
-      // app_users_territory_check constraint; zone names themselves are not.
-      const branchCode = zone
-        ? (await supabase.from("zones").select("branch_id,branch:branches!inner(code)").eq("code", zone).maybeSingle()).data
-        : null
-      const code = (branchCode as any)?.branch?.code ?? null
-      return code ? TERRITORY_BY_BRANCH[code] ?? null : null
-    }
-    case "FSE": {
-      if (!zone) return null
-      const { data: zoneRow } = await supabase
-        .from("zones")
-        .select("short_code,branch:branch_id(code)")
-        .eq("code", zone)
-        .maybeSingle()
-      if (!zoneRow) return null
-      const shortCode = (zoneRow as any)?.short_code ?? null
-      const branchCode = (zoneRow as any)?.branch?.code ?? null
-      return sanitizeTerritory(shortCode) ?? TERRITORY_BY_BRANCH[branchCode] ?? null
-    }
-    case "ASM": {
-      if (!chosenBranch) return null
-      return TERRITORY_BY_BRANCH[chosenBranch] ?? null
-    }
-    case "RSM": {
-      if (assignedBranches.length === 0) return null
-      const all = [...NORTH_BRANCHES, ...SOUTH_BRANCHES]
-      if (all.every((b) => assignedBranches.includes(b))) {
-        return "ITALY (All)"
-      }
-      if (NORTH_BRANCHES.every((b) => assignedBranches.includes(b))) {
-        return "North Region"
-      }
-      if (SOUTH_BRANCHES.every((b) => assignedBranches.includes(b))) {
-        return "South Region"
-      }
-      return null
-    }
-    default: {
-      return "ITALY (All)"
-    }
-  }
-}
+// Role, designation and territory vocabularies live in lib/user-roles.ts so the
+// platform screens, the FIELD IQ screens and the Incentive Statement screens all
+// resolve a user's scope from one place.
 
 /**
  * Create ONE account that works across every tool in the suite.

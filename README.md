@@ -55,7 +55,25 @@ key styles**, so both apps resolve correctly:
 Zone names are preserved exactly as supplied, including `HS MILANO`, `HS NAPOLI`,
 `HS ROMA` and `HS TORINOO`.
 
-### 3. Tool access
+### 3. Territory — the same allocation in every tool
+
+FIELD IQ's allocation is the reference for the whole suite; the platform user screen,
+the Incentive Statement user screen and the Contract user screen all resolve scope
+from the same columns (`app_users.role` / `branches` / `branch` / `zone` / `zone_id`):
+
+| Role | Scope written to `app_users` | Retailers visible |
+|---|---|---|
+| `HS-ADMIN`, `ADMIN`, `COUNTRY-MANAGER`, `UK-ADMIN` | no branches = all branches, or the branches assigned | the assigned branches, or the whole country |
+| `RSM` (Regional Manager) | every assigned branch — e.g. 4 branches = one region | all retailers in those branches |
+| `ASM` (Area Manager) | exactly one branch | all retailers in that branch |
+| `ZONE-MANAGER` | exactly one branch + one zone | only retailers in that zone |
+| `FSE` (Contract vocabulary) | one branch + one zone | only contracts in that zone |
+
+`zone` always holds the zone **name** (`HS MILANO ZONE 1`) and `branches[]` always
+holds branch **codes** (`LMIT-HS-MILAN`), whichever tool created or edited the user —
+`20260922000002_zone_name_parity.sql` normalises and back-fills them.
+
+### 4. Tool access
 
 `app_tools` (4 rows) + `user_tool_access` (per user, per tool) drive the Home screen and
 gate every tool route. New users get access to all active tools by default; an admin
@@ -102,7 +120,15 @@ supabase/migrations/20260918000001_unified_core.sql
 supabase/migrations/20260918000002_compat_views.sql
 supabase/migrations/20260918000003_app_tables.sql
 supabase/migrations/20260918000004_rls_rpc_seed.sql
+supabase/migrations/20260922000001_incentive_fieldiq_roles.sql
+supabase/migrations/20260922000002_zone_name_parity.sql
 ```
+
+`20260922000001_incentive_fieldiq_roles.sql` gives the Retailer Incentive Statement
+the same role vocabulary and the same territory rules as FIELD IQ, and
+`20260922000002_zone_name_parity.sql` guarantees that `app_users.zone` (and therefore
+the `rpa_users` and `users` views) always holds the zone **name** — `HS MILANO ZONE 1`,
+never `HS-MILANO-Z1` — and that `branches[]` always holds branch **codes**.
 
 The last one seeds the 8 branches, 30 zones, the 4 tools, default ISDM settings and the
 initial administrator (`dilan.fernando@universalservice.it` / `Lyca@2026`).

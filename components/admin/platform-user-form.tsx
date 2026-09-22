@@ -53,6 +53,20 @@ export interface PlatformZone {
 const NORTH_BRANCHES = ["LMIT-HS-BOLOGNA", "LMIT-HS-MILAN", "LMIT-HS-PADOVA", "LMIT-HS-TORINO"]
 const SOUTH_BRANCHES = ["LMIT-HS-BARI", "LMIT-HS-NAPLES", "LMIT-HS-PALERMO", "LMIT-HS-ROME"]
 
+/**
+ * `app_users.zone` (and therefore the FIELD IQ `rpa_users` and Contract
+ * `users` views) stores the zone NAME — "HS MILANO ZONE 1", never
+ * "HS-MILANO-Z1" — so a zone picked here is always converted to its name.
+ */
+function zoneNameFor(zones: PlatformZone[], value: string | null | undefined) {
+  const wanted = (value ?? "").trim().toLowerCase()
+  if (!wanted) return ""
+  const match = zones.find((zone) =>
+    [zone.code, zone.name].some((candidate) => (candidate ?? "").trim().toLowerCase() === wanted),
+  )
+  return match ? match.name : (value ?? "").trim()
+}
+
 type FormValues = {
   fullName: string
   email: string
@@ -120,7 +134,7 @@ export function PlatformUserForm({
               : user.role === "ZONE-MANAGER" || user.role === "FSE" || user.role === "RSM"
                 ? user.branch ? [user.branch] : []
                 : branches.map((branch) => branch.code),
-            zone: user.zone ?? "",
+            zone: zoneNameFor(zones, user.zone),
             mobileNumber: user.mobile_number ?? "",
             isActive: user.is_active,
             pdfExportEnabled: user.pdf_export_enabled,
@@ -128,7 +142,7 @@ export function PlatformUserForm({
           }
         : emptyForm,
     )
-  }, [open, user])
+  }, [open, user, zones])
 
   function setField<K extends keyof FormValues>(key: K, value: FormValues[K]) {
     setValues((current) => ({ ...current, [key]: value }))
@@ -294,8 +308,8 @@ export function PlatformUserForm({
               <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[#21264E]/70">Select zone</p>
               <div className="grid gap-1 sm:grid-cols-2 lg:grid-cols-3">
                 {zones.filter((zone) => zone.branches?.code === values.branches[0]).map((zone) => (
-                  <label key={zone.code} className={`flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-xs transition ${values.zone === zone.code ? "border border-gray-100 bg-white font-semibold text-brand-navy shadow-sm" : "text-gray-500 hover:bg-gray-100"}`}>
-                    <input type="radio" name="assigned-zone" checked={values.zone === zone.code} onChange={() => setField("zone", zone.code)} className="h-3.5 w-3.5 border-gray-300 text-[#245bc1] focus:ring-[#245bc1]" />
+                  <label key={zone.code} className={`flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-xs transition ${values.zone === zone.name ? "border border-gray-100 bg-white font-semibold text-brand-navy shadow-sm" : "text-gray-500 hover:bg-gray-100"}`}>
+                    <input type="radio" name="assigned-zone" checked={values.zone === zone.name} onChange={() => setField("zone", zone.name)} className="h-3.5 w-3.5 border-gray-300 text-[#245bc1] focus:ring-[#245bc1]" />
                     {zone.name}
                   </label>
                 ))}
