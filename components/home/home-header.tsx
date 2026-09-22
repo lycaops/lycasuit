@@ -41,7 +41,7 @@ export function HomeHeader({ user, backToHome = false, sidebarMode = false }: Pr
             className={sidebarMode ? "hidden" : "h-7 w-auto"}
           />
           <span className={sidebarMode ? "hidden" : "text-sm font-semibold tracking-tight text-[#21264E]"}>
-            {backToHome ? "Back to Home" : "LycaOps"}
+            {backToHome ? t("backToHome") : "LycaOps"}
           </span>
         </Link>
 

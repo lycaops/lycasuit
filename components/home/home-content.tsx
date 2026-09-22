@@ -158,8 +158,8 @@ export function HomeContent({
         </div>
         <div className="mx-auto max-w-6xl px-6 py-6">
           <header className="mb-5">
-            <p className="text-sm font-bold text-[#21264E]">Empowering Our Teams</p>
-            <p className="mt-1 max-w-2xl text-sm leading-relaxed text-[#21264E]/70">LycaOps brings your essential tools together in one place. Stay on top of incentives, manage contracts with ease, monitor performance in real time, and request assistance whenever you need it, so you can focus on growing your retailer network.</p>
+            <p className="text-sm font-bold text-[#21264E]">{t("homeTagline")}</p>
+            <p className="mt-1 max-w-2xl text-sm leading-relaxed text-[#21264E]/70">{t("homeDescription")}</p>
           </header>
 
           {tools.length === 0 ? (
