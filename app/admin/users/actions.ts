@@ -16,6 +16,22 @@ export interface ActionResult {
   error?: string
 }
 
+async function resolveZoneId(supabase: Awaited<ReturnType<typeof createClient>>, zone: string | null | undefined) {
+  const wanted = zone?.trim().toLowerCase()
+  if (!wanted) return null
+
+  const { data } = await supabase
+    .from("zones")
+    .select("id, code, name, short_code")
+    .eq("is_active", true)
+
+  const match = (data ?? []).find((row: { id: string; code: string; name: string; short_code: string | null }) =>
+    [row.code, row.name, row.short_code].some((value) => value?.trim().toLowerCase() === wanted),
+  )
+
+  return match?.id ?? null
+}
+
 // Role, designation and territory vocabularies live in lib/user-roles.ts so the
 // platform screens, the FIELD IQ screens and the Incentive Statement screens all
 // resolve a user's scope from one place.
@@ -60,6 +76,7 @@ export async function createPlatformUser(input: {
   }
 
   const designation = sanitizeDesignation(input.designation) ?? computeDesignation(input.role)
+  const zoneId = await resolveZoneId(admin, input.zone)
   const territory = sanitizeTerritory(input.territory) ?? (await computeTerritory(admin, input.role, {
     branches: input.branches,
     branch: input.branch,
@@ -77,6 +94,7 @@ export async function createPlatformUser(input: {
       branches: input.branches,
       branch: input.branch ?? input.branches[0] ?? null,
       zone: input.zone ?? null,
+      zone_id: zoneId,
       designation,
       territory,
       mobile_number: input.mobileNumber ?? null,
@@ -142,6 +160,8 @@ export async function updatePlatformUser(
     }
   }
 
+  const zoneId = patch.zone !== undefined ? await resolveZoneId(supabase, patch.zone) : undefined
+
   const { error } = await supabase
     .from("app_users")
     .update({
@@ -152,6 +172,7 @@ export async function updatePlatformUser(
       ...(patch.branches !== undefined ? { branches: patch.branches } : {}),
       ...(patch.branch !== undefined ? { branch: patch.branch } : {}),
       ...(patch.zone !== undefined ? { zone: patch.zone } : {}),
+      ...(patch.zone !== undefined ? { zone_id: zoneId } : {}),
       ...(designation !== undefined ? { designation } : {}),
       ...(territory !== undefined ? { territory } : {}),
       ...(patch.mobileNumber !== undefined ? { mobile_number: patch.mobileNumber } : {}),
