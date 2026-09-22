@@ -180,11 +180,11 @@ export function RetailerSignPanel(props: {
 
   if (expired) {
     return (
-      <Card className="border-2 shadow-lg">
-        <CardHeader className="border-b bg-muted/30">
+      <Card className="border-2 border-[#E8F4FE] py-0 gap-0 shadow-lg overflow-hidden">
+        <CardHeader className="border-b border-[#E8F4FE] bg-[#F4FAFF]">
           <CardTitle className="text-xl">{t("linkExpiredTitle")}</CardTitle>
         </CardHeader>
-        <CardContent className="pt-6">
+        <CardContent className="pb-6 pt-6">
           {t("linkExpiredDesc")}
         </CardContent>
       </Card>
@@ -193,11 +193,11 @@ export function RetailerSignPanel(props: {
 
   if (completed) {
     return (
-      <Card className="border-2 shadow-lg">
-        <CardHeader className="border-b bg-muted/30">
+      <Card className="border-2 border-[#E8F4FE] py-0 gap-0 shadow-lg overflow-hidden">
+        <CardHeader className="border-b border-[#E8F4FE] bg-[#F4FAFF]">
           <CardTitle className="text-xl">{t("contractFinalizedTitle")}</CardTitle>
         </CardHeader>
-        <CardContent className="pt-6">
+        <CardContent className="pb-6 pt-6">
           <div className="rounded-2xl border border-green-200 bg-green-50 p-6">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="flex items-start gap-3">
@@ -274,8 +274,8 @@ export function RetailerSignPanel(props: {
   }
 
   return (
-    <Card className="border-2 shadow-lg">
-      <CardHeader className="border-b bg-muted/30">
+    <Card className="border-2 border-[#E8F4FE] py-0 gap-0 shadow-lg overflow-hidden">
+      <CardHeader className="border-b border-[#E8F4FE] bg-[#F4FAFF]">
         <CardTitle className="text-xl">
           {step === 0
             ? t("reviewContractDetails")
@@ -289,9 +289,9 @@ export function RetailerSignPanel(props: {
           </CardDescription>
         )}
       </CardHeader>
-      <CardContent className="pt-6">
+      <CardContent className="pb-6 pt-6">
         {step !== 0 && (
-          <div className="mb-6 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+          <div className="mb-6 rounded-2xl border border-[#E8F4FE] bg-[#F4FAFF] p-4">
             <div className="mb-4 flex flex-row flex-wrap items-center justify-between gap-3 text-sm font-semibold text-slate-900">
               <span className={cn(step === 1 ? "text-slate-900" : "text-slate-500")}>{t("signature")}</span>
               <span className={cn(step === 2 ? "text-slate-900" : "text-slate-500")}>{t("otp")}</span>
@@ -415,7 +415,7 @@ export function RetailerSignPanel(props: {
           </div>
 
           <div className={step === 2 ? "flex flex-col gap-6" : "hidden"}>
-            <div className="rounded-lg border bg-muted/30 p-4">
+            <div className="rounded-lg border border-[#E8F4FE] bg-[#F4FAFF] p-4">
               <div className="text-sm font-semibold text-brand-navy">{t("identityVerification")}</div>
               <div className="mt-1 text-sm text-slate-600">
                 {t("enterOtpDesc")}
@@ -485,7 +485,7 @@ function InfoRow({
 }) {
   return (
     <div className={cn("flex items-start gap-3 rounded-lg border bg-white p-3 shadow-sm", className)}>
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#E8F4FE] text-[#245bc1]">
         <Icon className="h-4 w-4" />
       </div>
       <div className="min-w-0">
