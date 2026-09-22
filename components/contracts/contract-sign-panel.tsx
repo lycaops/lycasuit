@@ -312,7 +312,7 @@ export function ContractSignPanel({ contractId }: { contractId: string }) {
                   variant="outline"
                   onClick={onSendRemoteLink}
                   disabled={pending}
-                  className="w-full sm:w-auto border-[#D6EEFF] text-brand-navy hover:bg-[#D6EEFF]"
+                  className="w-full sm:w-auto bg-[#08dc7d] text-[#21264e] hover:bg-[#35e991] border-transparent"
                 >
                   <Link2 className="mr-2 h-4 w-4" />
                   {t("sendLink")}

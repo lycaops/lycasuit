@@ -1,16 +1,10 @@
 "use client"
 
 import { useTransition } from "react"
-import { Download, Link, Mail, MessageCircle, Share2, FileText } from "lucide-react"
+import { Download, Mail, MessageCircle } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import Loader from "@/components/Loader"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import {
   getContractPdfUrlAction,
   sendContractEmailAction,
@@ -47,8 +41,6 @@ export function ContractActions({
   const [pendingEmail, startEmail] = useTransition()
   const [pendingDraft, startDraft] = useTransition()
   const [pendingDraftShare, startDraftShare] = useTransition()
-
-  const disabled = status !== "SIGNED"
 
   function downloadDraft() {
     const popup = isIosSafari() ? window.open("", "_blank") : null
@@ -89,23 +81,6 @@ export function ContractActions({
         return
       }
       toast.success(t("emailSentTo").replace("{email}", res.data!.sentTo.join(", ")))
-    })
-  }
-
-  function copyDraftUrl() {
-    startDraftShare(async () => {
-      const res = await getDraftContractPdfUrlAction(contractId)
-      if (!res.ok) {
-        toast.error(res.error)
-        return
-      }
-
-      try {
-        await navigator.clipboard.writeText(res.data!.url)
-        toast.success(t("draftPdfLinkCopied"))
-      } catch {
-        toast.error("Could not copy to clipboard")
-      }
     })
   }
 
@@ -161,7 +136,7 @@ export function ContractActions({
 
   return (
     <div className="flex flex-col w-full gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
-      {status !== "SIGNED" && (
+      {status !== "SIGNED" ? (
         <>
           <Button
             onClick={downloadDraft}
@@ -172,66 +147,62 @@ export function ContractActions({
             {pendingDraft ? (
               <Loader size={18} weight={26} inherit label="Downloading draft" />
             ) : (
-              <FileText className="mr-1.5 h-4 w-4" aria-hidden="true" />
+              <Download className="mr-1.5 h-4 w-4" aria-hidden="true" />
             )}
             {t("downloadDraft")}
           </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                disabled={pendingDraftShare}
-                className="w-full sm:w-auto border-[#D6EEFF] text-brand-navy hover:bg-[#F4FAFF]"
-              >
-                {pendingDraftShare ? (
-                  <Loader size={18} weight={26} inherit label="Sharing draft" />
-                ) : (
-                  <Share2 className="mr-1.5 h-4 w-4" aria-hidden="true" />
-                )}
-                {t("shareDraft")}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start">
-              <DropdownMenuItem disabled={pendingDraftShare} onClick={shareDraftEmail}>
-                <Mail className="h-4 w-4" />
-                Email
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                disabled={pendingDraftShare}
-                onClick={shareDraftWhatsApp}
-              >
-                <MessageCircle className="h-4 w-4" />
-                {t("whatsapp")}
-              </DropdownMenuItem>
-              <DropdownMenuItem disabled={pendingDraftShare} onClick={copyDraftUrl}>
-                <Link className="h-4 w-4" />
-                {t("copyUrl")}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Button
+            onClick={shareDraftEmail}
+            variant="outline"
+            disabled={pendingDraftShare}
+            className="w-full sm:w-auto border-[#D6EEFF] text-brand-navy hover:bg-[#F4FAFF]"
+          >
+            {pendingDraftShare ? (
+              <Loader size={18} weight={26} inherit label="Sending email" />
+            ) : (
+              <Mail className="mr-1.5 h-4 w-4" aria-hidden="true" />
+            )}
+            {t("sendByEmail")}
+          </Button>
+          <Button
+            onClick={shareDraftWhatsApp}
+            variant="outline"
+            disabled={pendingDraftShare}
+            className="w-full sm:w-auto border-[#E8F4FE] text-brand-navy hover:bg-[#F4FAFF]"
+          >
+            {pendingDraftShare ? (
+              <Loader size={18} weight={26} inherit label="Sharing draft" />
+            ) : (
+              <MessageCircle className="mr-1.5 h-4 w-4" aria-hidden="true" />
+            )}
+            {t("whatsapp")}
+          </Button>
+        </>
+      ) : (
+        <>
+          <Button onClick={download} disabled={pendingDownload} className="w-full sm:w-auto">
+            {pendingDownload ? (
+              <Loader size={18} weight={26} inherit label="Downloading contract" />
+            ) : (
+              <Download className="mr-1.5 h-4 w-4" aria-hidden="true" />
+            )}
+            {t("downloadPdf")}
+          </Button>
+          <Button
+            onClick={email}
+            variant="outline"
+            disabled={pendingEmail}
+            className="w-full sm:w-auto border-[#E8F4FE]"
+          >
+            {pendingEmail ? (
+              <Loader size={18} weight={26} inherit label="Sending email" />
+            ) : (
+              <Mail className="mr-1.5 h-4 w-4" aria-hidden="true" />
+            )}
+            {t("sendByEmail")}
+          </Button>
         </>
       )}
-      <Button onClick={download} disabled={disabled || pendingDownload} className="w-full sm:w-auto">
-        {pendingDownload ? (
-          <Loader size={18} weight={26} inherit label="Downloading contract" />
-        ) : (
-          <Download className="mr-1.5 h-4 w-4" aria-hidden="true" />
-        )}
-        {t("downloadPdf")}
-      </Button>
-      <Button
-        onClick={email}
-        variant="outline"
-        disabled={disabled || pendingEmail}
-        className="w-full sm:w-auto border-[#E8F4FE]"
-      >
-        {pendingEmail ? (
-          <Loader size={18} weight={26} inherit label="Sending email" />
-        ) : (
-          <Mail className="mr-1.5 h-4 w-4" aria-hidden="true" />
-        )}
-        {t("sendByEmail")}
-      </Button>
     </div>
   )
 }
