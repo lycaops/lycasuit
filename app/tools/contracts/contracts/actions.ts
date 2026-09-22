@@ -201,12 +201,13 @@ function sha256Hex(input: string) {
   return crypto.createHash("sha256").update(input).digest("hex")
 }
 
+// Base URL for the retailer remote-signing links (email + sign panel).
+// Anchored to the dedicated public signing host so stale/incorrect env
+// overrides (e.g. NEXT_PUBLIC_APP_URL pointing at localhost or a preview
+// deploy, or VERCEL_URL pointing at a Vercel preview URL) can never
+// produce an invalid link in the signing email.
 function getBaseUrl() {
-  const raw =
-    process.env.NEXT_PUBLIC_APP_URL ??
-    process.env.APP_URL ??
-    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ??
-    "https://hs.lycaops.com"
+  const raw = process.env.REMOTE_SIGN_BASE_URL ?? "https://hs.lycaops.com"
   return raw.replace(/\/+$/, "")
 }
 
