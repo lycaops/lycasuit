@@ -49,6 +49,7 @@ export const translations = {
     port_in_gara_detail: "(Port-in + GARA)",
     portout_usage_detail: "(Port-out + Usage)",
     renewal_below_30: "Below 30%",
+    sort_total_paid_desc: "Highest Total Paid",
 
     // Statement
     retailer_incentive_statement: "Retailer Incentive Statement",
@@ -274,6 +275,7 @@ export const translations = {
     port_in_gara_detail: "(Port-in + GARA)",
     portout_usage_detail: "(Port-out + Utilizzo)",
     renewal_below_30: "Sotto il 30%",
+    sort_total_paid_desc: "Totale Pagato più alto",
 
     retailer_incentive_statement: "Estratto Incentivi Rivenditore",
     statement_period: "Periodo di Riferimento",

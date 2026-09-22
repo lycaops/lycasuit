@@ -5,7 +5,8 @@ import Layout from '@incentive/components/Layout';
 import RetailerTable from '@incentive/components/RetailerTable';
 import Dashboard from '@incentive/components/Dashboard';
 import { useApp } from '@incentive/lib/AppContext';
-import { Search, Database, Filter } from 'lucide-react';
+import { getNumber } from '@incentive/lib/csvUtils';
+import { Search, Database, Filter, ArrowDownWideNarrow } from 'lucide-react';
 import Loader from '@/components/Loader';
 
 function formatIncentiveMonth(value) {
@@ -40,6 +41,7 @@ export default function Home() {
   const [branchFilter, setBranchFilter] = useState('');
   const [zoneFilter, setZoneFilter] = useState('');
   const [groupFilter, setGroupFilter] = useState('');
+  const [sortByTotalPaid, setSortByTotalPaid] = useState(false);
 
   const handleSelect = (row) => {
     if (row?._scheme) setScheme(row._scheme);
@@ -69,6 +71,15 @@ export default function Home() {
   const filteredRecords = groupFilter
     ? records.filter((r) => r._incentiveGroup === groupFilter)
     : records;
+
+  // Highest → lowest Total Paid. Retailers without a Total Paid value stay at the bottom.
+  const sortedRecords = sortByTotalPaid
+    ? [...filteredRecords].sort(
+        (a, b) =>
+          (getNumber(b, 'TOTAL PAID (SBT+BT+VOU)') ?? Number.NEGATIVE_INFINITY) -
+          (getNumber(a, 'TOTAL PAID (SBT+BT+VOU)') ?? Number.NEGATIVE_INFINITY),
+      )
+    : filteredRecords;
 
   return (
     <Layout>
@@ -190,25 +201,40 @@ export default function Home() {
                       <h2 className="text-sm font-semibold text-slate-700">
                         {t('search_retailer')} ({filteredRecords.length}{groupFilter ? ` / ${records.length}` : ''})
                       </h2>
-                      <div className="inline-flex items-center gap-1 rounded-lg border border-[#E4E9F1] bg-white p-1">
-                        {groupOptions.map((opt) => (
-                          <button
-                            key={opt.value}
-                            type="button"
-                            onClick={() => setGroupFilter(opt.value)}
-                            className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
-                              groupFilter === opt.value
-                                ? 'bg-[#21264E] text-white'
-                                : 'text-[#21264E] hover:bg-[#21264E]/10'
-                            }`}
-                          >
-                            {opt.label}
-                          </button>
-                        ))}
+                      <div className="flex flex-wrap items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setSortByTotalPaid((current) => !current)}
+                          aria-pressed={sortByTotalPaid}
+                          className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
+                            sortByTotalPaid
+                              ? 'border-[#21264E] bg-[#21264E] text-white'
+                              : 'border-[#E4E9F1] bg-white text-[#21264E] hover:bg-[#21264E]/10'
+                          }`}
+                        >
+                          <ArrowDownWideNarrow className="h-3.5 w-3.5" />
+                          {t('sort_total_paid_desc')}
+                        </button>
+                        <div className="inline-flex items-center gap-1 rounded-lg border border-[#E4E9F1] bg-white p-1">
+                          {groupOptions.map((opt) => (
+                            <button
+                              key={opt.value}
+                              type="button"
+                              onClick={() => setGroupFilter(opt.value)}
+                              className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                                groupFilter === opt.value
+                                  ? 'bg-[#21264E] text-white'
+                                  : 'text-[#21264E] hover:bg-[#21264E]/10'
+                              }`}
+                            >
+                              {opt.label}
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
-                  <RetailerTable records={filteredRecords} onSelect={handleSelect} />
+                  <RetailerTable records={sortedRecords} onSelect={handleSelect} />
                   {filteredRecords.length === 0 && (
                     <div className="rounded-[12px] border border-[#E4E9F1] bg-white p-8 text-center text-sm text-slate-400">
                       {t('no_results')}

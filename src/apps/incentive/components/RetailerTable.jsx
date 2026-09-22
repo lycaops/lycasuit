@@ -79,30 +79,29 @@ export default function RetailerTable({ onSelect, records: recs }) {
 
             <div className="my-2 border-t border-[#E4E9F1]" />
 
-            {/* Desktop-only incentive detail (web view) */}
-            <div className="mb-2 hidden gap-4 md:grid md:grid-cols-3">
-              <div className="min-w-0">
+            {/* Desktop (web view) shows every figure in one row; mobile keeps Total Paid + View Statement */}
+            <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+              <div className="hidden min-w-0 md:block">
                 <p className="text-[10px] uppercase tracking-wide text-slate-400">{t("new_activation_bonus")}</p>
                 <p className="mt-0.5 truncate text-sm font-semibold text-[#0f9d63]">{cfmt(newActivationBonus)}</p>
               </div>
-              <div className="min-w-0">
-                <p className="text-[10px] uppercase tracking-wide text-slate-400">{t("total_port_in_bonus")}</p>
-                <p className="mt-0.5 truncate text-sm font-semibold text-[#0f9d63]">{cfmt(portInBonus)}</p>
-                <p className="text-[10px] text-slate-400">{t("port_in_gara_detail")}</p>
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] uppercase tracking-wide text-slate-400">{t("total_deductions")}</p>
-                <p className="mt-0.5 truncate text-sm font-semibold text-[#46286e]">{cfmt(totalDeductions)}</p>
-                <p className="text-[10px] text-slate-400">{t("portout_usage_detail")}</p>
-              </div>
-            </div>
-
-            <div className="flex items-end justify-between gap-3">
               <div className="min-w-0">
                 <p className="text-[10px] uppercase tracking-wide text-slate-400">{t("total_paid")}</p>
                 <p className="mt-0.5 truncate text-base font-bold text-[#21254F]">
                   {cfmt(totalPaid)}
                 </p>
+              </div>
+              <div className="hidden min-w-0 md:block">
+                <p className="text-[10px] uppercase tracking-wide text-slate-400">
+                  {t("total_port_in_bonus")} <span className="normal-case">{t("port_in_gara_detail")}</span>
+                </p>
+                <p className="mt-0.5 truncate text-sm font-semibold text-[#0f9d63]">{cfmt(portInBonus)}</p>
+              </div>
+              <div className="hidden min-w-0 md:block">
+                <p className="text-[10px] uppercase tracking-wide text-slate-400">
+                  {t("total_deductions")} <span className="normal-case">{t("portout_usage_detail")}</span>
+                </p>
+                <p className="mt-0.5 truncate text-sm font-semibold text-[#46286e]">{cfmt(totalDeductions)}</p>
               </div>
               <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[#006AE0] px-3 py-1 text-xs font-semibold text-white">
                 {t("view_statement")}
