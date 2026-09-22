@@ -5,13 +5,14 @@ import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { Lock, Mail } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
+import { signInAction } from "@/app/auth/actions"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
 import Loader from "@/components/Loader"
 
-export function LoginForm() {
+export function LoginForm({ returnTo }: { returnTo?: string }) {
   const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -21,17 +22,29 @@ export function LoginForm() {
     e.preventDefault()
     setLoading(true)
 
+    const formData = new FormData(e.currentTarget as HTMLFormElement)
+    if (returnTo) {
+      formData.set("returnTo", returnTo)
+    }
+
+    const result = await signInAction(formData)
+
+    if (!result.ok) {
+      toast.error(result.error)
+      setLoading(false)
+      return
+    }
+
     const supabase = createClient()
     const { error } = await supabase.auth.signInWithPassword({ email, password })
-    setLoading(false)
-
     if (error) {
       toast.error(error.message)
+      setLoading(false)
       return
     }
 
     toast.success("Signed in")
-    router.replace("/home")
+    router.replace(returnTo ?? "/home")
     router.refresh()
   }
 

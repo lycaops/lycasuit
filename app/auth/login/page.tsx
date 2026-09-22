@@ -1,7 +1,12 @@
 import { LoginForm } from "@/components/auth/login-form"
 import { LogIn } from "lucide-react"
 
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ returnTo?: string }>
+}) {
+  const { returnTo } = await searchParams
   return (
     <div className="w-full">
       <div className="mb-8">
@@ -11,7 +16,7 @@ export default function LoginPage() {
         <h1 className="text-3xl font-semibold tracking-tight text-[#182039]">Welcome back</h1>
         <p className="mt-2 text-[#68738b]">Log in to your LycaOps account</p>
       </div>
-      <LoginForm />
+      <LoginForm returnTo={returnTo} />
     </div>
   )
 }
