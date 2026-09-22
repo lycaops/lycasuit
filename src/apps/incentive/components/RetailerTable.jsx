@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useApp } from "@incentive/lib/AppContext";
 import { formatCurrency, getNumber, getText } from "@incentive/lib/csvUtils";
-import { ArrowRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import IncentiveGroupBadge from "./statement/IncentiveGroupBadge";
 
 export default function RetailerTable({ onSelect, records: recs }) {
@@ -20,45 +20,54 @@ export default function RetailerTable({ onSelect, records: recs }) {
   if (records.length === 0) return null;
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="bg-slate-50 text-slate-500 text-[10px] md:text-xs uppercase tracking-wide">
-              <th className="text-left px-3 md:px-4 py-2 md:py-2.5 font-medium whitespace-nowrap">{t("retailer_id")}</th>
-              <th className="text-left px-3 md:px-4 py-2 md:py-2.5 font-medium whitespace-nowrap">ACCMGRID</th>
-              <th className="text-left px-3 md:px-4 py-2 md:py-2.5 font-medium whitespace-nowrap">HOTSPOTID</th>
-              <th className="text-left px-3 md:px-4 py-2 md:py-2.5 font-medium whitespace-nowrap">{t("total_paid")}</th>
-              <th className="text-left px-3 md:px-4 py-2 md:py-2.5 font-medium whitespace-nowrap">{t("incentive_group")}</th>
-              <th className="px-3 md:px-4 py-2 md:py-2.5 whitespace-nowrap"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {shown.map((r, i) => (
-              <tr key={r._id || i} className="border-t border-slate-100 hover:bg-blue-50/40 transition-colors">
-                <td className="px-3 md:px-4 py-2 md:py-2.5 font-medium text-slate-800 whitespace-nowrap">{getText(r, "RETAILER ID") || "—"}</td>
-                <td className="px-3 md:px-4 py-2 md:py-2.5 text-slate-600 whitespace-nowrap">{getText(r, "ACCMGRID") || "—"}</td>
-                <td className="px-3 md:px-4 py-2 md:py-2.5 text-slate-600 whitespace-nowrap">{getText(r, "HOTSPOTID") || "—"}</td>
-                <td className="px-3 md:px-4 py-2 md:py-2.5 text-slate-600 whitespace-nowrap">
-                  {getNumber(r, "TOTAL PAID (SBT+BT+VOU)") === null
-                    ? "—"
-                    : formatCurrency(getNumber(r, "TOTAL PAID (SBT+BT+VOU)"), lang)}
-                </td>
-                <td className="px-3 md:px-4 py-2 md:py-2.5 whitespace-nowrap"><IncentiveGroupBadge group={r._incentiveGroup} /></td>
-                <td className="px-3 md:px-4 py-2 md:py-2.5 text-right whitespace-nowrap">
-                  <button onClick={() => select(r)} className="inline-flex items-center gap-1 text-xs font-medium text-[#006AE0] hover:underline">
-                    {t("view_statement")} <ArrowRight className="w-3 h-3" />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      {records.length === 0 && (<div className="p-8 text-center text-sm text-slate-400">{t("no_results")}</div>)}
+    <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+      {shown.map((r, i) => {
+        const totalPaid = getNumber(r, "TOTAL PAID (SBT+BT+VOU)");
+        return (
+          <button
+            key={r._id || i}
+            type="button"
+            onClick={() => select(r)}
+            className="w-full rounded-[12px] border border-[#E4E9F1] bg-white p-4 text-left transition-colors hover:border-[#B9C6DB] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#006AE0]/40"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <span className="min-w-0 truncate text-sm font-bold text-slate-900 sm:text-[15px]">
+                {getText(r, "RETAILER ID") || "—"}
+              </span>
+              <span className="shrink-0">
+                <IncentiveGroupBadge group={r._incentiveGroup} />
+              </span>
+            </div>
+
+            <p className="mt-1.5 truncate text-xs text-slate-500">
+              {getText(r, "ACCMGRID") || "—"} · {getText(r, "HOTSPOTID") || "—"}
+            </p>
+
+            <div className="my-3 border-t border-[#E4E9F1]" />
+
+            <div className="flex items-end justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-[10px] uppercase tracking-wide text-slate-400">{t("total_paid")}</p>
+                <p className="mt-0.5 truncate text-lg font-bold text-[#21254F]">
+                  {totalPaid === null ? "—" : formatCurrency(totalPaid, lang)}
+                </p>
+              </div>
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[#006AE0] px-3.5 py-1.5 text-xs font-semibold text-white">
+                {t("view_statement")}
+                <ChevronRight className="h-3.5 w-3.5" />
+              </span>
+            </div>
+          </button>
+        );
+      })}
       {records.length > limit && (
-        <div className="p-3 border-t border-slate-100 text-center">
-          <button onClick={() => setLimit(limit + 25)} className="text-sm text-[#006AE0] font-medium hover:underline">+25</button>
+        <div className="col-span-full pt-1 text-center">
+          <button
+            onClick={() => setLimit(limit + 25)}
+            className="text-sm text-[#006AE0] font-medium hover:underline"
+          >
+            +25
+          </button>
         </div>
       )}
     </div>
