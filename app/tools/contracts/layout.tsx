@@ -14,7 +14,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
       <AppSidebar user={user} />
       <SidebarInset className="min-w-0 overflow-x-hidden bg-white pt-14 md:pt-0">
         <DashboardHeader user={user} />
-        <div className="flex flex-1 flex-col gap-6 bg-white p-4 md:p-6 lg:p-8">{children}</div>
+        <div className="flex flex-1 flex-col gap-6 bg-white p-4 pb-28 md:p-6 md:pb-8 lg:p-8">{children}</div>
       </SidebarInset>
       <MobileToolNav />
     </SidebarProvider>

@@ -89,8 +89,8 @@ export function ContractDetailContent({ contract, user, isEdit }: ContractDetail
             </CardContent>
           </Card>
         ) : (
-          <Card className="lg:col-span-1">
-            <CardHeader className="flex flex-row items-start justify-between gap-4 p-4 md:p-6">
+          <Card className="lg:col-span-1 gap-0">
+            <CardHeader className="flex flex-row items-start justify-between gap-4 p-4 pb-3 md:p-6 md:pb-4">
               <div>
                 <CardTitle className="text-lg md:text-xl">{t("retailerDetails")}</CardTitle>
                 <CardDescription>{t("contractMetadataDesc")}</CardDescription>
@@ -104,8 +104,8 @@ export function ContractDetailContent({ contract, user, isEdit }: ContractDetail
                 </Button>
               ) : null}
             </CardHeader>
-            <CardContent className="p-4 md:p-6">
-              <dl className="grid grid-cols-1 gap-3 md:gap-4 text-xs md:text-sm">
+            <CardContent className="p-4 pt-1 md:p-6 md:pt-2">
+              <dl className="grid grid-cols-1 gap-0 text-xs md:text-sm">
                 <Row label={t("company")} value={contract.company_name} />
                 <Row label={t("vatNumberLabel")} value={contract.vat_number} />
                 <Row
@@ -139,14 +139,14 @@ export function ContractDetailContent({ contract, user, isEdit }: ContractDetail
         )}
         <div className="lg:col-span-2 flex flex-col gap-4 md:gap-6">
           {contract.status !== "SIGNED" && (
-            <Card>
-              <CardHeader className="p-4 md:p-6">
+            <Card className="gap-0">
+              <CardHeader className="p-4 pb-3 md:p-6 md:pb-4">
                 <CardTitle className="text-lg md:text-xl">{t("draftActions")}</CardTitle>
                 <CardDescription>
                   {t("draftActionsDesc")}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="p-4 md:p-6">
+              <CardContent className="p-4 pt-0 md:p-6 md:pt-0">
                 <ContractActions contractId={contract.id} status={contract.status} />
               </CardContent>
             </Card>
@@ -155,14 +155,14 @@ export function ContractDetailContent({ contract, user, isEdit }: ContractDetail
           {contract.status !== "SIGNED" ? (
             <ContractSignPanel contractId={contract.id} />
           ) : (
-            <Card>
-              <CardHeader className="p-4 md:p-6">
+            <Card className="gap-0">
+              <CardHeader className="p-4 pb-3 md:p-6 md:pb-4">
                 <CardTitle className="text-lg md:text-xl">{t("signedContractTitle")}</CardTitle>
                 <CardDescription>
                   {t("signedContractDesc")}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="p-4 md:p-6">
+              <CardContent className="p-4 pt-0 md:p-6 md:pt-0">
                 <ContractActions contractId={contract.id} status={contract.status} />
               </CardContent>
             </Card>
@@ -175,7 +175,7 @@ export function ContractDetailContent({ contract, user, isEdit }: ContractDetail
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-0.5 sm:gap-3 py-1.5 sm:py-2 border-b border-gray-100 last:border-0">
+    <div className="flex items-baseline justify-between gap-3 py-1.5 sm:py-2 border-b border-gray-100 last:border-0">
       <dt className="text-[10px] sm:text-xs uppercase tracking-wide text-muted-foreground sm:w-32 sm:shrink-0">
         {label}
       </dt>
