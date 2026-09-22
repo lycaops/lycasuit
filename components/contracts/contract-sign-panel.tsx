@@ -243,12 +243,14 @@ export function ContractSignPanel({ contractId }: { contractId: string }) {
   }
 
   return (
-    <Card className="border-2 border-[#E8F4FE] shadow-lg overflow-hidden">
-      <CardHeader className="border-b border-[#E8F4FE] bg-[#F4FAFF] p-4 sm:p-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <Card className="border-2 border-[#E8F4FE] py-0 gap-0 shadow-lg overflow-hidden">
+      <CardHeader className="relative overflow-hidden border-b border-[#E8F4FE] bg-[#21264e] p-4 sm:p-6">
+        <img src="/h1.svg" alt="" aria-hidden="true" className="pointer-events-none absolute -right-24 -top-10 h-48 w-48 opacity-20 sm:h-56 sm:w-56" />
+        <img src="/h2.svg" alt="" aria-hidden="true" className="pointer-events-none absolute right-5 top-6 h-48 w-48 opacity-[.15] sm:h-56 sm:w-56" />
+        <div className="relative z-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
-            <CardTitle className="text-lg sm:text-xl">{t("contractFinalization")}</CardTitle>
-            <CardDescription className="text-xs sm:text-sm">
+            <CardTitle className="text-lg sm:text-xl text-white">{t("contractFinalization")}</CardTitle>
+            <CardDescription className="text-xs sm:text-sm text-white/70">
               {step === 1
                 ? t("stepRetailerSignature")
                 : step === 2
@@ -257,9 +259,9 @@ export function ContractSignPanel({ contractId }: { contractId: string }) {
             </CardDescription>
           </div>
           <div className="flex gap-1 sm:shrink-0">
-            <div className={`h-2 w-8 rounded-full ${step >= 1 ? "bg-brand-navy" : "bg-muted"}`} />
-            <div className={`h-2 w-8 rounded-full ${step >= 2 ? "bg-brand-navy" : "bg-muted"}`} />
-            <div className={`h-2 w-8 rounded-full ${step >= 3 ? "bg-brand-navy" : "bg-muted"}`} />
+            <div className={`h-2 w-8 rounded-full ${step >= 1 ? "bg-[#08dc7d]" : "bg-white/25"}`} />
+            <div className={`h-2 w-8 rounded-full ${step >= 2 ? "bg-[#08dc7d]" : "bg-white/25"}`} />
+            <div className={`h-2 w-8 rounded-full ${step >= 3 ? "bg-[#08dc7d]" : "bg-white/25"}`} />
           </div>
         </div>
       </CardHeader>
