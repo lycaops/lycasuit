@@ -90,11 +90,6 @@ export default function Layout({ children }) {
               <p className="truncate text-[11px] text-white/50">{roleLabel}{territoryLabel ? ` · ${territoryLabel}` : ''}</p>
             </div>
           </div>
-          {showSidebarLabels && territoryLabel && (
-            <div className="px-4 py-1 text-[11px] text-white/50 truncate">
-              {territoryLabel}
-            </div>
-          )}
           {showSidebarLabels && (
             <div className="mt-3 border-t border-white/10 px-4 pt-3">
               <div className="flex items-center gap-2 text-white/70" aria-label="Language">

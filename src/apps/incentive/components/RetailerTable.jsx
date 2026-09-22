@@ -81,15 +81,15 @@ export default function RetailerTable({ onSelect, records: recs }) {
 
             {/* Desktop (web view) shows every figure in one row; mobile keeps Total Paid + View Statement */}
             <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
-              <div className="hidden min-w-0 md:block">
-                <p className="text-[10px] uppercase tracking-wide text-slate-400">{t("new_activation_bonus")}</p>
-                <p className="mt-0.5 truncate text-sm font-semibold text-[#0f9d63]">{cfmt(newActivationBonus)}</p>
-              </div>
               <div className="min-w-0">
                 <p className="text-[10px] uppercase tracking-wide text-slate-400">{t("total_paid")}</p>
                 <p className="mt-0.5 truncate text-base font-bold text-[#21254F]">
                   {cfmt(totalPaid)}
                 </p>
+              </div>
+              <div className="hidden min-w-0 md:block">
+                <p className="text-[10px] uppercase tracking-wide text-slate-400">{t("new_activation_bonus")}</p>
+                <p className="mt-0.5 truncate text-sm font-semibold text-[#0f9d63]">{cfmt(newActivationBonus)}</p>
               </div>
               <div className="hidden min-w-0 md:block">
                 <p className="text-[10px] uppercase tracking-wide text-slate-400">
