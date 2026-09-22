@@ -40,7 +40,8 @@ export function ContractActions({
   const [pendingDownload, startDownload] = useTransition()
   const [pendingEmail, startEmail] = useTransition()
   const [pendingDraft, startDraft] = useTransition()
-  const [pendingDraftShare, startDraftShare] = useTransition()
+  const [pendingDraftEmail, startDraftEmail] = useTransition()
+  const [pendingDraftWhatsApp, startDraftWhatsApp] = useTransition()
 
   function downloadDraft() {
     const popup = isIosSafari() ? window.open("", "_blank") : null
@@ -74,7 +75,7 @@ export function ContractActions({
   }
 
   function shareDraftEmail() {
-    startDraftShare(async () => {
+    startDraftEmail(async () => {
       const res = await sendDraftContractEmailAction(contractId)
       if (!res.ok) {
         toast.error(res.error)
@@ -85,7 +86,7 @@ export function ContractActions({
   }
 
   function shareDraftWhatsApp() {
-    startDraftShare(async () => {
+    startDraftWhatsApp(async () => {
       const res = await getDraftContractPdfUrlAction(contractId)
       if (!res.ok) {
         toast.error(res.error)
@@ -154,10 +155,10 @@ export function ContractActions({
           <Button
             onClick={shareDraftEmail}
             variant="outline"
-            disabled={pendingDraftShare}
+            disabled={pendingDraftEmail}
             className="w-full sm:w-auto border-[#D6EEFF] text-brand-navy hover:bg-[#F4FAFF]"
           >
-            {pendingDraftShare ? (
+            {pendingDraftEmail ? (
               <Loader size={18} weight={26} inherit label="Sending email" />
             ) : (
               <Mail className="mr-1.5 h-4 w-4" aria-hidden="true" />
@@ -167,10 +168,10 @@ export function ContractActions({
           <Button
             onClick={shareDraftWhatsApp}
             variant="outline"
-            disabled={pendingDraftShare}
+            disabled={pendingDraftWhatsApp}
             className="w-full sm:w-auto border-[#E8F4FE] text-brand-navy hover:bg-[#F4FAFF]"
           >
-            {pendingDraftShare ? (
+            {pendingDraftWhatsApp ? (
               <Loader size={18} weight={26} inherit label="Sharing draft" />
             ) : (
               <MessageCircle className="mr-1.5 h-4 w-4" aria-hidden="true" />
