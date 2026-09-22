@@ -54,7 +54,7 @@ export default function Layout({ children }) {
   const closeMobileNav = () => setMobileNavOpen(false);
 
   return (
-    <div className="min-h-screen bg-[#f4f7fb] flex">
+    <div className="h-screen overflow-hidden bg-[#f4f7fb] flex">
       <aside
         className={`sticky top-0 h-screen shrink-0 hidden md:flex flex-col transition-all duration-300 ${sidebarCollapsed ? 'w-[72px]' : 'w-64'}`}
         style={{ backgroundColor: '#21264e' }}
@@ -192,7 +192,7 @@ export default function Layout({ children }) {
           </div>
         )}
 
-        <main className="flex-1 overflow-x-hidden overflow-y-visible">{children}</main>
+        <main className="min-w-0 flex-1 overflow-y-auto">{children}</main>
       </div>
     </div>
   );

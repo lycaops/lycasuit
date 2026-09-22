@@ -23,6 +23,13 @@ export default function RetailerTable({ onSelect, records: recs }) {
     <div className="grid grid-cols-1 gap-3">
       {shown.map((r, i) => {
         const totalPaid = getNumber(r, "TOTAL PAID (SBT+BT+VOU)");
+        const bonus =
+          (getNumber(r, "QUALITY_BONUS M-1") ?? 0) +
+          (getNumber(r, "VOLUME_BONUS M-1") ?? 0) +
+          (getNumber(r, "T3REN_BONUS") ?? 0);
+        const deductions =
+          (getNumber(r, "PORTOUT DEDUCTION") ?? 0) +
+          (getNumber(r, "USAGE_CLAWBACK") ?? 0);
         return (
           <button
             key={r._id || i}
@@ -51,6 +58,20 @@ export default function RetailerTable({ onSelect, records: recs }) {
                 <p className="mt-0.5 truncate text-base font-bold text-[#21254F]">
                   {totalPaid === null ? "—" : formatCurrency(totalPaid, lang)}
                 </p>
+              </div>
+              <div className="hidden min-w-0 items-end gap-6 md:flex">
+                <div className="min-w-0">
+                  <p className="text-[10px] uppercase tracking-wide text-slate-400">{t("total_bonuses")}</p>
+                  <p className="mt-0.5 truncate text-sm font-semibold text-[#0f9d63]">
+                    {formatCurrency(bonus, lang)}
+                  </p>
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[10px] uppercase tracking-wide text-slate-400">{t("total_deductions")}</p>
+                  <p className="mt-0.5 truncate text-sm font-semibold text-[#46286e]">
+                    {formatCurrency(deductions, lang)}
+                  </p>
+                </div>
               </div>
               <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[#006AE0] px-3 py-1 text-xs font-semibold text-white">
                 {t("view_statement")}

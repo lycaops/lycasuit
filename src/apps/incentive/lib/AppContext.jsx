@@ -137,7 +137,7 @@ export function AppProvider({ children }) {
           p_retailer_id: filters.retailerId || null,
           p_accmgrid: filters.branch || null,
           p_hotspotid: filters.zone || null,
-          p_limit: 1000,
+          p_limit: 10000,
         });
         if (error) throw error;
         mapped = (data || []).map((r) => {

@@ -72,7 +72,7 @@ export default function Home() {
 
   return (
     <Layout>
-      <div className="p-3 md:p-8 max-w-7xl mx-auto space-y-4 md:space-y-6">
+      <div className="p-3 pb-24 md:p-8 md:pb-8 max-w-7xl mx-auto space-y-4 md:space-y-6">
         {recordsError && (
           <div className="rounded-lg bg-red-50 border border-red-200 p-4 flex items-start gap-3 text-sm text-red-700">
             <Database className="w-5 h-5 shrink-0 mt-0.5" />
@@ -183,12 +183,12 @@ export default function Home() {
 
             {records.length > 0 && (
               <>
-                <Dashboard records={records} />
+                <Dashboard records={filteredRecords} />
                 <div>
-                  <div className="sticky top-[calc(3.5rem_+_env(safe-area-inset-top))] z-20 -mx-3 mb-3 border-b border-[#E4E9F1] bg-[#f4f7fb]/95 px-3 py-2.5 backdrop-blur-sm md:top-0 md:-mx-8 md:px-8">
+                  <div className="sticky top-[env(safe-area-inset-top)] z-20 -mx-3 mb-3 border-b border-[#E4E9F1] bg-[#f4f7fb]/95 px-3 py-2.5 backdrop-blur-sm md:top-0 md:-mx-8 md:px-8">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <h2 className="text-sm font-semibold text-slate-700">
-                        {t('search_retailer')} ({records.length} / 1000)
+                        {t('search_retailer')} ({filteredRecords.length}{groupFilter ? ` / ${records.length}` : ''})
                       </h2>
                       <div className="inline-flex items-center gap-1 rounded-lg bg-[#21254F] p-1">
                         {groupOptions.map((opt) => (
