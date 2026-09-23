@@ -4,6 +4,7 @@ import Link from "next/link"
 import { useState, type ReactNode } from "react"
 import { ArrowRight, BarChart3, FileSignature, Home, LayoutGrid, LifeBuoy, Menu, Receipt, Users, X, KeyRound } from "lucide-react"
 import { useI18n } from "@/lib/i18n/i18n-context"
+import type { TranslationKey } from "@/lib/i18n/translations"
 import { HomeHeader } from "@/components/home/home-header"
 import { MobileToolNav } from "@/components/dashboard/mobile-tool-nav"
 import type { PlatformTool } from "@/lib/auth"
@@ -27,6 +28,13 @@ const TOOL_LABELS: Record<string, "toolFieldIq" | "toolContracts" | "toolIncenti
   contracts: "toolContracts",
   incentive: "toolIncentive",
   assistance: "toolAssistance",
+}
+
+const TOOL_DESCRIPTIONS: Record<string, TranslationKey> = {
+  field_iq: "toolFieldIqDesc",
+  contracts: "toolContractsDesc",
+  incentive: "toolIncentiveDesc",
+  assistance: "toolAssistanceDesc",
 }
 
 function ToolLink({ tool, className, onClick, children }: { tool: PlatformTool; className: string; onClick?: () => void; children: ReactNode }) {
@@ -180,7 +188,7 @@ export function HomeContent({
                       <div className="flex items-start justify-between gap-4">
                         <div className="min-w-0 flex-1 pt-1">
                           <h2 className="text-xl font-semibold leading-tight tracking-tight text-[#21264E] sm:text-2xl">{TOOL_LABELS[tool.key] ? t(TOOL_LABELS[tool.key]) : tool.name}</h2>
-                          <p className="mt-4 max-w-sm text-sm leading-relaxed text-[#21264E]/65">{tool.description}</p>
+                          <p className="mt-4 max-w-sm text-sm leading-relaxed text-[#21264E]/65">{TOOL_DESCRIPTIONS[tool.key] ? t(TOOL_DESCRIPTIONS[tool.key]) : tool.description}</p>
                         </div>
                         <div className="flex h-[64px] w-[78px] shrink-0 items-center justify-center p-0 sm:h-[78px] sm:w-[96px]">{LOGOS[tool.key] ? <img src={LOGOS[tool.key] as string} alt="" className="h-full w-full object-contain" /> : <Icon className="h-9 w-9" style={{ color: accent }} />}</div>
                       </div>
