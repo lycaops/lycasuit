@@ -26,7 +26,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { useI18n } from "@/lib/i18n/i18n-context"
-const PLATFORM_ADMIN_ROLES = ["SUPER-ADMIN", "HS-ADMIN", "PM-ADMIN", "CS-ADMIN", "COUNTRY-MANAGER", "UK-ADMIN"]
+const PLATFORM_ADMIN_ROLES = ["SUPER-ADMIN", "HS-ADMIN"]
 
 interface SidebarUser {
   full_name: string

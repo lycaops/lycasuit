@@ -205,7 +205,7 @@ export default function Home() {
               <>
                 <Dashboard records={filteredRecords} />
                 <div>
-                  <div className="sticky top-[env(safe-area-inset-top)] z-20 -mx-3 mb-3 border-b border-[#E4E9F1] bg-[#f4f7fb]/95 px-3 py-2.5 backdrop-blur-sm md:top-0 md:-mx-8 md:px-8">
+                  <div className="sticky top-0 z-20 -mx-3 mb-3 border-b border-[#E4E9F1] bg-[#f4f7fb]/95 px-3 py-2.5 backdrop-blur-sm md:-mx-8 md:px-8">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <h2 className="text-sm font-semibold text-slate-700">
                         {t('search_retailer')} ({filteredRecords.length}{groupFilter ? ` / ${records.length}` : ''})

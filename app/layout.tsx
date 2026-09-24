@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next"
 import { Toaster } from "@/components/ui/sonner"
 import { InstallButton } from "@/components/pwa/install-button"
 import { PwaRegister } from "@/components/pwa/pwa-register"
+import { OfflineRedirect } from "@/components/pwa/offline-redirect"
 import { I18nProvider } from "@/lib/i18n/i18n-context"
 import "./globals.css"
 
@@ -43,6 +44,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <I18nProvider>
           {children}
           <PwaRegister />
+          <OfflineRedirect />
           <InstallButton />
           <Toaster richColors position="top-right" />
           {process.env.NODE_ENV === "production" && <Analytics />}

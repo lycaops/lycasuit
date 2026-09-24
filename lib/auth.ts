@@ -6,10 +6,6 @@ import type { AppUser } from "@/lib/types"
 const ADMIN_ROLES = [
   "SUPER-ADMIN",
   "HS-ADMIN",
-  "PM-ADMIN",
-  "CS-ADMIN",
-  "COUNTRY-MANAGER",
-  "UK-ADMIN",
 ] as const
 
 export type ToolKey = "field_iq" | "contracts" | "incentive" | "assistance"

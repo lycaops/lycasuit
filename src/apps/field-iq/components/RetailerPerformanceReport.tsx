@@ -958,7 +958,38 @@ export default function RetailerPerformanceReport({ region, branch, zone, user }
                 </div>
               </div>
             </div>
-            <div className="overflow-x-hidden rounded-xl border border-slate-200">
+            <div className="grid gap-3 md:hidden">
+              {filteredRetailerRows.map((row: Record<string, unknown>, index: number) => {
+                const priority = getRowPriority(row);
+                const mtdVariance = calculateMtdVariance(row, monthInfo);
+                return (
+                  <article key={`${row['retailer_id'] || row['id'] || index}-${index}`} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                    <div className="flex items-start justify-between gap-3 border-b border-slate-100 pb-3">
+                      <div>
+                        <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">Retailer ID</p>
+                        <p className="mt-1 break-all text-sm font-bold text-slate-900">{String(row['retailer_id'] ?? row['id'] ?? row['retailer'] ?? '—')}</p>
+                      </div>
+                      <span className="inline-flex rounded-full px-2 py-1 text-[10px] font-bold" style={{ backgroundColor: `${getPriorityColor(priority)}20`, color: getPriorityColor(priority) }}>
+                        {getPriorityKey(priority) || priority || '—'}
+                      </span>
+                    </div>
+                    <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-3">
+                      {retailerTableColumns.map((column: { key: string; label: string; shortLabel: string; aliases: string[] }) => (
+                        <div key={column.key}>
+                          <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">{column.shortLabel || column.label}</p>
+                          <p className="mt-1 text-sm font-semibold text-slate-800">{fieldValue(row, column.aliases).toLocaleString()}</p>
+                        </div>
+                      ))}
+                      <div className="col-span-2 border-t border-slate-100 pt-3">
+                        <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">MTD Variance</p>
+                        <p className="mt-1 text-sm font-semibold text-slate-800">{mtdVariance.toLocaleString()}</p>
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+            <div className="hidden overflow-x-hidden rounded-xl border border-slate-200 md:block">
               <table className="w-full divide-y divide-slate-200 text-left text-[10px] md:text-sm">
                 <thead className="bg-slate-50 text-slate-600">
                   <tr className="divide-x divide-slate-200">
@@ -1056,7 +1087,29 @@ export default function RetailerPerformanceReport({ region, branch, zone, user }
                   <h2 className="text-lg font-semibold text-[#21264E]">{(isRegionSelected && !isBranchSelected) ? "Branch-wise Summary" : "Zone-wise Summary"}</h2>
                   <p className="text-sm text-slate-500">{(isRegionSelected && !isBranchSelected) ? "Individual branch performance breakdown." : "Individual zone performance breakdown."}</p>
                 </div>
-                <div className="overflow-x-auto rounded-xl border border-slate-200">
+                <div className="grid gap-3 md:hidden">
+                  {displayRows.map((row: Record<string, unknown>, index: number) => (
+                    <article key={`${row['zone'] || index}-${index}`} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                      <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                        <div className="col-span-2 border-b border-slate-100 pb-3">
+                          <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">{(isRegionSelected && !isBranchSelected) ? 'Branch' : 'Zone'}</p>
+                          <p className="mt-1 text-sm font-bold text-slate-900">{String(row['zone'] || '—')}</p>
+                        </div>
+                        {monthInfo.map((entry: MonthInfo & { shortLabel: string }) => (
+                          <div key={entry.key}>
+                            <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">{entry.shortLabel}</p>
+                            <p className="mt-1 text-sm font-semibold text-slate-800">{fieldValue(row, entry.aliases).toLocaleString()}</p>
+                          </div>
+                        ))}
+                        <div className="col-span-2 border-t border-slate-100 pt-3">
+                          <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">MTD Variance</p>
+                          <p className="mt-1 text-sm font-semibold text-slate-800">{calculateMtdVariance(row, monthInfo).toLocaleString()}</p>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+                <div className="hidden overflow-x-auto rounded-xl border border-slate-200 md:block">
                   <table className="w-full divide-y divide-slate-200 text-left text-[10px] md:text-sm">
                     <thead className="bg-slate-50 text-slate-600">
                       <tr className="divide-x divide-slate-200">

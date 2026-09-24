@@ -1,9 +1,19 @@
 const CACHE_NAME = "lycaops-static-v1"
 const STATIC_PREFIXES = ["/_next/static/", "/icons/"]
+const BRAND_ASSETS = [
+  "/lops.svg",
+  "/lops_w.svg",
+  "/logo.png",
+  "/logo_b.webp",
+  "/fiq.png",
+  "/rcm.png",
+  "/statement.png",
+  "/lmac.png",
+]
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.add("/offline"))
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(["/offline", ...BRAND_ASSETS]))
   )
   self.skipWaiting()
 })
@@ -25,6 +35,17 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin) return
 
   if (request.method === "GET" && STATIC_PREFIXES.some((prefix) => url.pathname.startsWith(prefix))) {
+    event.respondWith(
+      caches.match(request).then((cached) => cached || fetch(request).then((response) => {
+        const copy = response.clone()
+        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy))
+        return response
+      }))
+    )
+    return
+  }
+
+  if (request.method === "GET" && BRAND_ASSETS.includes(url.pathname)) {
     event.respondWith(
       caches.match(request).then((cached) => cached || fetch(request).then((response) => {
         const copy = response.clone()

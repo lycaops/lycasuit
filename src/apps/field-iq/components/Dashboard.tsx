@@ -43,7 +43,7 @@ export default function Dashboard() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const hasAllBranchAccess = user?.role === 'HS-ADMIN' || user?.role === 'COUNTRY-MANAGER' || user?.role === 'UK-ADMIN';
+  const hasAllBranchAccess = user?.role === 'HS-ADMIN' || user?.role === 'PM-ADMIN' || user?.role === 'COUNTRY-MANAGER' || user?.role === 'UK-ADMIN';
   const isZoneManager = user?.role === 'ZONE-MANAGER';
   const [kpiBranch, setKpiBranch] = useState('');
   const [kpiRegion, setKpiRegion] = useState('ITALY');
@@ -171,7 +171,7 @@ export default function Dashboard() {
         if (user.role === 'ZONE-MANAGER') {
           const b = normalizeBranch(user.branches?.[0] || '');
           availableBranches = b ? [b] : [];
-        } else if (!['HS-ADMIN', 'COUNTRY-MANAGER', 'UK-ADMIN'].includes(user.role)) {
+        } else if (!['HS-ADMIN', 'PM-ADMIN', 'COUNTRY-MANAGER', 'UK-ADMIN'].includes(user.role)) {
           const userBranches = (user.branches || []).map(normalizeBranch);
           availableBranches = uniqueBranches.filter((b: string) => userBranches.includes(normalizeBranch(b)));
         }
@@ -241,7 +241,7 @@ export default function Dashboard() {
         if (user.role === 'ZONE-MANAGER') {
           const b = normalizeBranch(user.branches?.[0] || '');
           availableBranches = b ? [b] : [];
-        } else if (!['HS-ADMIN', 'COUNTRY-MANAGER', 'UK-ADMIN'].includes(user.role)) {
+        } else if (!['HS-ADMIN', 'PM-ADMIN', 'COUNTRY-MANAGER', 'UK-ADMIN'].includes(user.role)) {
           const userBranches = (user.branches || []).map(normalizeBranch);
           availableBranches = uniqueBranches.filter((b: string) => userBranches.includes(normalizeBranch(b)));
         }
@@ -311,7 +311,7 @@ export default function Dashboard() {
           
           // Filter based on user role
           let availableBranches: string[] = [];
-          if (user.role === 'HS-ADMIN' || user.role === 'COUNTRY-MANAGER' || user.role === 'UK-ADMIN') {
+          if (user.role === 'HS-ADMIN' || user.role === 'PM-ADMIN' || user.role === 'COUNTRY-MANAGER' || user.role === 'UK-ADMIN') {
             // Admin and Country Manager can see all standard branches.
             availableBranches = ALL_BRANCHES;
           } else if (user.role === 'RSM') {
@@ -361,7 +361,7 @@ export default function Dashboard() {
           
           // Filter based on user role and region
           let availableKpiBranches: string[] = [];
-          if (user.role === 'HS-ADMIN' || user.role === 'COUNTRY-MANAGER' || user.role === 'UK-ADMIN') {
+          if (user.role === 'HS-ADMIN' || user.role === 'PM-ADMIN' || user.role === 'COUNTRY-MANAGER' || user.role === 'UK-ADMIN') {
             availableKpiBranches = (uniqueKpiBranches as string[]);
           } else if (user.role === 'ZONE-MANAGER') {
             const b = normalizeBranch(user.branches?.[0] || '');
@@ -552,7 +552,7 @@ export default function Dashboard() {
           
           // Filter based on user role and region
           let availableIsdmBranches: string[] = [];
-          if (user.role === 'HS-ADMIN' || user.role === 'COUNTRY-MANAGER' || user.role === 'UK-ADMIN') {
+          if (user.role === 'HS-ADMIN' || user.role === 'PM-ADMIN' || user.role === 'COUNTRY-MANAGER' || user.role === 'UK-ADMIN') {
             availableIsdmBranches = (uniqueIsdmBranches as string[]);
           } else if (user.role === 'ZONE-MANAGER') {
             const b = normalizeBranch(user.branches?.[0] || '');

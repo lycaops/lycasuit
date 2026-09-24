@@ -950,7 +950,37 @@ export default function PlanActivationReport({ region, branch, zone, user }: Pla
             </div>
           )}
         </div>
-        <div className="overflow-x-auto rounded-xl border border-slate-200">
+        <div className="grid gap-3 md:hidden">
+          {(isZoneSelected ? sortedRetailerRows : sortedRows).map((row: any, index: number) => {
+            const values = [
+              [isZoneSelected ? 'Retailer ID' : ((isRegionSelected && !isBranchSelected) ? 'Branch' : 'Zone'), isZoneSelected ? row.retailer_id : row.zone],
+              ['No Plan', row.no_plan],
+              ['€5.99', row.plan_5_99],
+              ['€6.99', row.plan_6_99],
+              ['€7.99', row.plan_7_99],
+              ['€9.99', row.plan_9_99],
+              ['€11.99', row.plan_11_99],
+              ['€14.99', row.plan_14_99],
+              ['Less than €6.99', row.group_a],
+              ['Greater than €6.99', row.group_b],
+              ['Total', row.total],
+            ];
+
+            return (
+              <article key={`${isZoneSelected ? row.retailer_id : row.zone}-${index}`} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                  {values.map(([label, value]) => (
+                    <div key={label} className={label === 'Total' ? 'col-span-2 border-t border-slate-100 pt-3' : ''}>
+                      <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">{label}</p>
+                      <p className="mt-1 text-sm font-semibold text-slate-800">{typeof value === 'number' ? value.toLocaleString() : value || '—'}</p>
+                    </div>
+                  ))}
+                </div>
+              </article>
+            );
+          })}
+        </div>
+        <div className="hidden overflow-x-auto rounded-xl border border-slate-200 md:block">
           <table className="w-full divide-y divide-slate-200 text-left text-[10px] md:text-sm">
             <thead className="bg-slate-50 text-slate-600">
               <tr className="divide-x divide-slate-200">
