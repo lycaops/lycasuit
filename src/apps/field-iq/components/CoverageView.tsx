@@ -1027,7 +1027,8 @@ export default function CoverageView({ user }: { user: RpaUser }) {
           ) : filteredCoverage.length === 0 ? (
             <div className="text-center py-8 text-gray-500">No records found</div>
           ) : (
-            <div className="grid gap-3 md:hidden">
+            <>
+              <div className="grid gap-3 md:hidden">
               {filteredCoverage.map((retailer) => (
                 <article key={retailer.retailer_id} className="rounded-xl border border-gray-200 bg-white px-3 py-2.5 shadow-sm">
                   <div className="flex items-center justify-between gap-2 border-b border-gray-100 pb-2">
@@ -1073,8 +1074,8 @@ export default function CoverageView({ user }: { user: RpaUser }) {
                   )}
                 </article>
               ))}
-            </div>
-            <div className="hidden overflow-x-auto md:block">
+              </div>
+              <div className="hidden overflow-x-auto md:block">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-200">
@@ -1163,7 +1164,8 @@ export default function CoverageView({ user }: { user: RpaUser }) {
                   ))}
                 </tbody>
               </table>
-            </div>
+              </div>
+            </>
           )}
         </div>
       )}
