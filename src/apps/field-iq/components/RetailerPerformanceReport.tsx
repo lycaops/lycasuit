@@ -166,6 +166,43 @@ const calculateMtdVariance = (row: Record<string, unknown>, monthInfo: MonthInfo
   return Math.round(m0 - expectedPerformance);
 };
 
+function PerformanceSummaryTile({
+  row,
+  index,
+  label,
+  monthInfo,
+}: {
+  row: Record<string, unknown>;
+  index: number;
+  label: string;
+  monthInfo: MonthInfo[];
+}) {
+  return (
+    <article key={`${row.zone || index}-${index}`} className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 shadow-sm">
+      <div className="border-b border-slate-100 pb-2">
+        <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">{label}</p>
+        <p className="mt-0.5 text-xs font-bold text-slate-900">{String(row.zone || '—')}</p>
+      </div>
+      <div className="mt-2 grid grid-cols-2 gap-2">
+        {monthInfo.map((entry) => {
+          const value = fieldValue(row, entry.aliases);
+          if (value === 0) return null;
+          return (
+            <div key={entry.key} className="flex items-center justify-between border-b border-slate-50 pb-1 text-xs">
+              <span className="text-[10px] font-semibold uppercase text-slate-400">{entry.offset === 0 ? 'MTD' : `M${Math.abs(entry.offset)}`}</span>
+              <span className="font-semibold text-slate-800">{value.toLocaleString()}</span>
+            </div>
+          );
+        })}
+      </div>
+      <div className="mt-1.5 flex items-center justify-between border-t border-slate-100 pt-1.5">
+        <span className="text-[9px] font-semibold uppercase tracking-wide text-slate-400">MTD variance</span>
+        <span className="text-xs font-semibold text-slate-800">{calculateMtdVariance(row, monthInfo).toLocaleString()}</span>
+      </div>
+    </article>
+  );
+}
+
 export default function RetailerPerformanceReport({ region, branch, zone, user }: RetailerPerformanceReportProps) {
   const [rows, setRows] = useState<Record<string, unknown>[]>([]);
   const [retailerRows, setRetailerRows] = useState<Record<string, unknown>[]>([]);
@@ -1107,25 +1144,13 @@ export default function RetailerPerformanceReport({ region, branch, zone, user }
                 </div>
                 <div className="grid gap-3 md:hidden">
                   {displayRows.map((row: Record<string, unknown>, index: number) => (
-                    <article key={`${row['zone'] || index}-${index}`} className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 shadow-sm">
-                      <div>
-                        <div className="border-b border-slate-100 pb-2">
-                          <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">{(isRegionSelected && !isBranchSelected) ? 'Branch' : 'Zone'}</p>
-                          <p className="mt-0.5 text-xs font-bold text-slate-900">{String(row['zone'] || '—')}</p>
-                        </div>
-                        <div className="mt-2 grid grid-cols-2 gap-2">
-                          {monthInfo.map((entry: MonthInfo & { shortLabel: string }) => {
-                            const value = fieldValue(row, entry.aliases);
-                            if (value === 0) return null;
-                            return <div key={entry.key} className="flex items-center justify-between border-b border-slate-50 pb-1 text-xs"><span className="text-[10px] font-semibold uppercase text-slate-400">{entry.shortLabel}</span><span className="font-semibold text-slate-800">{value.toLocaleString()}</span></div>;
-                          })}
-                        </div>
-                        <div className="mt-1.5 flex items-center justify-between border-t border-slate-100 pt-1.5">
-                          <span className="text-[9px] font-semibold uppercase tracking-wide text-slate-400">MTD variance</span>
-                          <span className="text-xs font-semibold text-slate-800">{calculateMtdVariance(row, monthInfo).toLocaleString()}</span>
-                        </div>
-                      </div>
-                    </article>
+                    <PerformanceSummaryTile
+                      key={`${row.zone || index}-${index}`}
+                      row={row}
+                      index={index}
+                      label={isRegionSelected && !isBranchSelected ? 'Branch' : 'Zone'}
+                      monthInfo={monthInfo}
+                    />
                   ))}
                 </div>
                 <div className="hidden overflow-x-auto rounded-xl border border-slate-200 md:block">
