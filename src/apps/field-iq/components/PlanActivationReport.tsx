@@ -99,6 +99,7 @@ export default function PlanActivationReport({ region, branch, zone, user }: Pla
   });
   const [searchQuery, setSearchQuery] = useState('');
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+  const [summarySort, setSummarySort] = useState<'no-plan-desc' | 'total-desc'>('no-plan-desc');
 
   const isZoneSelected = Boolean(zone);
   const isBranchSelected = Boolean(branch);
@@ -416,8 +417,11 @@ export default function PlanActivationReport({ region, branch, zone, user }: Pla
   }, [isZoneSelected, isRegionSelected, isBranchSelected, rows, branchWiseData]);
 
   const sortedRows = useMemo(() => {
-    if (!sortConfig) return displayRows;
+    if (isZoneSelected) return [];
     return [...displayRows].sort((a, b) => {
+      if (!isZoneSelected && summarySort === 'no-plan-desc') return b.no_plan - a.no_plan;
+      if (!isZoneSelected && summarySort === 'total-desc') return b.total - a.total;
+      if (!sortConfig) return 0;
       const aVal = a[sortConfig.key as keyof PlanData];
       const bVal = b[sortConfig.key as keyof PlanData];
       
@@ -431,11 +435,15 @@ export default function PlanActivationReport({ region, branch, zone, user }: Pla
         ? (aVal as number) - (bVal as number) 
         : (bVal as number) - (aVal as number);
     });
-  }, [displayRows, sortConfig]);
+  }, [displayRows, sortConfig, summarySort, isZoneSelected]);
 
   const sortedRetailerRows = useMemo(() => {
     let sorted = [...retailerRows];
-    if (sortConfig) {
+    if (summarySort === 'no-plan-desc') {
+      sorted.sort((a, b) => b.no_plan - a.no_plan);
+    } else if (summarySort === 'total-desc') {
+      sorted.sort((a, b) => b.total - a.total);
+    } else if (sortConfig) {
       sorted.sort((a, b) => {
         const aVal = a[sortConfig.key as keyof RetailerPlanData];
         const bVal = b[sortConfig.key as keyof RetailerPlanData];
@@ -456,7 +464,7 @@ export default function PlanActivationReport({ region, branch, zone, user }: Pla
       sorted = sorted.filter(row => row.retailer_id.toLowerCase().includes(lowerQuery));
     }
     return sorted;
-  }, [retailerRows, sortConfig, searchQuery]);
+  }, [retailerRows, sortConfig, searchQuery, summarySort]);
 
   const handleExportExcel = useCallback(async () => {
     if (sortedRetailerRows.length === 0) return;
@@ -917,6 +925,12 @@ export default function PlanActivationReport({ region, branch, zone, user }: Pla
           <div className="flex flex-col gap-2">
             <h2 className="text-lg font-semibold text-[#21264E]">{isZoneSelected ? "Retailer-wise Breakdown" : (isRegionSelected && !isBranchSelected) ? "Branch-wise Breakdown" : "Zone-wise Breakdown"}</h2>
             <p className="text-sm text-slate-500">{isZoneSelected ? "Detailed plan activation data per retailer." : (isRegionSelected && !isBranchSelected) ? "Detailed plan activation data per branch." : "Detailed plan activation data per zone."}</p>
+            {!isZoneSelected && (
+              <select value={summarySort} onChange={(event) => setSummarySort(event.target.value as typeof summarySort)} className="w-fit rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs font-medium text-slate-700">
+                <option value="no-plan-desc">No Plan: highest to lowest</option>
+                <option value="total-desc">Total: largest to smallest</option>
+              </select>
+            )}
             {isZoneSelected && (
               <input
                 type="text"
@@ -974,9 +988,9 @@ export default function PlanActivationReport({ region, branch, zone, user }: Pla
                 </div>
                 <div className="mt-2 grid grid-cols-7 gap-1 border-t border-slate-100 pt-2">
                   {values.slice(1, 8).map(([label, value]) => (
-                    <div key={label} className="min-w-0 text-center">
+                    <div key={label} className={`min-w-0 text-center ${label === 'No Plan' && Number(value) > 0 ? 'rounded bg-red-50' : ''}`}>
                       <p className="truncate text-[8px] font-semibold uppercase tracking-wide text-slate-400">{label}</p>
-                      <p className="mt-0.5 truncate text-[11px] font-semibold text-slate-800">{typeof value === 'number' ? value.toLocaleString() : value || '—'}</p>
+                      <p className={`mt-0.5 truncate text-[11px] font-semibold ${label === 'No Plan' && Number(value) > 0 ? 'text-red-700' : 'text-slate-800'}`}>{typeof value === 'number' ? value.toLocaleString() : value || '—'}</p>
                     </div>
                   ))}
                 </div>
@@ -1031,7 +1045,7 @@ export default function PlanActivationReport({ region, branch, zone, user }: Pla
                     <td className="px-1 py-2 md:px-4 md:py-3 font-medium text-slate-900">{row.retailer_id}</td>
                     <td 
                       className="px-1 py-2 md:px-4 md:py-3 text-center"
-                      style={{ backgroundColor: row.no_plan > 0 ? '#FFE4E1' : 'transparent' }}
+                      style={{ backgroundColor: row.no_plan > 0 ? '#FEE2E2' : 'transparent', color: row.no_plan > 0 ? '#B91C1C' : undefined, fontWeight: row.no_plan > 0 ? 700 : undefined }}
                     >
                       {row.no_plan.toLocaleString()}
                     </td>
@@ -1052,7 +1066,7 @@ export default function PlanActivationReport({ region, branch, zone, user }: Pla
                     <td className="px-1 py-2 md:px-4 md:py-3 font-medium text-slate-900">{row.zone}</td>
                     <td 
                       className="px-1 py-2 md:px-4 md:py-3 text-center"
-                      style={{ backgroundColor: row.no_plan > 0 ? '#FFE4E1' : 'transparent' }}
+                      style={{ backgroundColor: row.no_plan > 0 ? '#FEE2E2' : 'transparent', color: row.no_plan > 0 ? '#B91C1C' : undefined, fontWeight: row.no_plan > 0 ? 700 : undefined }}
                     >
                       {row.no_plan.toLocaleString()}
                     </td>

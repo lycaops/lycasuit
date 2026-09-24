@@ -179,6 +179,7 @@ export default function RetailerPerformanceReport({ region, branch, zone, user }
   });
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
   const [retailerIdSearch, setRetailerIdSearch] = useState('');
+  const [summarySort, setSummarySort] = useState<'mtd-desc' | 'mtd-asc' | 'plan-desc' | 'plan-asc'>('mtd-desc');
 
   const isZoneSelected = Boolean(zone);
   const isBranchSelected = Boolean(branch);
@@ -213,9 +214,17 @@ export default function RetailerPerformanceReport({ region, branch, zone, user }
 
   const displayRows = useMemo(() => {
     if (isZoneSelected) return [];
-    if (isRegionSelected && !isBranchSelected) return branchWiseData;
-    return rows;
-  }, [isZoneSelected, isRegionSelected, isBranchSelected, rows, branchWiseData]);
+    const source = isRegionSelected && !isBranchSelected ? branchWiseData : rows;
+    return [...source].sort((a, b) => {
+      const aMtd = calculateMtdVariance(a, monthInfo);
+      const bMtd = calculateMtdVariance(b, monthInfo);
+      const aPlan = fieldValue(a, ['plan_value', 'PLAN_VALUE', 'total', 'TOTAL']);
+      const bPlan = fieldValue(b, ['plan_value', 'PLAN_VALUE', 'total', 'TOTAL']);
+      const aValue = summarySort.startsWith('mtd') ? aMtd : aPlan;
+      const bValue = summarySort.startsWith('mtd') ? bMtd : bPlan;
+      return summarySort.endsWith('asc') ? aValue - bValue : bValue - aValue;
+    });
+  }, [isZoneSelected, isRegionSelected, isBranchSelected, rows, branchWiseData, summarySort, monthInfo]);
 
   useEffect(() => {
     console.log('RetailerPerformanceReport useEffect triggered!', {
@@ -1087,23 +1096,33 @@ export default function RetailerPerformanceReport({ region, branch, zone, user }
                   <h2 className="text-lg font-semibold text-[#21264E]">{(isRegionSelected && !isBranchSelected) ? "Branch-wise Summary" : "Zone-wise Summary"}</h2>
                   <p className="text-sm text-slate-500">{(isRegionSelected && !isBranchSelected) ? "Individual branch performance breakdown." : "Individual zone performance breakdown."}</p>
                 </div>
+                <div className="mb-4 flex items-center justify-end gap-2">
+                  <label htmlFor="summary-sort" className="text-xs font-semibold text-slate-500">Sort</label>
+                  <select id="summary-sort" value={summarySort} onChange={(event) => setSummarySort(event.target.value as typeof summarySort)} className="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs font-medium text-slate-700">
+                    <option value="mtd-desc">MTD variance: high to low</option>
+                    <option value="mtd-asc">MTD variance: low to high</option>
+                    <option value="plan-desc">Plan value: high to low</option>
+                    <option value="plan-asc">Plan value: low to high</option>
+                  </select>
+                </div>
                 <div className="grid gap-3 md:hidden">
                   {displayRows.map((row: Record<string, unknown>, index: number) => (
-                    <article key={`${row['zone'] || index}-${index}`} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                      <div className="grid grid-cols-2 gap-x-4 gap-y-3">
-                        <div className="col-span-2 border-b border-slate-100 pb-3">
+                    <article key={`${row['zone'] || index}-${index}`} className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 shadow-sm">
+                      <div>
+                        <div className="border-b border-slate-100 pb-2">
                           <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">{(isRegionSelected && !isBranchSelected) ? 'Branch' : 'Zone'}</p>
-                          <p className="mt-1 text-sm font-bold text-slate-900">{String(row['zone'] || '—')}</p>
+                          <p className="mt-0.5 text-xs font-bold text-slate-900">{String(row['zone'] || '—')}</p>
                         </div>
-                        {monthInfo.map((entry: MonthInfo & { shortLabel: string }) => (
-                          <div key={entry.key}>
-                            <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">{entry.shortLabel}</p>
-                            <p className="mt-1 text-sm font-semibold text-slate-800">{fieldValue(row, entry.aliases).toLocaleString()}</p>
-                          </div>
-                        ))}
-                        <div className="col-span-2 border-t border-slate-100 pt-3">
-                          <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">MTD Variance</p>
-                          <p className="mt-1 text-sm font-semibold text-slate-800">{calculateMtdVariance(row, monthInfo).toLocaleString()}</p>
+                        <div className="mt-2 grid grid-cols-2 gap-2">
+                          {monthInfo.map((entry: MonthInfo & { shortLabel: string }) => {
+                            const value = fieldValue(row, entry.aliases);
+                            if (value === 0) return null;
+                            return <div key={entry.key} className="flex items-center justify-between border-b border-slate-50 pb-1 text-xs"><span className="text-[10px] font-semibold uppercase text-slate-400">{entry.shortLabel}</span><span className="font-semibold text-slate-800">{value.toLocaleString()}</span></div>;
+                          })}
+                        </div>
+                        <div className="mt-1.5 flex items-center justify-between border-t border-slate-100 pt-1.5">
+                          <span className="text-[9px] font-semibold uppercase tracking-wide text-slate-400">MTD variance</span>
+                          <span className="text-xs font-semibold text-slate-800">{calculateMtdVariance(row, monthInfo).toLocaleString()}</span>
                         </div>
                       </div>
                     </article>
