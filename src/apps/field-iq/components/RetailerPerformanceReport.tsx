@@ -179,18 +179,23 @@ function PerformanceSummaryTile({
 }) {
   return (
     <article key={`${row.zone || index}-${index}`} className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 shadow-sm">
-      <div className="border-b border-slate-100 pb-2">
-        <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">{label}</p>
-        <p className="mt-0.5 text-xs font-bold text-slate-900">{String(row.zone || '—')}</p>
+      <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-2">
+        <div>
+          <p className="text-[9px] font-semibold uppercase tracking-wide text-slate-400">{label}</p>
+          <p className="mt-0.5 break-all text-xs font-bold text-slate-900">{String(row.zone || '—')}</p>
+        </div>
+        <span className="inline-flex shrink-0 rounded-full bg-[#d6eeff] px-2 py-1 text-[10px] font-bold text-[#245bc1]">
+          {calculateMtdVariance(row, monthInfo).toLocaleString()}
+        </span>
       </div>
-      <div className="mt-2 grid grid-cols-2 gap-2">
+      <div className="mt-2 grid grid-cols-4 gap-2">
         {monthInfo.map((entry) => {
           const value = fieldValue(row, entry.aliases);
           if (value === 0) return null;
           return (
-            <div key={entry.key} className="flex items-center justify-between border-b border-slate-50 pb-1 text-xs">
-              <span className="text-[10px] font-semibold uppercase text-slate-400">{entry.offset === 0 ? 'MTD' : `M${Math.abs(entry.offset)}`}</span>
-              <span className="font-semibold text-slate-800">{value.toLocaleString()}</span>
+            <div key={entry.key} className="min-w-0 text-center">
+              <p className="text-[9px] font-semibold uppercase tracking-wide text-slate-400">{entry.offset === 0 ? 'MTD' : `M${Math.abs(entry.offset)}`}</p>
+              <p className="mt-0.5 truncate text-xs font-semibold text-slate-800">{value.toLocaleString()}</p>
             </div>
           );
         })}
