@@ -216,15 +216,15 @@ export default function RetailerPerformanceReport({ region, branch, zone, user }
     if (isZoneSelected) return [];
     const source = isRegionSelected && !isBranchSelected ? branchWiseData : rows;
     return [...source].sort((a, b) => {
-      const aMtd = calculateMtdVariance(a, monthInfo);
-      const bMtd = calculateMtdVariance(b, monthInfo);
+      const aMtd = calculateMtdVariance(a, MONTH_KEYS);
+      const bMtd = calculateMtdVariance(b, MONTH_KEYS);
       const aPlan = fieldValue(a, ['plan_value', 'PLAN_VALUE', 'total', 'TOTAL']);
       const bPlan = fieldValue(b, ['plan_value', 'PLAN_VALUE', 'total', 'TOTAL']);
       const aValue = summarySort.startsWith('mtd') ? aMtd : aPlan;
       const bValue = summarySort.startsWith('mtd') ? bMtd : bPlan;
       return summarySort.endsWith('asc') ? aValue - bValue : bValue - aValue;
     });
-  }, [isZoneSelected, isRegionSelected, isBranchSelected, rows, branchWiseData, summarySort, monthInfo]);
+  }, [isZoneSelected, isRegionSelected, isBranchSelected, rows, branchWiseData, summarySort]);
 
   useEffect(() => {
     console.log('RetailerPerformanceReport useEffect triggered!', {
