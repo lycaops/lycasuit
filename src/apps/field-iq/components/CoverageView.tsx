@@ -1035,24 +1035,40 @@ export default function CoverageView({ user }: { user: RpaUser }) {
                       <p className="text-[9px] font-semibold uppercase tracking-wide text-gray-400">Retailer ID</p>
                       <p className="mt-0.5 truncate text-xs font-bold text-[#21264E]">{retailer.retailer_id}</p>
                     </div>
-                    <span className="rounded-full bg-[#d6eeff] px-2 py-1 text-[10px] font-semibold text-[#245bc1]">{retailer.zone}</span>
-                  </div>
-                  <div className="mt-2 grid grid-cols-3 gap-2 text-center">
-                    <div><p className="text-[9px] font-semibold uppercase tracking-wide text-gray-400">Branch</p><p className="mt-0.5 truncate text-[11px] text-[#21264E]">{retailer.branch.replace('LMIT-HS-', '')}</p></div>
-                    <div><p className="text-[9px] font-semibold uppercase tracking-wide text-gray-400">Coverage</p><p className="mt-0.5 text-[11px] font-semibold text-[#21264E]">{retailer.coverage_status === 'yes' ? 'Covered' : 'Not Covered'}</p></div>
-                    <div><p className="text-[9px] font-semibold uppercase tracking-wide text-gray-400">ASM Visit</p><p className="mt-0.5 text-[11px] font-semibold text-[#21264E]">{(retailer.asm_visits || 0) >= 1 ? 'Visited' : 'Not Visited'}</p></div>
-                  </div>
-                  <div className="mt-2 flex items-center justify-between border-t border-gray-100 pt-1.5">
-                    <p className="truncate text-[10px] text-gray-500">{retailer.remarks || '-'}</p>
-                    <button onClick={() => setExpandedRetailer(expandedRetailer === retailer.retailer_id ? null : retailer.retailer_id)} className="shrink-0 text-[#245bc1]" aria-label={`View ${retailer.retailer_id}`}>
-                      {expandedRetailer === retailer.retailer_id ? <EyeOff size={15} /> : <Eye size={15} />}
+                    <button
+                      type="button"
+                      onClick={() => setExpandedRetailer(expandedRetailer === retailer.retailer_id ? null : retailer.retailer_id)}
+                      className="inline-flex shrink-0 items-center gap-1 rounded-md bg-[#245bc1] px-2 py-1 text-[10px] font-semibold text-white"
+                      aria-label={`View details for ${retailer.retailer_id}`}
+                    >
+                      {expandedRetailer === retailer.retailer_id ? <EyeOff size={13} /> : <Eye size={13} />}
+                      View
                     </button>
                   </div>
+                  <div className="mt-2 grid grid-cols-2 gap-2 text-center">
+                    <div>
+                      <p className="text-[9px] font-semibold uppercase tracking-wide text-gray-400">Coverage</p>
+                      <p className={`mt-0.5 text-[11px] font-semibold ${retailer.coverage_status === 'yes' ? 'text-emerald-700' : 'text-orange-700'}`}>
+                        {retailer.coverage_status === 'yes' ? 'Covered' : 'Not Covered'}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-[9px] font-semibold uppercase tracking-wide text-gray-400">Red Flag</p>
+                      <p className={`mt-0.5 text-[11px] font-semibold ${retailer.red_flag ? 'text-red-600' : 'text-gray-500'}`}>
+                        {retailer.red_flag ? 'Yes' : 'No'}
+                      </p>
+                    </div>
+                  </div>
                   {expandedRetailer === retailer.retailer_id && (
-                    <div className="mt-2 grid grid-cols-3 gap-2 border-t border-gray-100 pt-2 text-[10px] text-[#21264E]">
+                    <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1.5 border-t border-gray-100 pt-2 text-[10px] text-[#21264E]">
+                      <span>Branch: {retailer.branch.replace('LMIT-HS-', '')}</span>
+                      <span>Zone: {retailer.zone}</span>
+                      <span>ASM Visit: {(retailer.asm_visits || 0) >= 1 ? 'Visited' : 'Not Visited'}</span>
                       <span>Planned: {retailer.planned_visits_count}</span>
-                      <span>HS: {retailer.hs_visits}</span>
-                      <span>ASM: {retailer.asm_visits}</span>
+                      <span>HS Visits: {retailer.hs_visits}</span>
+                      <span>ASM Visits: {retailer.asm_visits}</span>
+                      <span className="col-span-2">Remarks: {retailer.remarks || '-'}</span>
+                      {retailer.red_flag && <span className="col-span-2 text-red-600">Red Flag Type: {retailer.red_flag_type || 'Red Flag'}</span>}
                     </div>
                   )}
                 </article>
