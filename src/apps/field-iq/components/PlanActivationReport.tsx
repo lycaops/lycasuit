@@ -759,7 +759,7 @@ export default function PlanActivationReport({ region, branch, zone, user }: Pla
               <p className="text-[11px] uppercase tracking-[0.18em] text-[#21264E]/70">Branch</p>
               <p className="mt-2 text-sm font-semibold">{branch || 'All Branches'}</p>
             </div>
-            <div className="rounded-2xl bg-[#fff7f2] px-4 py-3 text-[#21264E] shadow-sm border border-[#21264E]/10">
+            <div className="rounded-2xl bg-[#d6eeff] px-4 py-3 text-[#21264E] shadow-sm border border-[#245bc1]/20">
               <p className="text-[11px] uppercase tracking-[0.18em] text-[#21264E]/70">Zone</p>
               <p className="mt-2 text-sm font-semibold">{zone || 'All Zones'}</p>
             </div>
@@ -967,12 +967,24 @@ export default function PlanActivationReport({ region, branch, zone, user }: Pla
             ];
 
             return (
-              <article key={`${isZoneSelected ? row.retailer_id : row.zone}-${index}`} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                <div className="grid grid-cols-2 gap-x-4 gap-y-3">
-                  {values.map(([label, value]) => (
-                    <div key={label} className={label === 'Total' ? 'col-span-2 border-t border-slate-100 pt-3' : ''}>
-                      <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">{label}</p>
-                      <p className="mt-1 text-sm font-semibold text-slate-800">{typeof value === 'number' ? value.toLocaleString() : value || '—'}</p>
+              <article key={`${isZoneSelected ? row.retailer_id : row.zone}-${index}`} className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 shadow-sm">
+                <div>
+                  <p className="text-[9px] font-semibold uppercase tracking-wide text-slate-400">{values[0][0]}</p>
+                  <p className="mt-0.5 truncate text-xs font-bold text-slate-900">{values[0][1] || '—'}</p>
+                </div>
+                <div className="mt-2 grid grid-cols-7 gap-1 border-t border-slate-100 pt-2">
+                  {values.slice(1, 8).map(([label, value]) => (
+                    <div key={label} className="min-w-0 text-center">
+                      <p className="truncate text-[8px] font-semibold uppercase tracking-wide text-slate-400">{label}</p>
+                      <p className="mt-0.5 truncate text-[11px] font-semibold text-slate-800">{typeof value === 'number' ? value.toLocaleString() : value || '—'}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-2 grid grid-cols-3 gap-2 border-t border-slate-100 pt-2">
+                  {values.slice(8).map(([label, value]) => (
+                    <div key={label} className="text-center">
+                      <p className="text-[8px] font-semibold uppercase tracking-wide text-slate-400">{label}</p>
+                      <p className="mt-0.5 text-[11px] font-semibold text-slate-800">{typeof value === 'number' ? value.toLocaleString() : value || '—'}</p>
                     </div>
                   ))}
                 </div>

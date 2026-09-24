@@ -894,7 +894,35 @@ export default function CoverageView({ user }: { user: RpaUser }) {
         <div className="bg-white rounded-2xl border border-gray-200 p-6">
           <h3 className="text-lg font-bold text-[#21264E] mb-4">Branch & Zone Coverage Summary</h3>
 
-          <div className="overflow-x-auto">
+          <div className="grid gap-3 md:hidden">
+            {filteredZoneSummaries.length === 0 ? (
+              <p className="py-8 text-center text-sm text-gray-500">No data available</p>
+            ) : filteredZoneSummaries.map((summary, idx) => (
+              <article key={idx} className="rounded-xl border border-gray-200 bg-white px-3 py-2.5 shadow-sm">
+                <div className="flex items-center justify-between gap-2 border-b border-gray-100 pb-2">
+                  <div>
+                    <p className="text-[9px] font-semibold uppercase tracking-wide text-gray-400">Branch / Zone</p>
+                    <p className="mt-0.5 text-xs font-bold text-[#21264E]">{summary.branch.replace('LMIT-HS-', '')} / {summary.zone}</p>
+                  </div>
+                  <span className="rounded-full bg-[#d6eeff] px-2 py-1 text-[10px] font-semibold text-[#245bc1]">{summary.region}</span>
+                </div>
+                <div className="mt-2 grid grid-cols-4 gap-2 text-center">
+                  {[
+                    ['Total', summary.total_retailers],
+                    ['UAO', summary.uao],
+                    ['Covered', summary.covered_retailers],
+                    ['Coverage', `${summary.coverage_percentage.toFixed(1)}%`],
+                  ].map(([label, value]) => (
+                    <div key={label}>
+                      <p className="text-[9px] font-semibold uppercase tracking-wide text-gray-400">{label}</p>
+                      <p className="mt-0.5 text-xs font-semibold text-[#21264E]">{value}</p>
+                    </div>
+                  ))}
+                </div>
+              </article>
+            ))}
+          </div>
+          <div className="hidden overflow-x-auto md:block">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-200">
@@ -999,7 +1027,38 @@ export default function CoverageView({ user }: { user: RpaUser }) {
           ) : filteredCoverage.length === 0 ? (
             <div className="text-center py-8 text-gray-500">No records found</div>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="grid gap-3 md:hidden">
+              {filteredCoverage.map((retailer) => (
+                <article key={retailer.retailer_id} className="rounded-xl border border-gray-200 bg-white px-3 py-2.5 shadow-sm">
+                  <div className="flex items-center justify-between gap-2 border-b border-gray-100 pb-2">
+                    <div className="min-w-0">
+                      <p className="text-[9px] font-semibold uppercase tracking-wide text-gray-400">Retailer ID</p>
+                      <p className="mt-0.5 truncate text-xs font-bold text-[#21264E]">{retailer.retailer_id}</p>
+                    </div>
+                    <span className="rounded-full bg-[#d6eeff] px-2 py-1 text-[10px] font-semibold text-[#245bc1]">{retailer.zone}</span>
+                  </div>
+                  <div className="mt-2 grid grid-cols-3 gap-2 text-center">
+                    <div><p className="text-[9px] font-semibold uppercase tracking-wide text-gray-400">Branch</p><p className="mt-0.5 truncate text-[11px] text-[#21264E]">{retailer.branch.replace('LMIT-HS-', '')}</p></div>
+                    <div><p className="text-[9px] font-semibold uppercase tracking-wide text-gray-400">Coverage</p><p className="mt-0.5 text-[11px] font-semibold text-[#21264E]">{retailer.coverage_status === 'yes' ? 'Covered' : 'Not Covered'}</p></div>
+                    <div><p className="text-[9px] font-semibold uppercase tracking-wide text-gray-400">ASM Visit</p><p className="mt-0.5 text-[11px] font-semibold text-[#21264E]">{(retailer.asm_visits || 0) >= 1 ? 'Visited' : 'Not Visited'}</p></div>
+                  </div>
+                  <div className="mt-2 flex items-center justify-between border-t border-gray-100 pt-1.5">
+                    <p className="truncate text-[10px] text-gray-500">{retailer.remarks || '-'}</p>
+                    <button onClick={() => setExpandedRetailer(expandedRetailer === retailer.retailer_id ? null : retailer.retailer_id)} className="shrink-0 text-[#245bc1]" aria-label={`View ${retailer.retailer_id}`}>
+                      {expandedRetailer === retailer.retailer_id ? <EyeOff size={15} /> : <Eye size={15} />}
+                    </button>
+                  </div>
+                  {expandedRetailer === retailer.retailer_id && (
+                    <div className="mt-2 grid grid-cols-3 gap-2 border-t border-gray-100 pt-2 text-[10px] text-[#21264E]">
+                      <span>Planned: {retailer.planned_visits_count}</span>
+                      <span>HS: {retailer.hs_visits}</span>
+                      <span>ASM: {retailer.asm_visits}</span>
+                    </div>
+                  )}
+                </article>
+              ))}
+            </div>
+            <div className="hidden overflow-x-auto md:block">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-200">
