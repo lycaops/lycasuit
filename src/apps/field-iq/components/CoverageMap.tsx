@@ -299,7 +299,7 @@ export default function CoverageMap({
       setMapError(null);
       setMapReady(true);
       chart.on('click', (params: any) => {
-        const province = BY_CODE[params.data?.code || params.name] ?? Object.values(BY_CODE).find((item) => provinceKey(item.name) === provinceKey(params.name));
+        const province = BY_CODE[params.data?.code] ?? Object.values(BY_CODE).find((item) => provinceKey(item.name) === provinceKey(params.name));
         if (province) {
           onSelectBranch(province.branch);
           onSelectZone(province.zone);
@@ -335,23 +335,30 @@ export default function CoverageMap({
     const summaryByAssignment = new Map(
       zoneSummaries.map((summary) => [`${summary.branch}|${summary.zone}`, summary]),
     );
+    const geoFeatures = geoJsonRef.current?.features ?? [];
     const visibleProvinces = PROVINCES_MAP.filter((province) => (
       (selectedRegion === 'ALL ITALY' || BRANCH_TO_REGION[province.branch] === selectedRegion)
       && (selectedBranch === 'ALL' || province.branch === selectedBranch)
       && (selectedZone === 'ALL' || province.zone === selectedZone)
     ));
+    const visibleCodes = new Set(visibleProvinces.map((province) => province.code));
 
-    const data = PROVINCES_MAP.map((province) => {
-      const summary = summaryByAssignment.get(`${province.branch}|${province.zone}`);
-      const isVisible = visibleProvinces.some((item) => item.code === province.code);
+    const data = geoFeatures.map((feature: any) => {
+      const properties = feature.properties ?? {};
+      const code = String(properties.prov_acr ?? properties.code ?? '').toUpperCase();
+      const geoName = properties.prov_name ?? properties.name ?? code;
+      const province = BY_CODE[code];
+      const summary = province ? summaryByAssignment.get(`${province.branch}|${province.zone}`) : undefined;
+      const isVisible = visibleCodes.has(code);
       const coverage = summary ? Number(summary.coverage_percentage) : null;
 
       return {
-        name: province.name,
-        code: province.code,
+        name: geoName,
+        code,
+        geoName,
         value: coverage,
-        branch: province.branch,
-        zone: province.zone,
+        branch: province?.branch,
+        zone: province?.zone,
         summary,
         coverage,
         itemStyle: { areaColor: isVisible ? getCoverageColor(coverage) : '#f1f5f9' },
@@ -362,12 +369,14 @@ export default function CoverageMap({
       tooltip: {
         trigger: 'item',
         formatter: (params: any) => {
-          const province = BY_CODE[params.data?.code || params.name] ?? Object.values(BY_CODE).find((item) => provinceKey(item.name) === provinceKey(params.name));
-          if (!province) return params.name;
+          const code = String(params.data?.code ?? '').toUpperCase();
+          const province = BY_CODE[code] ?? Object.values(BY_CODE).find((item) => provinceKey(item.name) === provinceKey(params.name));
+          const provinceName = params.data?.geoName ?? params.name;
+          if (!province) return `<strong>${provinceName}${code ? ` (${code})` : ''}</strong><br/>No Data`;
           const summary = summaryByAssignment.get(`${province.branch}|${province.zone}`);
-          if (!summary) return `<strong>${province.name} (${province.code})</strong><br/>No Data`;
+          if (!summary) return `<strong>${provinceName} (${province.code})</strong><br/>No Data`;
           const metric = (value: unknown) => Number(value ?? 0).toLocaleString();
-          return `<strong>${province.name} (${province.code})</strong><br/>Coverage: ${Number(summary.coverage_percentage).toFixed(1)}%<br/>Covered retailers: ${metric(summary.covered_retailers)}<br/>Total retailers: ${metric(summary.total_retailers)}<br/>UAO: ${metric(summary.uao)}<br/>Not covered: ${metric(summary.not_covered_retailers)}<br/>Red flagged: ${metric(summary.red_flagged_retailers)}`;
+          return `<strong>${provinceName} (${province.code})</strong><br/>Coverage: ${Number(summary.coverage_percentage).toFixed(1)}%<br/>Covered retailers: ${metric(summary.covered_retailers)}<br/>Total retailers: ${metric(summary.total_retailers)}<br/>UAO: ${metric(summary.uao)}<br/>Not covered: ${metric(summary.not_covered_retailers)}<br/>Red flagged: ${metric(summary.red_flagged_retailers)}`;
         },
       },
       visualMap: {
@@ -391,12 +400,10 @@ export default function CoverageMap({
     }, true);
 
     if (visibleProvinces.length > 0) {
-      const features = geoJsonRef.current?.features ?? [];
-      const points = features
+      const points = geoFeatures
         .filter((feature: any) => {
-          const featureName = feature.properties?.name ?? feature.properties?.NAME_2 ?? feature.properties?.prov_name;
-          const featureCode = feature.properties?.code ?? feature.properties?.prov_istat_code ?? feature.properties?.id;
-          return visibleProvinces.some((province) => province.code === featureCode || provinceKey(province.name) === provinceKey(featureName));
+          const featureCode = String(feature.properties?.prov_acr ?? feature.properties?.code ?? '').toUpperCase();
+          return visibleCodes.has(featureCode);
         })
         .flatMap((feature: any) => {
           const coordinates = feature.geometry?.coordinates?.flat(Infinity) ?? [];
