@@ -45,8 +45,8 @@ export default function BranchCoverageChart({ zoneSummaries, selectedBranch, sel
     );
 
     return [
-      { name: 'Covered', value: totals.covered, color: '#08a35e' },
-      { name: 'Not Covered', value: totals.notCovered, color: '#FFD54F' },
+      { name: 'Covered', value: totals.covered, color: '#08DC7D' },
+      { name: 'Not Covered', value: totals.notCovered, color: '#F04438' },
     ];
   }, [zoneSummaries]);
 
@@ -67,8 +67,8 @@ export default function BranchCoverageChart({ zoneSummaries, selectedBranch, sel
 
     const nonUao = Math.max(0, totals.totalRetailers - totals.uao);
     return [
-      { name: 'UAO', value: totals.uao, color: '#006ae0' },
-      { name: 'Non-UAO', value: nonUao, color: '#E5E7EB' },
+      { name: 'UAO', value: totals.uao, color: '#1080FD' },
+      { name: 'Non-UAO', value: nonUao, color: '#D5E1F7' },
     ];
   }, [zoneSummaries]);
 
@@ -128,19 +128,19 @@ export default function BranchCoverageChart({ zoneSummaries, selectedBranch, sel
 
           <div className="mt-3 flex items-center justify-center gap-4 text-xs flex-wrap text-[#21264E]">
             <span className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full" style={{ backgroundColor: '#08a35e' }} />
+              <span className="w-3 h-3 rounded-full" style={{ backgroundColor: '#08DC7D' }} />
               Covered
             </span>
             <span className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full" style={{ backgroundColor: '#FFD54F' }} />
+              <span className="w-3 h-3 rounded-full" style={{ backgroundColor: '#F04438' }} />
               Not Covered
             </span>
             <span className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full" style={{ backgroundColor: '#006ae0' }} />
+              <span className="w-3 h-3 rounded-full" style={{ backgroundColor: '#1080FD' }} />
               UAO
             </span>
             <span className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full" style={{ backgroundColor: '#E5E7EB' }} />
+              <span className="w-3 h-3 rounded-full" style={{ backgroundColor: '#D5E1F7' }} />
               Non-UAO
             </span>
           </div>
@@ -156,14 +156,17 @@ export default function BranchCoverageChart({ zoneSummaries, selectedBranch, sel
               bottom: 5,
             }}
           >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="covered" stackId="a" fill="#08a35e" name="Covered" />
-            <Bar dataKey="notCovered" stackId="a" fill="#FFD54F" name="Not Covered" />
-            <Line type="monotone" dataKey="uao" stroke="#006ae0" strokeWidth={4} dot={false} name="UAO" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+            <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#21264E' }} />
+            <YAxis tick={{ fontSize: 12, fill: '#21264E' }} />
+            <Tooltip
+              contentStyle={{ backgroundColor: '#21264E', border: 'none', borderRadius: '8px' }}
+              itemStyle={{ color: '#ffffff', fontWeight: 'bold', fontSize: '12px' }}
+            />
+            <Legend formatter={(value) => <span className="font-bold text-[#21264E]">{value}</span>} />
+            <Bar dataKey="covered" stackId="a" fill="#08DC7D" name="Covered" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="notCovered" stackId="a" fill="#F04438" name="Not Covered" />
+            <Line type="monotone" dataKey="uao" stroke="#1080FD" strokeWidth={3} dot={false} name="UAO" />
           </BarChart>
         </ResponsiveContainer>
       )}
