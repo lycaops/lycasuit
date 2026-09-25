@@ -590,22 +590,33 @@ export default function CoverageView({ user }: { user: RpaUser }) {
 
   return (
     <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
-      {/* Filters (moved to top - matching KPI page layout) */}
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-gray-200 bg-white p-3 md:p-4">
+        <button
+          onClick={() => setShowMap(!showMap)}
+          className={`flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-semibold transition-all ${
+            showMap
+              ? 'bg-[#21264E] text-white shadow-md'
+              : 'bg-white text-[#21264E] border border-gray-200 hover:bg-gray-50'
+          }`}
+        >
+          {showMap ? <Table size={16} /> : <MapIcon size={16} />}
+          {showMap ? 'Table View' : 'Map View'}
+        </button>
+
+        {lastUpdatedDate && (
+          <div className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 bg-gray-50 border border-gray-200 rounded-lg">
+            <span className="text-xs font-medium text-gray-600">Last Updated:</span>
+            <span className="text-sm font-semibold text-[#21264E]">
+              {lastUpdatedDate.toLocaleDateString()} {lastUpdatedDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Filters (matching the ISDM page layout) */}
       <div className="bg-white rounded-2xl border border-gray-200 p-4 md:p-6 mb-6">
         <div className="flex flex-wrap items-center justify-between gap-3 md:gap-4">
           <div className="flex flex-wrap items-center gap-2 md:gap-4">
-            <button
-              onClick={() => setShowMap(!showMap)}
-              className={`flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-semibold transition-all ${
-                showMap
-                  ? 'bg-[#21264E] text-white shadow-md'
-                  : 'bg-white text-[#21264E] border border-gray-200 hover:bg-gray-50'
-              }`}
-            >
-              {showMap ? <Table size={16} /> : <MapIcon size={16} />}
-              {showMap ? 'Table View' : 'Map View'}
-            </button>
-
             <div className="flex items-center gap-2 min-w-max">
               <Globe size={16} className="text-[#21264E]" />
             <select
@@ -661,14 +672,6 @@ export default function CoverageView({ user }: { user: RpaUser }) {
               )}
             </select>
           </div>
-          {lastUpdatedDate && (
-            <div className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 bg-gray-50 border border-gray-200 rounded-lg ml-auto">
-              <span className="text-xs font-medium text-gray-600">Last Updated:</span>
-              <span className="text-sm font-semibold text-[#21264E]">
-                {lastUpdatedDate.toLocaleDateString()} {lastUpdatedDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-              </span>
-            </div>
-          )}
         </div>
       </div>
     </div>
