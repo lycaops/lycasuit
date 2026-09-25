@@ -1,6 +1,5 @@
 'use client';
 import React, { useMemo } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Line, PieChart, Pie, Cell } from 'recharts';
 import type { ZoneCoverageSummary } from '@fieldiq/types';
 
 interface BranchCoverageChartProps {
@@ -13,16 +12,17 @@ export default function BranchCoverageChart({ zoneSummaries, selectedBranch, sel
   const showZoneWise = Boolean(selectedBranch && selectedBranch !== 'ALL');
   const showZoneDonut = Boolean(selectedZone && selectedZone !== 'ALL');
   const chartData = useMemo(() => {
-    const map = new Map<string, { covered: number; notCovered: number; uao: number }>();
+    const map = new Map<string, { covered: number; notCovered: number; total: number; uao: number }>();
 
     zoneSummaries.forEach(summary => {
       const key = showZoneWise ? summary.zone : summary.branch.replace('LMIT-HS-', '');
       if (!map.has(key)) {
-        map.set(key, { covered: 0, notCovered: 0, uao: 0 });
+        map.set(key, { covered: 0, notCovered: 0, total: 0, uao: 0 });
       }
       const current = map.get(key)!;
       current.covered += summary.covered_retailers;
       current.notCovered += summary.not_covered_retailers;
+      current.total += summary.total_retailers;
       current.uao += summary.uao;
     });
 
@@ -30,146 +30,46 @@ export default function BranchCoverageChart({ zoneSummaries, selectedBranch, sel
       name,
       covered: data.covered,
       notCovered: data.notCovered,
+      total: data.total,
       uao: data.uao,
     }));
   }, [zoneSummaries, showZoneWise]);
 
-  const donutData = useMemo(() => {
-    const totals = zoneSummaries.reduce(
-      (acc, s) => ({
-        covered: acc.covered + s.covered_retailers,
-        notCovered: acc.notCovered + s.not_covered_retailers,
-        uao: acc.uao + s.uao,
-      }),
-      { covered: 0, notCovered: 0, uao: 0 }
-    );
-
-    return [
-      { name: 'Covered', value: totals.covered, color: '#08DC7D' },
-      { name: 'Not Covered', value: totals.notCovered, color: '#F04438' },
-    ];
-  }, [zoneSummaries]);
-
-  const coveragePct = useMemo(() => {
-    const covered = donutData.find(d => d.name === 'Covered')?.value || 0;
-    const total = donutData.reduce((s, d) => s + d.value, 0);
-    return total > 0 ? (covered / total) * 100 : 0;
-  }, [donutData]);
-
-  const uaoDonutData = useMemo(() => {
-    const totals = zoneSummaries.reduce(
-      (acc, s) => ({
-        totalRetailers: acc.totalRetailers + s.total_retailers,
-        uao: acc.uao + s.uao,
-      }),
-      { totalRetailers: 0, uao: 0 }
-    );
-
-    const nonUao = Math.max(0, totals.totalRetailers - totals.uao);
-    return [
-      { name: 'UAO', value: totals.uao, color: '#1080FD' },
-      { name: 'Non-UAO', value: nonUao, color: '#D5E1F7' },
-    ];
-  }, [zoneSummaries]);
-
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 p-6">
-      <h3 className="text-lg font-bold text-[#21264E] mb-4">
+    <div className="rounded-2xl border border-gray-200 bg-white p-4 md:p-6">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <h3 className="text-base font-bold text-[#21264E] md:text-lg">
         {showZoneDonut ? 'Zone-wise Coverage' : showZoneWise ? 'Zone-wise Coverage' : 'Branch-wise Coverage'}
-      </h3>
-      {showZoneDonut ? (
-        <>
-          <div className="relative w-full h-[360px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={donutData}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={75}
-                  outerRadius={120}
-                  paddingAngle={3}
-                  isAnimationActive={false}
-                >
-                  {donutData.map((d) => (
-                    <Cell key={d.name} fill={d.color} />
-                  ))}
-                </Pie>
-                <Pie
-                  data={uaoDonutData}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={52}
-                  outerRadius={68}
-                  paddingAngle={2}
-                  isAnimationActive={false}
-                >
-                  {uaoDonutData.map((d) => (
-                    <Cell key={d.name} fill={d.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
+        </h3>
+        <div className="flex items-center gap-3 text-[11px] font-semibold text-[#21264E] md:text-xs">
+          <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-[#08DC7D]" />Covered</span>
+          <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-[#F28C28]" />Not Covered</span>
+          <span className="flex items-center gap-1.5"><span className="h-3 w-0.5 bg-[#1080FD]" />UAO</span>
+        </div>
+      </div>
+      <div className="space-y-5">
+        {chartData.length === 0 ? (
+          <p className="py-8 text-center text-sm text-gray-500">No coverage data available</p>
+        ) : chartData.map((row) => {
+          const total = Math.max(row.total, row.covered + row.notCovered, 1);
+          const coveredWidth = Math.min(100, (row.covered / total) * 100);
+          const notCoveredWidth = Math.min(100 - coveredWidth, (row.notCovered / total) * 100);
+          const uaoPosition = Math.min(100, (row.uao / total) * 100);
 
-            <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-              <div className="text-[28px] font-bold text-[#21264E] leading-none">
-                {coveragePct.toFixed(0)}%
+          return (
+            <div key={row.name} className="grid grid-cols-[minmax(92px,0.7fr)_minmax(0,3fr)_auto] items-center gap-2 md:grid-cols-[minmax(150px,0.8fr)_minmax(0,4fr)_auto] md:gap-4">
+              <span className="truncate text-xs font-semibold text-[#21264E] md:text-sm" title={row.name}>{row.name}</span>
+              <div className="relative h-7 rounded-md bg-[#E0E7F7]" aria-label={`${row.name}: ${row.total} total`}>
+                <div className="absolute inset-y-0 left-0 rounded-l-md bg-[#08DC7D]" style={{ width: `${coveredWidth}%` }} />
+                <div className="absolute inset-y-0 rounded-r-md bg-[#F28C28]" style={{ left: `${coveredWidth}%`, width: `${notCoveredWidth}%` }} />
+                <div className="absolute -top-5 -translate-x-1/2 whitespace-nowrap text-[10px] font-bold text-[#1080FD]" style={{ left: `${uaoPosition}%` }}>UAO {row.uao}</div>
+                <div className="absolute inset-y-[-3px] w-0.5 bg-[#1080FD]" style={{ left: `calc(${uaoPosition}% - 1px)` }} />
               </div>
-              <div className="text-[11px] font-semibold text-gray-500 mt-1">
-                Coverage
-              </div>
+              <span className="min-w-[42px] text-right text-xs font-bold text-[#21264E] md:text-sm">{row.total}</span>
             </div>
-          </div>
-
-          <div className="mt-3 flex items-center justify-center gap-4 text-xs flex-wrap text-[#21264E]">
-            <span className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full" style={{ backgroundColor: '#08DC7D' }} />
-              Covered
-            </span>
-            <span className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full" style={{ backgroundColor: '#F04438' }} />
-              Not Covered
-            </span>
-            <span className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full" style={{ backgroundColor: '#1080FD' }} />
-              UAO
-            </span>
-            <span className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full" style={{ backgroundColor: '#D5E1F7' }} />
-              Non-UAO
-            </span>
-          </div>
-        </>
-      ) : (
-        <ResponsiveContainer width="100%" height={400}>
-          <BarChart
-            data={chartData}
-            margin={{
-              top: 20,
-              right: 30,
-              left: 20,
-              bottom: 5,
-            }}
-          >
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-            <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#21264E' }} />
-            <YAxis tick={{ fontSize: 12, fill: '#21264E' }} />
-            <Tooltip
-              contentStyle={{ backgroundColor: '#21264E', border: 'none', borderRadius: '8px' }}
-              itemStyle={{ color: '#ffffff', fontWeight: 'bold', fontSize: '12px' }}
-            />
-            <Legend formatter={(value) => <span className="font-bold text-[#21264E]">{value}</span>} />
-            <Bar dataKey="covered" stackId="a" fill="#08DC7D" name="Covered" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="notCovered" stackId="a" fill="#F04438" name="Not Covered" />
-            <Line type="monotone" dataKey="uao" stroke="#1080FD" strokeWidth={3} dot={false} name="UAO" />
-          </BarChart>
-        </ResponsiveContainer>
-      )}
+          );
+        })}
+      </div>
     </div>
   );
 }
