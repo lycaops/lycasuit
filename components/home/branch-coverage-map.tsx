@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useMemo, useRef, useState } from "react"
-import * as echarts from "echarts"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { GitBranch, Layers3, MapPinned } from "lucide-react"
 import Loader from "@/components/Loader"
@@ -254,19 +253,28 @@ export function BranchCoverageMap() {
   useEffect(() => {
     if (!ready) return
 
-    const host = mapHostRef.current
-    if (!host || !geoJsonRef.current) return
+    let cancelled = false
+    let resizeObserver: ResizeObserver | null = null
+    let chart: any = null
 
-    const chart = echarts.init(host)
-    chartRef.current = chart
-    echarts.registerMap("italy-provinces", geoJsonRef.current)
+    async function mountChart() {
+      const host = mapHostRef.current
+      if (!host || !geoJsonRef.current) return
+      const echarts = await import("echarts")
+      if (cancelled) return
+      chart = echarts.init(host)
+      chartRef.current = chart
+      echarts.registerMap("italy-provinces", geoJsonRef.current)
+      resizeObserver = new ResizeObserver(() => chart.resize())
+      resizeObserver.observe(host)
+    }
 
-    const ro = new ResizeObserver(() => chart.resize())
-    ro.observe(host)
+    mountChart()
 
     return () => {
-      ro.disconnect()
-      chart.dispose()
+      cancelled = true
+      resizeObserver?.disconnect()
+      chart?.dispose()
       chartRef.current = null
     }
   }, [ready])

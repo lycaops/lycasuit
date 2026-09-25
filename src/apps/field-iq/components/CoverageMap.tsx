@@ -2,7 +2,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ZoneCoverageSummary } from '@fieldiq/types';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
-import * as echarts from 'echarts';
 
 const GEOJSON_URL = '/maps/italy-provinces.json';
 let provinceGeoJsonPromise: Promise<any> | null = null;
@@ -285,6 +284,7 @@ export default function CoverageMap({
 
     const loadChart = async () => {
       if (!mapRef.current) return;
+      const echarts = await import('echarts');
       provinceGeoJsonPromise ??= fetch(GEOJSON_URL).then((response) => {
         if (!response.ok) throw new Error('Failed to load province map');
         return response.json();
