@@ -177,6 +177,8 @@ function PerformanceSummaryTile({
   label: string;
   monthInfo: MonthInfo[];
 }) {
+  const mtdVariance = calculateMtdVariance(row, monthInfo);
+
   return (
     <article key={`${row.zone || index}-${index}`} className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 shadow-sm">
       <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-2">
@@ -184,8 +186,10 @@ function PerformanceSummaryTile({
           <p className="text-[9px] font-semibold uppercase tracking-wide text-slate-400">{label}</p>
           <p className="mt-0.5 break-all text-xs font-bold text-slate-900">{String(row.zone || '—')}</p>
         </div>
-        <span className="inline-flex shrink-0 rounded-full bg-[#d6eeff] px-2 py-1 text-[10px] font-bold text-[#245bc1]">
-          {calculateMtdVariance(row, monthInfo).toLocaleString()}
+        <span className={`inline-flex shrink-0 rounded-full px-2 py-1 text-[10px] font-bold ${
+          mtdVariance < 0 ? 'bg-red-100 text-red-600' : 'bg-[#d6eeff] text-[#245bc1]'
+        }`}>
+          {mtdVariance.toLocaleString()}
         </span>
       </div>
       <div className="mt-2 grid grid-cols-4 gap-2">
@@ -202,7 +206,7 @@ function PerformanceSummaryTile({
       </div>
       <div className="mt-1.5 flex items-center justify-between border-t border-slate-100 pt-1.5">
         <span className="text-[9px] font-semibold uppercase tracking-wide text-slate-400">MTD variance</span>
-        <span className="text-xs font-semibold text-slate-800">{calculateMtdVariance(row, monthInfo).toLocaleString()}</span>
+        <span className="text-xs font-semibold text-slate-800">{mtdVariance.toLocaleString()}</span>
       </div>
     </article>
   );
