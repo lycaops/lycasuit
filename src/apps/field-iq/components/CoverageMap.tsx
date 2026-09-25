@@ -28,6 +28,27 @@ const provinceKey = (value: unknown) => {
   return NAME_ALIASES[normalized] ?? normalized;
 };
 
+const branchKey = (value: unknown) => String(value ?? '')
+  .trim()
+  .toUpperCase()
+  .replace(/^LMIT-HS-NAPOLI$/, 'LMIT-HS-NAPLES')
+  .replace(/^MILAN$/, 'LMIT-HS-MILAN')
+  .replace(/^BOLOGNA$/, 'LMIT-HS-BOLOGNA')
+  .replace(/^TORINO$/, 'LMIT-HS-TORINO')
+  .replace(/^PADOVA$/, 'LMIT-HS-PADOVA')
+  .replace(/^ROME$/, 'LMIT-HS-ROME')
+  .replace(/^PALERMO$/, 'LMIT-HS-PALERMO')
+  .replace(/^BARI$/, 'LMIT-HS-BARI')
+  .replace(/^NAPLES$/, 'LMIT-HS-NAPLES');
+
+const zoneKey = (value: unknown) => String(value ?? '')
+  .trim()
+  .toUpperCase()
+  .replace(/\s+/g, ' ')
+  .replace('HS TORINO ', 'HS TORINOO ');
+
+const assignmentKey = (branch: unknown, zone: unknown) => `${branchKey(branch)}|${zoneKey(zone)}`;
+
 const getCoverageColor = (coverage: number | null) => {
   if (coverage === null) return '#e2e8f0';
   if (coverage < 20) return '#c2413b';
@@ -35,6 +56,12 @@ const getCoverageColor = (coverage: number | null) => {
   if (coverage < 60) return '#f4c95d';
   if (coverage < 80) return '#69b578';
   return '#1f7a58';
+};
+
+const getSummaryCoverage = (summary: ZoneCoverageSummary | undefined) => {
+  if (!summary || Number(summary.total_retailers) <= 0) return null;
+  const covered = Number(summary.covered_retailers) || 0;
+  return covered / Number(summary.total_retailers) * 100;
 };
 
 function getGeometryBounds(geometry: any) {
@@ -359,7 +386,7 @@ export default function CoverageMap({
     if (!chart || !mapReady) return;
 
     const summaryByAssignment = new Map(
-      zoneSummaries.map((summary) => [`${summary.branch}|${summary.zone}`, summary]),
+      zoneSummaries.map((summary) => [assignmentKey(summary.branch, summary.zone), summary]),
     );
     const geoFeatures = geoJsonRef.current?.features ?? [];
     const visibleProvinces = PROVINCES_MAP.filter((province) => (
@@ -368,15 +395,16 @@ export default function CoverageMap({
       && (selectedZone === 'ALL' || province.zone === selectedZone)
     ));
     const visibleCodes = new Set(visibleProvinces.map((province) => province.code));
+    const hasTerritorySelection = selectedRegion !== 'ALL ITALY' || selectedBranch !== 'ALL' || selectedZone !== 'ALL';
 
     const data = geoFeatures.map((feature: any) => {
       const properties = feature.properties ?? {};
       const code = String(properties.prov_acr ?? properties.code ?? '').toUpperCase();
       const geoName = properties.prov_name ?? properties.name ?? code;
       const province = BY_CODE[code];
-      const summary = province ? summaryByAssignment.get(`${province.branch}|${province.zone}`) : undefined;
+      const summary = province ? summaryByAssignment.get(assignmentKey(province.branch, province.zone)) : undefined;
       const isVisible = visibleCodes.has(code);
-      const coverage = summary ? Number(summary.coverage_percentage) : null;
+      const coverage = getSummaryCoverage(summary);
 
       return {
         name: geoName,
@@ -387,7 +415,11 @@ export default function CoverageMap({
         zone: province?.zone,
         summary,
         coverage,
-        itemStyle: { areaColor: isVisible ? getCoverageColor(coverage) : '#f1f5f9' },
+        itemStyle: {
+          areaColor: isVisible ? getCoverageColor(coverage) : '#f1f5f9',
+          borderColor: isVisible && hasTerritorySelection ? '#21264e' : '#ffffff',
+          borderWidth: isVisible && hasTerritorySelection ? 1.8 : 0.8,
+        },
       };
     });
 
@@ -400,10 +432,11 @@ export default function CoverageMap({
           const province = BY_CODE[code] ?? Object.values(BY_CODE).find((item) => provinceKey(item.name) === provinceKey(params.name));
           const provinceName = params.data?.geoName ?? params.name;
           if (!province) return `<strong>${provinceName}${code ? ` (${code})` : ''}</strong><br/>No Data`;
-          const summary = summaryByAssignment.get(`${province.branch}|${province.zone}`);
+          const summary = summaryByAssignment.get(assignmentKey(province.branch, province.zone));
           if (!summary) return `<strong>${provinceName} (${province.code})</strong><br/>No Data`;
           const metric = (value: unknown) => Number(value ?? 0).toLocaleString();
-          return `<strong>${provinceName} (${province.code})</strong><br/>Coverage: ${Number(summary.coverage_percentage).toFixed(1)}%<br/>Covered retailers: ${metric(summary.covered_retailers)}<br/>Total retailers: ${metric(summary.total_retailers)}<br/>UAO: ${metric(summary.uao)}<br/>Not covered: ${metric(summary.not_covered_retailers)}<br/>Red flagged: ${metric(summary.red_flagged_retailers)}`;
+          const coverage = getSummaryCoverage(summary);
+          return `<strong>${provinceName} (${province.code})</strong><br/>Coverage: ${coverage === null ? 'No Data' : `${coverage.toFixed(1)}%`}<br/>Covered retailers: ${metric(summary.covered_retailers)}<br/>Total retailers: ${metric(summary.total_retailers)}<br/>UAO: ${metric(summary.uao)}<br/>Not covered: ${metric(summary.not_covered_retailers)}<br/>Red flagged: ${metric(summary.red_flagged_retailers)}`;
         },
       },
       visualMap: {
@@ -457,8 +490,19 @@ export default function CoverageMap({
       <div className="bg-white rounded-2xl border border-gray-200 p-6 relative">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="text-lg font-bold text-[#21264E]">Territory Coverage Map</h3>
-            <p className="text-sm text-gray-500">Provinces colored by coverage percentage</p>
+            <h3 className="text-lg font-bold text-[#21264E]">Province Coverage Heatmap</h3>
+            <p className="text-sm text-gray-500">Each province is colored by its current covered retailer percentage.</p>
+            <div className="mt-2 flex flex-wrap items-center gap-2 text-xs font-semibold text-[#21264E]">
+              <span className="rounded-full bg-[#21264E]/10 px-2.5 py-1">
+                Region: {selectedRegion === 'ALL ITALY' ? 'All Italy' : selectedRegion}
+              </span>
+              <span className="rounded-full bg-[#21264E]/10 px-2.5 py-1">
+                Branch: {selectedBranch === 'ALL' ? 'All branches' : selectedBranch.replace('LMIT-HS-', '')}
+              </span>
+              <span className="rounded-full bg-[#21264E]/10 px-2.5 py-1">
+                Zone: {selectedZone === 'ALL' ? 'All zones' : selectedZone}
+              </span>
+            </div>
           </div>
           
           <div className="flex flex-wrap gap-x-4 gap-y-2">
