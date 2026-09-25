@@ -275,7 +275,9 @@ export default function CoverageMap({
 
       const response = await fetch('/italy-provinces.json');
       if (!response.ok) throw new Error('Failed to load province map');
-      const geoJson = await response.json();
+      const mapText = await response.text();
+      const rootEnd = mapText.indexOf('\n}\n');
+      const geoJson = JSON.parse(rootEnd >= 0 ? mapText.slice(0, rootEnd + 2) : mapText);
       if (cancelled || !mapRef.current || !window.echarts) return;
 
       window.echarts.registerMap('italy-provinces', geoJson);
