@@ -44,7 +44,9 @@ const branchKey = (value: unknown) => String(value ?? '')
 const zoneKey = (value: unknown) => String(value ?? '')
   .trim()
   .toUpperCase()
-  .replace(/\s+/g, ' ');
+  .replace(/\s+/g, ' ')
+  .replace(/^HS ROME\s+/, 'HS ROMA ')
+  .replace(/^HS TORINO(O)?\s+/, 'HS TORINO ');
 
 const assignmentKey = (branch: unknown, zone: unknown) => `${branchKey(branch)}|${zoneKey(zone)}`;
 
@@ -172,6 +174,10 @@ const PROVINCES_MAP = [
   {code:"OR",zone:"HS ROMA ZONE 2",branch:"LMIT-HS-ROME",name:"Oristano"},
   {code:"SS",zone:"HS ROMA ZONE 2",branch:"LMIT-HS-ROME",name:"Sassari"},
   {code:"SU",zone:"HS ROMA ZONE 2",branch:"LMIT-HS-ROME",name:"Sud Sardegna"},
+  {code:"OT",zone:"HS ROMA ZONE 2",branch:"LMIT-HS-ROME",name:"Gallura Nord-Est Sardegna"},
+  {code:"OG",zone:"HS ROMA ZONE 2",branch:"LMIT-HS-ROME",name:"Ogliastra"},
+  {code:"VS",zone:"HS ROMA ZONE 2",branch:"LMIT-HS-ROME",name:"Medio Campidano"},
+  {code:"CI",zone:"HS ROMA ZONE 2",branch:"LMIT-HS-ROME",name:"Sulcis Iglesiente"},
   {code:"RI",zone:"HS ROMA ZONE 3",branch:"LMIT-HS-ROME",name:"Rieti"},
   {code:"VT",zone:"HS ROMA ZONE 3",branch:"LMIT-HS-ROME",name:"Viterbo"},
   {code:"SI",zone:"HS ROMA ZONE 3",branch:"LMIT-HS-ROME",name:"Siena"},
@@ -401,8 +407,8 @@ export default function CoverageMap({
     const geoFeatures = geoJsonRef.current?.features ?? [];
     const visibleProvinces = PROVINCES_MAP.filter((province) => (
       (selectedRegion === 'ALL ITALY' || BRANCH_TO_REGION[province.branch] === selectedRegion)
-      && (selectedBranch === 'ALL' || province.branch === selectedBranch)
-      && (selectedZone === 'ALL' || province.zone === selectedZone)
+      && (selectedBranch === 'ALL' || branchKey(province.branch) === branchKey(selectedBranch))
+      && (selectedZone === 'ALL' || zoneKey(province.zone) === zoneKey(selectedZone))
     ));
     const visibleCodes = new Set(visibleProvinces.map((province) => province.code));
     const hasTerritorySelection = selectedRegion !== 'ALL ITALY' || selectedBranch !== 'ALL' || selectedZone !== 'ALL';
@@ -420,7 +426,7 @@ export default function CoverageMap({
         name: geoName,
         code,
         geoName,
-        value: coverage,
+        value: isVisible ? coverage : null,
         branch: province?.branch,
         zone: province?.zone,
         summary,
@@ -444,6 +450,7 @@ export default function CoverageMap({
           textStyle: { color: '#ffffff' },
           formatter: (params: any) => {
             const code = String(params.data?.code ?? '').toUpperCase();
+            if (!visibleCodes.has(code)) return `<strong>${params.data?.geoName ?? params.name}</strong><br/>Outside selected territory`;
             const province = BY_CODE[code] ?? Object.values(BY_CODE).find((item) => provinceKey(item.name) === provinceKey(params.name));
             const provinceName = params.data?.geoName ?? params.name;
             if (!province) return `<strong>${provinceName}${code ? ` (${code})` : ''}</strong><br/>No Data`;
