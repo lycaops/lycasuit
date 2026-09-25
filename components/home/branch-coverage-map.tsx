@@ -7,8 +7,7 @@ import Loader from "@/components/Loader"
 
 declare global {
   interface Window {
-    d3?: any
-    topojson?: any
+    echarts?: any
   }
 }
 
@@ -153,11 +152,7 @@ const BRANCH_LABEL: Record<string, string> = {
 
 function loadScript(src: string) {
   return new Promise<void>((resolve, reject) => {
-    if (src.includes("d3") && window.d3) {
-      resolve()
-      return
-    }
-    if (src.includes("topojson") && window.topojson) {
+    if (window.echarts) {
       resolve()
       return
     }
@@ -184,9 +179,8 @@ function loadScript(src: string) {
 
 export function BranchCoverageMap() {
   const mapHostRef = useRef<HTMLDivElement | null>(null)
-  const tooltipRef = useRef<HTMLDivElement | null>(null)
-  const pathSelectionRef = useRef<any>(null)
-  const topoRef = useRef<any>(null)
+  const chartRef = useRef<any>(null)
+  const geoJsonRef = useRef<any>(null)
   const activeBranchRef = useRef<string | null>(null)
 
   const [activeBranch, setActiveBranch] = useState<string | null>(null)
@@ -216,30 +210,15 @@ export function BranchCoverageMap() {
     return preferredOrder.filter((b) => existing.has(b))
   }, [])
 
-  function getColor(code: string) {
-    const p = byCode[code]
-    if (!p) return "#e5e7eb"
-    if (activeBranchRef.current && p.branch !== activeBranchRef.current) return "#e5e7eb"
-    return BRANCH_PALETTE[p.branch]?.base ?? "#9ca3af"
-  }
-
-  function getStroke(code: string) {
-    const p = byCode[code]
-    if (!p) return "#d1d5db"
-    if (activeBranchRef.current && p.branch !== activeBranchRef.current) return "#d1d5db"
-    return "#ffffff"
-  }
-
   useEffect(() => {
     let cancelled = false
 
     async function bootstrap() {
       try {
-        await loadScript("https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js")
-        await loadScript("https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js")
-        const res = await fetch("https://cdn.jsdelivr.net/gh/openpolis/geojson-italy@master/topojson/limits_IT_provinces.topo.json")
+        await loadScript("https://cdn.jsdelivr.net/npm/echarts@6.0.0/dist/echarts.min.js")
+        const res = await fetch("/italy-provinces.json")
         if (!res.ok) throw new Error("Failed to load map topology")
-        topoRef.current = await res.json()
+        geoJsonRef.current = await res.json()
         if (!cancelled) setReady(true)
       } catch (e) {
         if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load map")
@@ -256,97 +235,93 @@ export function BranchCoverageMap() {
     if (!ready) return
 
     const host = mapHostRef.current
-    const d3 = window.d3
-    const topojson = window.topojson
-    if (!host || !d3 || !topojson || !topoRef.current) return
+    const echarts = window.echarts
+    if (!host || !echarts || !geoJsonRef.current) return
 
-    let rafId = 0
+    const chart = echarts.init(host)
+    chartRef.current = chart
+    echarts.registerMap("italy-provinces", geoJsonRef.current)
 
-    const draw = () => {
-      const topo = topoRef.current
-      const features = topojson.feature(topo, topo.objects.provinces).features
+    chart.on("click", (params: any) => {
+      const province = byCode[params.data?.code ?? params.name]
+      if (province) setActiveBranch((prev) => (prev === province.branch ? null : province.branch))
+    })
 
-      const width = host.clientWidth || 500
-      const height = Math.round(width * 1.35)
+    const render = () => {
+      const data = PROVINCES.map((province) => ({
+        name: province.name,
+        code: province.code,
+        value: branches.indexOf(province.branch),
+        branch: province.branch,
+        zone: province.zone,
+        itemStyle: {
+          areaColor: activeBranchRef.current && activeBranchRef.current !== province.branch
+            ? "#e5e7eb"
+            : BRANCH_PALETTE[province.branch]?.base ?? "#9ca3af",
+        },
+      }))
 
-      while (host.firstChild) host.removeChild(host.firstChild)
-
-      const svg = d3
-        .select(host)
-        .append("svg")
-        .attr("viewBox", `0 0 ${width} ${height}`)
-        .attr("width", "100%")
-        .style("display", "block")
-
-      const projection = d3.geoMercator().fitSize([width, height], topojson.feature(topo, topo.objects.provinces))
-      const path = d3.geoPath(projection)
-
-      const tooltipEl = tooltipRef.current
-      const mapRectHost = host.parentElement
-
-      const sel = svg
-        .selectAll("path")
-        .data(features)
-        .join("path")
-        .attr("d", path)
-        .attr("fill", (d: any) => getColor(d.properties.prov_acr))
-        .attr("stroke", (d: any) => getStroke(d.properties.prov_acr))
-        .attr("stroke-width", 0.5)
-        .style("cursor", "pointer")
-        .style("transition", "opacity 0.15s")
-        .on("mouseover", function (this: SVGPathElement, event: any, d: any) {
-          const code = d.properties.prov_acr as string
-          const p = byCode[code]
-          d3.select(this).attr("stroke-width", 1.5).attr("opacity", 0.85)
-          if (p && tooltipEl) {
-            tooltipEl.innerHTML = `
-              <div style="font-weight:600; font-size:13px; color:#0f172a; margin-bottom:2px;">${p.name} (${code})</div>
-              <div style="font-size:11px; color:#475569;">${BRANCH_LABEL[p.branch] ?? p.branch}</div>`
-            tooltipEl.style.display = "block"
-          }
-        })
-        .on("mousemove", function (event: any) {
-          if (!tooltipEl || !mapRectHost) return
-          const rect = mapRectHost.getBoundingClientRect()
-          const x = event.clientX - rect.left
-          const y = event.clientY - rect.top
-          tooltipEl.style.left = `${x + 12}px`
-          tooltipEl.style.top = `${y - 10}px`
-        })
-        .on("mouseleave", function (this: SVGPathElement) {
-          d3.select(this).attr("stroke-width", 0.5).attr("opacity", 1)
-          if (tooltipEl) tooltipEl.style.display = "none"
-        })
-        .on("click", function (event: any, d: any) {
-          const code = d.properties.prov_acr as string
-          const p = byCode[code]
-          if (!p) return
-          setActiveBranch((prev) => (prev === p.branch ? null : p.branch))
-        })
-
-      pathSelectionRef.current = sel
+      chart.setOption({
+        animationDuration: 400,
+        tooltip: {
+          trigger: "item",
+          formatter: (params: any) => {
+            const province = byCode[params.data?.code ?? params.name]
+            if (!province) return params.name
+            return `<strong>${province.name} (${province.code})</strong><br/>Branch: ${BRANCH_LABEL[province.branch] ?? province.branch}<br/>Zone: ${province.zone}`
+          },
+        },
+        toolbox: {
+          right: 12,
+          top: 12,
+          feature: { restore: {}, saveAsImage: {} },
+        },
+        geo: {
+          map: "italy-provinces",
+          roam: true,
+          zoom: 1.05,
+          silent: true,
+          itemStyle: { borderColor: "#ffffff", borderWidth: 0.8 },
+          emphasis: { itemStyle: { borderColor: "#0f172a", borderWidth: 1.5 } },
+        },
+        series: [{
+          name: "Branch coverage",
+          type: "map",
+          map: "italy-provinces",
+          geoIndex: 0,
+          roam: true,
+          data,
+          selectedMode: false,
+          emphasis: { label: { show: false } },
+        }],
+      }, true)
     }
 
-    const scheduleDraw = () => {
-      cancelAnimationFrame(rafId)
-      rafId = requestAnimationFrame(draw)
-    }
-
-    const ro = new ResizeObserver(() => scheduleDraw())
+    const ro = new ResizeObserver(() => chart.resize())
     ro.observe(host)
-    scheduleDraw()
+    render()
 
     return () => {
-      cancelAnimationFrame(rafId)
       ro.disconnect()
+      chart.dispose()
+      chartRef.current = null
     }
   }, [ready, byCode])
 
   useEffect(() => {
-    const sel = pathSelectionRef.current
-    if (!sel) return
-    sel.attr("fill", (d: any) => getColor(d.properties.prov_acr)).attr("stroke", (d: any) => getStroke(d.properties.prov_acr))
-  }, [activeBranch])
+    if (!chartRef.current) return
+    const data = PROVINCES.map((province) => ({
+      name: province.name,
+      code: province.code,
+      value: branches.indexOf(province.branch),
+      branch: province.branch,
+      zone: province.zone,
+      itemStyle: {
+        areaColor: activeBranch && activeBranch !== province.branch ? "#e5e7eb" : BRANCH_PALETTE[province.branch]?.base ?? "#9ca3af",
+      },
+    }))
+    chartRef.current.setOption({ series: [{ data }] })
+  }, [activeBranch, branches])
 
   const branchBreakdown = useMemo(() => {
     return branches.map((b) => {
@@ -458,12 +433,7 @@ export function BranchCoverageMap() {
           </div>
 
           <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
-            <div ref={mapHostRef} className="w-full" />
-            <div
-              ref={tooltipRef}
-              style={{ display: "none" }}
-              className="pointer-events-none absolute z-10 max-w-[200px] rounded-md border border-slate-200 bg-white px-3 py-2 text-sm shadow-lg"
-            />
+            <div ref={mapHostRef} className="h-[min(75vw,720px)] min-h-[520px] w-full" />
             {error ? (
               <div className="absolute inset-0 flex items-center justify-center p-6 text-center text-sm text-slate-600">{error}</div>
             ) : null}
