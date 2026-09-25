@@ -432,7 +432,7 @@ export default function CoverageMap({
         summary,
         coverage,
         itemStyle: {
-          areaColor: isVisible ? getCoverageColor(coverage) : '#ffffff',
+          areaColor: isVisible ? getCoverageColor(coverage) : '#21264e',
           borderColor: '#ffffff',
           borderWidth: isVisible && hasTerritorySelection ? 1.8 : 0.8,
         },
@@ -477,8 +477,8 @@ export default function CoverageMap({
         geo: {
           map: 'italy-provinces',
           roam: true,
-          itemStyle: { areaColor: '#ffffff', borderColor: '#ffffff', borderWidth: 0.8 },
-          emphasis: { itemStyle: { areaColor: 'rgba(255, 255, 255, 0.3)', borderColor: '#ffffff', borderWidth: 1.5 } },
+          itemStyle: { areaColor: '#21264e', borderColor: 'rgba(255, 255, 255, 0.18)', borderWidth: 0.8 },
+          emphasis: { itemStyle: { areaColor: 'rgba(255, 255, 255, 0.24)', borderColor: 'rgba(255, 255, 255, 0.72)', borderWidth: 1.5 } },
         },
         series: [{
           name: 'Coverage percentage',
@@ -487,10 +487,10 @@ export default function CoverageMap({
           geoIndex: 0,
           roam: true,
           data,
-          itemStyle: { borderColor: '#ffffff', borderWidth: 0.8 },
+          itemStyle: { areaColor: '#21264e', borderColor: 'rgba(255, 255, 255, 0.18)', borderWidth: 0.8 },
           emphasis: {
             label: { show: true, color: '#ffffff', fontSize: 10, fontWeight: 700 },
-            itemStyle: { areaColor: 'rgba(255, 255, 255, 0.3)', borderColor: '#ffffff', borderWidth: 1.5 },
+            itemStyle: { areaColor: 'rgba(255, 255, 255, 0.24)', borderColor: 'rgba(255, 255, 255, 0.72)', borderWidth: 1.5 },
           },
         }],
       }, true);
