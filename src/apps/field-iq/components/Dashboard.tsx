@@ -1272,12 +1272,6 @@ export default function Dashboard() {
               <span>ISDM</span>
             </div>
           )}
-          {view === VIEWS.COVERAGE && (
-            <div className="flex items-center gap-2 text-[#21264E] font-bold">
-              <Globe size={18} />
-              <span>Coverage</span>
-            </div>
-          )}
           {view === VIEWS.RETAILER_PERFORMANCE && (
             <div className="flex items-center gap-2 text-[#21264E] font-bold">
               <Activity size={18} />
