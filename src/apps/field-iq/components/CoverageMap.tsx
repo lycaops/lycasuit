@@ -44,8 +44,7 @@ const branchKey = (value: unknown) => String(value ?? '')
 const zoneKey = (value: unknown) => String(value ?? '')
   .trim()
   .toUpperCase()
-  .replace(/\s+/g, ' ')
-  .replace('HS TORINO ', 'HS TORINOO ');
+  .replace(/\s+/g, ' ');
 
 const assignmentKey = (branch: unknown, zone: unknown) => `${branchKey(branch)}|${zoneKey(zone)}`;
 
@@ -189,15 +188,15 @@ const PROVINCES_MAP = [
   {code:"AP",zone:"HS ROMA ZONE 5",branch:"LMIT-HS-ROME",name:"Ascoli Piceno"},
   {code:"CB",zone:"HS ROMA ZONE 5",branch:"LMIT-HS-ROME",name:"Campobasso"},
   {code:"IS",zone:"HS ROMA ZONE 5",branch:"LMIT-HS-ROME",name:"Isernia"},
-  {code:"TO",zone:"HS TORINOO ZONE 1",branch:"LMIT-HS-TORINO",name:"Turin"},
-  {code:"AO",zone:"HS TORINOO ZONE 2",branch:"LMIT-HS-TORINO",name:"Aosta"},
-  {code:"AT",zone:"HS TORINOO ZONE 2",branch:"LMIT-HS-TORINO",name:"Asti"},
-  {code:"BI",zone:"HS TORINOO ZONE 2",branch:"LMIT-HS-TORINO",name:"Biella"},
-  {code:"CN",zone:"HS TORINOO ZONE 2",branch:"LMIT-HS-TORINO",name:"Cuneo"},
-  {code:"SV",zone:"HS TORINOO ZONE 3",branch:"LMIT-HS-TORINO",name:"Savona"},
-  {code:"GE",zone:"HS TORINOO ZONE 3",branch:"LMIT-HS-TORINO",name:"Genoa"},
-  {code:"IM",zone:"HS TORINOO ZONE 3",branch:"LMIT-HS-TORINO",name:"Imperia"},
-  {code:"SP",zone:"HS TORINOO ZONE 3",branch:"LMIT-HS-TORINO",name:"La Spezia"},
+  {code:"TO",zone:"HS TORINO ZONE 1",branch:"LMIT-HS-TORINO",name:"Turin"},
+  {code:"AO",zone:"HS TORINO ZONE 2",branch:"LMIT-HS-TORINO",name:"Aosta"},
+  {code:"AT",zone:"HS TORINO ZONE 2",branch:"LMIT-HS-TORINO",name:"Asti"},
+  {code:"BI",zone:"HS TORINO ZONE 2",branch:"LMIT-HS-TORINO",name:"Biella"},
+  {code:"CN",zone:"HS TORINO ZONE 2",branch:"LMIT-HS-TORINO",name:"Cuneo"},
+  {code:"SV",zone:"HS TORINO ZONE 3",branch:"LMIT-HS-TORINO",name:"Savona"},
+  {code:"GE",zone:"HS TORINO ZONE 3",branch:"LMIT-HS-TORINO",name:"Genoa"},
+  {code:"IM",zone:"HS TORINO ZONE 3",branch:"LMIT-HS-TORINO",name:"Imperia"},
+  {code:"SP",zone:"HS TORINO ZONE 3",branch:"LMIT-HS-TORINO",name:"La Spezia"},
 ];
 
 const BY_CODE = Object.fromEntries(PROVINCES_MAP.map(p => [p.code, p]));
@@ -425,38 +424,50 @@ export default function CoverageMap({
 
     try {
       chart.setOption({
-      tooltip: {
-        trigger: 'item',
-        formatter: (params: any) => {
-          const code = String(params.data?.code ?? '').toUpperCase();
-          const province = BY_CODE[code] ?? Object.values(BY_CODE).find((item) => provinceKey(item.name) === provinceKey(params.name));
-          const provinceName = params.data?.geoName ?? params.name;
-          if (!province) return `<strong>${provinceName}${code ? ` (${code})` : ''}</strong><br/>No Data`;
-          const summary = summaryByAssignment.get(assignmentKey(province.branch, province.zone));
-          if (!summary) return `<strong>${provinceName} (${province.code})</strong><br/>No Data`;
-          const metric = (value: unknown) => Number(value ?? 0).toLocaleString();
-          const coverage = getSummaryCoverage(summary);
-          return `<strong>${provinceName} (${province.code})</strong><br/>Coverage: ${coverage === null ? 'No Data' : `${coverage.toFixed(1)}%`}<br/>Covered retailers: ${metric(summary.covered_retailers)}<br/>Total retailers: ${metric(summary.total_retailers)}<br/>UAO: ${metric(summary.uao)}<br/>Not covered: ${metric(summary.not_covered_retailers)}<br/>Red flagged: ${metric(summary.red_flagged_retailers)}`;
+        backgroundColor: 'transparent',
+        tooltip: {
+          trigger: 'item',
+          confine: true,
+          backgroundColor: '#21264e',
+          borderWidth: 0,
+          textStyle: { color: '#ffffff' },
+          formatter: (params: any) => {
+            const code = String(params.data?.code ?? '').toUpperCase();
+            const province = BY_CODE[code] ?? Object.values(BY_CODE).find((item) => provinceKey(item.name) === provinceKey(params.name));
+            const provinceName = params.data?.geoName ?? params.name;
+            if (!province) return `<strong>${provinceName}${code ? ` (${code})` : ''}</strong><br/>No Data`;
+            const summary = summaryByAssignment.get(assignmentKey(province.branch, province.zone));
+            if (!summary) return `<strong>${provinceName} (${province.code})</strong><br/>No Data`;
+            const metric = (value: unknown) => Number(value ?? 0).toLocaleString();
+            const coverage = getSummaryCoverage(summary);
+            return `<strong>${provinceName} (${province.code})</strong><br/>Coverage: ${coverage === null ? 'No Data' : `${coverage.toFixed(1)}%`}<br/>Covered retailers: ${metric(summary.covered_retailers)}<br/>Total retailers: ${metric(summary.total_retailers)}<br/>UAO: ${metric(summary.uao)}<br/>Not covered: ${metric(summary.not_covered_retailers)}<br/>Red flagged: ${metric(summary.red_flagged_retailers)}`;
+          },
         },
-      },
-      visualMap: {
-        show: false,
-      },
-      geo: {
-        map: 'italy-provinces',
-        roam: true,
-        itemStyle: { borderColor: '#ffffff', borderWidth: 0.8 },
-        emphasis: { itemStyle: { borderColor: '#21264e', borderWidth: 1.5 } },
-      },
-      series: [{
-        name: 'Coverage percentage',
-        type: 'map',
-        map: 'italy-provinces',
-        geoIndex: 0,
-        roam: true,
-        data,
-        emphasis: { label: { show: false } },
-      }],
+        visualMap: {
+          type: 'continuous',
+          min: 0,
+          max: 100,
+          left: 18,
+          bottom: 18,
+          itemWidth: 12,
+          itemHeight: 130,
+          text: ['100%', '0%'],
+          textStyle: { color: '#475569', fontSize: 11, fontWeight: 600 },
+          inRange: { color: ['#c2413b', '#f28c28', '#f4c95d', '#69b578', '#1f7a58'] },
+          outOfRange: { color: '#e2e8f0' },
+        },
+        series: [{
+          name: 'Coverage percentage',
+          type: 'map',
+          map: 'italy-provinces',
+          roam: true,
+          data,
+          itemStyle: { borderColor: '#ffffff', borderWidth: 0.8 },
+          emphasis: {
+            label: { show: true, color: '#21264e', fontSize: 10, fontWeight: 700 },
+            itemStyle: { borderColor: '#21264e', borderWidth: 1.5 },
+          },
+        }],
       }, true);
 
       if (visibleProvinces.length > 0) {
