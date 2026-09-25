@@ -37,6 +37,31 @@ const getCoverageColor = (coverage: number | null) => {
   return '#1f7a58';
 };
 
+function getGeometryBounds(geometry: any) {
+  if (!geometry?.coordinates) return null;
+
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  const pending = [geometry.coordinates];
+
+  while (pending.length > 0) {
+    const value = pending.pop();
+    if (!Array.isArray(value)) continue;
+    if (typeof value[0] === 'number' && typeof value[1] === 'number') {
+      minX = Math.min(minX, value[0]);
+      minY = Math.min(minY, value[1]);
+      maxX = Math.max(maxX, value[0]);
+      maxY = Math.max(maxY, value[1]);
+      continue;
+    }
+    for (const child of value) pending.push(child);
+  }
+
+  return Number.isFinite(minX) ? { minX, minY, maxX, maxY } : null;
+}
+
 // Map province codes to names, zones, and branches (from the HTML provided)
 const PROVINCES_MAP = [
   {code:"BA",zone:"HS BARI ZONE 1",branch:"LMIT-HS-BARI",name:"Bari"},
@@ -402,23 +427,24 @@ export default function CoverageMap({
       }, true);
 
       if (visibleProvinces.length > 0) {
-      const points = geoFeatures
+      const bounds = geoFeatures
         .filter((feature: any) => {
           const featureCode = String(feature.properties?.prov_acr ?? feature.properties?.code ?? '').toUpperCase();
           return visibleCodes.has(featureCode);
         })
-        .flatMap((feature: any) => {
-          const coordinates = feature.geometry?.coordinates?.flat(Infinity) ?? [];
-          const result: number[][] = [];
-          for (let index = 0; index < coordinates.length - 1; index += 2) {
-            if (typeof coordinates[index] === 'number' && typeof coordinates[index + 1] === 'number') result.push([coordinates[index], coordinates[index + 1]]);
-          }
-          return result;
-        });
-        if (points.length > 0) {
-          const xs = points.map((point) => point[0]);
-          const ys = points.map((point) => point[1]);
-          chart.setOption({ geo: { boundingCoords: [[Math.min(...xs), Math.min(...ys)], [Math.max(...xs), Math.max(...ys)]] } });
+        .reduce((current: { minX: number; minY: number; maxX: number; maxY: number } | null, feature: any) => {
+          const next = getGeometryBounds(feature.geometry);
+          if (!next) return current;
+          if (!current) return next;
+          return {
+            minX: Math.min(current.minX, next.minX),
+            minY: Math.min(current.minY, next.minY),
+            maxX: Math.max(current.maxX, next.maxX),
+            maxY: Math.max(current.maxY, next.maxY),
+          };
+        }, null);
+        if (bounds) {
+          chart.setOption({ geo: { boundingCoords: [[bounds.minX, bounds.minY], [bounds.maxX, bounds.maxY]] } });
         }
       }
     } catch (error) {
