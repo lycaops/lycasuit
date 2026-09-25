@@ -1,21 +1,73 @@
 "use client"
 
 import { useEffect, useMemo, useRef, useState } from "react"
+import * as echarts from "echarts"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { GitBranch, Layers3, MapPinned } from "lucide-react"
 import Loader from "@/components/Loader"
-
-declare global {
-  interface Window {
-    echarts?: any
-  }
-}
 
 type Province = {
   code: string
   zone: string
   branch: string
   name: string
+}
+
+type CoverageSummary = {
+  total_retailers: number
+  covered_retailers: number
+  not_covered_retailers: number
+  coverage_percentage: number
+  uao?: number
+  red_flagged_retailers?: number
+  logic_followed?: number
+  asm_visits?: number
+  ASM_visits?: number
+}
+
+const GEOJSON_URL = "/maps/italy-provinces.json"
+
+function normalizeName(value: unknown) {
+  return String(value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[’'`]/g, "")
+    .replace(/\s*\/\s*.*/g, "")
+    .replace(/[^a-z0-9]+/gi, "-")
+    .replace(/^-|-$/g, "")
+    .toLowerCase()
+}
+
+const NAME_ALIASES: Record<string, string> = {
+  [normalizeName("Trentino-Alto Adige/Südtirol")]: normalizeName("Trentino-Alto Adige"),
+  [normalizeName("Bolzano/Bozen")]: normalizeName("Bolzano"),
+  [normalizeName("Forlì-Cesena")]: normalizeName("Forli-Cesena"),
+  [normalizeName("Pesaro and Urbino")]: normalizeName("Pesaro-Urbino"),
+  [normalizeName("Monza-Brianza")]: normalizeName("Monza e della Brianza"),
+}
+
+function nameKey(value: unknown) {
+  const normalized = normalizeName(value)
+  return NAME_ALIASES[normalized] ?? normalized
+}
+
+function getCoverageColor(value: number | null) {
+  if (value === null) return "#e2e8f0"
+  if (value < 20) return "#c2413b"
+  if (value < 40) return "#f28c28"
+  if (value < 60) return "#f4c95d"
+  if (value < 80) return "#69b578"
+  return "#1f7a58"
+}
+
+function getCoordinates(geometry: any): number[][] {
+  if (!geometry) return []
+  if (geometry.type === "Point") return [geometry.coordinates]
+  if (geometry.coordinates) return geometry.coordinates.flat(Infinity).reduce<number[][]>((points, value, index, values) => {
+    if (index % 2 === 0 && typeof value === "number" && typeof values[index + 1] === "number") points.push([value, values[index + 1]])
+    return points
+  }, [])
+  return []
 }
 
 const PROVINCES: Province[] = [
@@ -150,44 +202,13 @@ const BRANCH_LABEL: Record<string, string> = {
   "LMIT-HS-TORINO": "Torino",
 }
 
-function loadScript(src: string) {
-  return new Promise<void>((resolve, reject) => {
-    if (window.echarts) {
-      resolve()
-      return
-    }
-
-    const existing = document.querySelector<HTMLScriptElement>(`script[src="${src}"]`)
-    if (existing) {
-      existing.addEventListener("load", () => resolve(), { once: true })
-      existing.addEventListener("error", () => reject(new Error(`Failed to load ${src}`)), { once: true })
-      if ((existing as any).dataset.loaded === "true") resolve()
-      return
-    }
-
-    const script = document.createElement("script")
-    script.src = src
-    script.async = true
-    script.onload = () => {
-      ;(script as any).dataset.loaded = "true"
-      resolve()
-    }
-    script.onerror = () => reject(new Error(`Failed to load ${src}`))
-    document.head.appendChild(script)
-  })
-}
-
 export function BranchCoverageMap() {
   const mapHostRef = useRef<HTMLDivElement | null>(null)
   const chartRef = useRef<any>(null)
   const geoJsonRef = useRef<any>(null)
-  const activeBranchRef = useRef<string | null>(null)
-
   const [activeBranch, setActiveBranch] = useState<string | null>(null)
   const [ready, setReady] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
-  activeBranchRef.current = activeBranch
 
   const byCode = useMemo(() => {
     const m: Record<string, Province> = {}
@@ -215,8 +236,7 @@ export function BranchCoverageMap() {
 
     async function bootstrap() {
       try {
-        await loadScript("https://cdn.jsdelivr.net/npm/echarts@6.0.0/dist/echarts.min.js")
-        const res = await fetch("/italy-provinces.json")
+        const res = await fetch(GEOJSON_URL)
         if (!res.ok) throw new Error("Failed to load map topology")
         geoJsonRef.current = await res.json()
         if (!cancelled) setReady(true)
@@ -235,93 +255,21 @@ export function BranchCoverageMap() {
     if (!ready) return
 
     const host = mapHostRef.current
-    const echarts = window.echarts
-    if (!host || !echarts || !geoJsonRef.current) return
+    if (!host || !geoJsonRef.current) return
 
     const chart = echarts.init(host)
     chartRef.current = chart
     echarts.registerMap("italy-provinces", geoJsonRef.current)
 
-    chart.on("click", (params: any) => {
-      const province = byCode[params.data?.code ?? params.name]
-      if (province) setActiveBranch((prev) => (prev === province.branch ? null : province.branch))
-    })
-
-    const render = () => {
-      const data = PROVINCES.map((province) => ({
-        name: province.name,
-        code: province.code,
-        value: branches.indexOf(province.branch),
-        branch: province.branch,
-        zone: province.zone,
-        itemStyle: {
-          areaColor: activeBranchRef.current && activeBranchRef.current !== province.branch
-            ? "#e5e7eb"
-            : BRANCH_PALETTE[province.branch]?.base ?? "#9ca3af",
-        },
-      }))
-
-      chart.setOption({
-        animationDuration: 400,
-        tooltip: {
-          trigger: "item",
-          formatter: (params: any) => {
-            const province = byCode[params.data?.code ?? params.name]
-            if (!province) return params.name
-            return `<strong>${province.name} (${province.code})</strong><br/>Branch: ${BRANCH_LABEL[province.branch] ?? province.branch}<br/>Zone: ${province.zone}`
-          },
-        },
-        toolbox: {
-          right: 12,
-          top: 12,
-          feature: { restore: {}, saveAsImage: {} },
-        },
-        geo: {
-          map: "italy-provinces",
-          roam: true,
-          zoom: 1.05,
-          silent: true,
-          itemStyle: { borderColor: "#ffffff", borderWidth: 0.8 },
-          emphasis: { itemStyle: { borderColor: "#0f172a", borderWidth: 1.5 } },
-        },
-        series: [{
-          name: "Branch coverage",
-          type: "map",
-          map: "italy-provinces",
-          geoIndex: 0,
-          roam: true,
-          data,
-          selectedMode: false,
-          emphasis: { label: { show: false } },
-        }],
-      }, true)
-    }
-
     const ro = new ResizeObserver(() => chart.resize())
     ro.observe(host)
-    render()
 
     return () => {
       ro.disconnect()
       chart.dispose()
       chartRef.current = null
     }
-  }, [ready, byCode])
-
-  useEffect(() => {
-    if (!chartRef.current) return
-    const data = PROVINCES.map((province) => ({
-      name: province.name,
-      code: province.code,
-      value: branches.indexOf(province.branch),
-      branch: province.branch,
-      zone: province.zone,
-      itemStyle: {
-        areaColor: activeBranch && activeBranch !== province.branch ? "#e5e7eb" : BRANCH_PALETTE[province.branch]?.base ?? "#9ca3af",
-      },
-    }))
-    chartRef.current.setOption({ series: [{ data }] })
-  }, [activeBranch, branches])
+  }, [ready])
 
   const branchBreakdown = useMemo(() => {
     return branches.map((b) => {

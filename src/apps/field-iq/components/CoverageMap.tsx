@@ -2,12 +2,41 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ZoneCoverageSummary } from '@fieldiq/types';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import * as echarts from 'echarts';
 
-declare global {
-  interface Window {
-    echarts?: any;
-  }
-}
+const GEOJSON_URL = '/maps/italy-provinces.json';
+let provinceGeoJsonPromise: Promise<any> | null = null;
+
+const normalizeName = (value: unknown) => String(value ?? '')
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')
+  .replace(/[’'`]/g, '')
+  .replace(/\s*\/\s*.*/g, '')
+  .replace(/[^a-z0-9]+/gi, '-')
+  .replace(/^-|-$/g, '')
+  .toLowerCase();
+
+const NAME_ALIASES: Record<string, string> = {
+  [normalizeName('Trentino-Alto Adige/Südtirol')]: normalizeName('Trentino-Alto Adige'),
+  [normalizeName('Bolzano/Bozen')]: normalizeName('Bolzano'),
+  [normalizeName('Forlì-Cesena')]: normalizeName('Forli-Cesena'),
+  [normalizeName('Pesaro and Urbino')]: normalizeName('Pesaro-Urbino'),
+  [normalizeName('Monza-Brianza')]: normalizeName('Monza e della Brianza'),
+};
+
+const provinceKey = (value: unknown) => {
+  const normalized = normalizeName(value);
+  return NAME_ALIASES[normalized] ?? normalized;
+};
+
+const getCoverageColor = (coverage: number | null) => {
+  if (coverage === null) return '#e2e8f0';
+  if (coverage < 20) return '#c2413b';
+  if (coverage < 40) return '#f28c28';
+  if (coverage < 60) return '#f4c95d';
+  if (coverage < 80) return '#69b578';
+  return '#1f7a58';
+};
 
 // Map province codes to names, zones, and branches (from the HTML provided)
 const PROVINCES_MAP = [
@@ -152,6 +181,7 @@ export default function CoverageMap({
 }: CoverageMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<any>(null);
+  const geoJsonRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [mapReady, setMapReady] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
@@ -255,38 +285,21 @@ export default function CoverageMap({
 
     const loadChart = async () => {
       if (!mapRef.current) return;
-      if (!window.echarts) {
-        await new Promise<void>((resolve, reject) => {
-          const existing = document.querySelector<HTMLScriptElement>('script[data-echarts="true"]');
-          if (existing) {
-            existing.addEventListener('load', () => resolve(), { once: true });
-            existing.addEventListener('error', () => reject(new Error('Failed to load ECharts')), { once: true });
-            return;
-          }
-          const script = document.createElement('script');
-          script.src = 'https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js';
-          script.async = true;
-          script.dataset.echarts = 'true';
-          script.onload = () => resolve();
-          script.onerror = () => reject(new Error('Failed to load ECharts'));
-          document.head.appendChild(script);
-        });
-      }
+      provinceGeoJsonPromise ??= fetch(GEOJSON_URL).then((response) => {
+        if (!response.ok) throw new Error('Failed to load province map');
+        return response.json();
+      });
+      const geoJson = await provinceGeoJsonPromise;
+      if (cancelled || !mapRef.current) return;
 
-      const response = await fetch('/italy-provinces.json');
-      if (!response.ok) throw new Error('Failed to load province map');
-      const mapText = await response.text();
-      const rootEnd = mapText.indexOf('\n}\n');
-      const geoJson = JSON.parse(rootEnd >= 0 ? mapText.slice(0, rootEnd + 2) : mapText);
-      if (cancelled || !mapRef.current || !window.echarts) return;
-
-      window.echarts.registerMap('italy-provinces', geoJson);
-      const chart = window.echarts.init(mapRef.current);
+      geoJsonRef.current = geoJson;
+      echarts.registerMap('italy-provinces', geoJson);
+      const chart = echarts.init(mapRef.current);
       chartRef.current = chart;
       setMapError(null);
       setMapReady(true);
       chart.on('click', (params: any) => {
-        const province = BY_CODE[params.data?.code || params.name];
+        const province = BY_CODE[params.data?.code || params.name] ?? Object.values(BY_CODE).find((item) => provinceKey(item.name) === provinceKey(params.name));
         if (province) {
           onSelectBranch(province.branch);
           onSelectZone(province.zone);
@@ -319,20 +332,29 @@ export default function CoverageMap({
     const chart = chartRef.current;
     if (!chart || !mapReady) return;
 
+    const summaryByAssignment = new Map(
+      zoneSummaries.map((summary) => [`${summary.branch}|${summary.zone}`, summary]),
+    );
+    const visibleProvinces = PROVINCES_MAP.filter((province) => (
+      (selectedRegion === 'ALL ITALY' || BRANCH_TO_REGION[province.branch] === selectedRegion)
+      && (selectedBranch === 'ALL' || province.branch === selectedBranch)
+      && (selectedZone === 'ALL' || province.zone === selectedZone)
+    ));
+
     const data = PROVINCES_MAP.map((province) => {
-      const summary = zoneSummaries.find((item) => item.zone === province.zone && item.branch === province.branch);
-      const isVisible = (selectedRegion === 'ALL ITALY' || BRANCH_TO_REGION[province.branch] === selectedRegion)
-        && (selectedBranch === 'ALL' || province.branch === selectedBranch)
-        && (selectedZone === 'ALL' || province.zone === selectedZone);
+      const summary = summaryByAssignment.get(`${province.branch}|${province.zone}`);
+      const isVisible = visibleProvinces.some((item) => item.code === province.code);
+      const coverage = summary ? Number(summary.coverage_percentage) : null;
 
       return {
         name: province.name,
         code: province.code,
-        value: summary?.coverage_percentage ?? 0,
+        value: coverage,
         branch: province.branch,
         zone: province.zone,
-        coverage: summary?.coverage_percentage,
-        itemStyle: { areaColor: isVisible && summary ? getCoverageColor(summary.coverage_percentage) : '#e5e7eb' },
+        summary,
+        coverage,
+        itemStyle: { areaColor: isVisible ? getCoverageColor(coverage) : '#f1f5f9' },
       };
     });
 
@@ -340,25 +362,20 @@ export default function CoverageMap({
       tooltip: {
         trigger: 'item',
         formatter: (params: any) => {
-          const province = BY_CODE[params.data?.code || params.name];
-          const summary = province ? zoneSummaries.find((item) => item.zone === province.zone && item.branch === province.branch) : null;
+          const province = BY_CODE[params.data?.code || params.name] ?? Object.values(BY_CODE).find((item) => provinceKey(item.name) === provinceKey(params.name));
           if (!province) return params.name;
-          return `<strong>${province.name} (${province.code})</strong><br/>${province.branch.replace('LMIT-HS-', '')} - ${province.zone}<br/>Coverage: ${summary ? `${summary.coverage_percentage.toFixed(1)}%` : 'No data'}`;
+          const summary = summaryByAssignment.get(`${province.branch}|${province.zone}`);
+          if (!summary) return `<strong>${province.name} (${province.code})</strong><br/>No Data`;
+          const metric = (value: unknown) => Number(value ?? 0).toLocaleString();
+          return `<strong>${province.name} (${province.code})</strong><br/>Coverage: ${Number(summary.coverage_percentage).toFixed(1)}%<br/>Covered retailers: ${metric(summary.covered_retailers)}<br/>Total retailers: ${metric(summary.total_retailers)}<br/>UAO: ${metric(summary.uao)}<br/>Not covered: ${metric(summary.not_covered_retailers)}<br/>Red flagged: ${metric(summary.red_flagged_retailers)}`;
         },
       },
       visualMap: {
-        min: 0,
-        max: 100,
-        left: 12,
-        bottom: 12,
-        text: ['100%', '0%'],
-        calculable: true,
-        inRange: { color: ['#c11007', '#ff8904', '#ffdf20', '#58d56d', '#065f46'] },
+        show: false,
       },
       geo: {
         map: 'italy-provinces',
         roam: true,
-        silent: true,
         itemStyle: { borderColor: '#ffffff', borderWidth: 0.8 },
         emphasis: { itemStyle: { borderColor: '#21264e', borderWidth: 1.5 } },
       },
@@ -372,6 +389,29 @@ export default function CoverageMap({
         emphasis: { label: { show: false } },
       }],
     }, true);
+
+    if (visibleProvinces.length > 0) {
+      const features = geoJsonRef.current?.features ?? [];
+      const points = features
+        .filter((feature: any) => {
+          const featureName = feature.properties?.name ?? feature.properties?.NAME_2 ?? feature.properties?.prov_name;
+          const featureCode = feature.properties?.code ?? feature.properties?.prov_istat_code ?? feature.properties?.id;
+          return visibleProvinces.some((province) => province.code === featureCode || provinceKey(province.name) === provinceKey(featureName));
+        })
+        .flatMap((feature: any) => {
+          const coordinates = feature.geometry?.coordinates?.flat(Infinity) ?? [];
+          const result: number[][] = [];
+          for (let index = 0; index < coordinates.length - 1; index += 2) {
+            if (typeof coordinates[index] === 'number' && typeof coordinates[index + 1] === 'number') result.push([coordinates[index], coordinates[index + 1]]);
+          }
+          return result;
+        });
+      if (points.length > 0) {
+        const xs = points.map((point) => point[0]);
+        const ys = points.map((point) => point[1]);
+        chart.setOption({ geo: { boundingCoords: [[Math.min(...xs), Math.min(...ys)], [Math.max(...xs), Math.max(...ys)]] } });
+      }
+    }
   }, [mapReady, zoneSummaries, selectedZone, selectedRegion, selectedBranch]);
 
   return (
@@ -383,19 +423,20 @@ export default function CoverageMap({
             <p className="text-sm text-gray-500">Provinces colored by coverage percentage</p>
           </div>
           
-          <div className="flex gap-4">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
-              <span className="text-xs font-medium text-gray-600">80-100%</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-amber-500"></div>
-              <span className="text-xs font-medium text-gray-600">50-80%</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-red-500"></div>
-              <span className="text-xs font-medium text-gray-600">&lt;50%</span>
-            </div>
+          <div className="flex flex-wrap gap-x-4 gap-y-2">
+            {[
+              ['#c2413b', '0-20% Very Low'],
+              ['#f28c28', '20-40% Low'],
+              ['#f4c95d', '40-60% Medium'],
+              ['#69b578', '60-80% Good'],
+              ['#1f7a58', '80-100% High'],
+              ['#e2e8f0', 'No Data'],
+            ].map(([color, label]) => (
+              <div key={label} className="flex items-center gap-2">
+                <div className="h-3 w-3 rounded-full" style={{ backgroundColor: color }} />
+                <span className="text-xs font-medium text-gray-600">{label}</span>
+              </div>
+            ))}
           </div>
         </div>
 
