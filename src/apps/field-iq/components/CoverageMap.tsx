@@ -467,10 +467,17 @@ export default function CoverageMap({
           inRange: { color: ['#c2413b', '#f28c28', '#f4c95d', '#69b578', '#1f7a58'] },
           outOfRange: { color: '#e2e8f0' },
         },
+        geo: {
+          map: 'italy-provinces',
+          roam: true,
+          itemStyle: { borderColor: '#ffffff', borderWidth: 0.8 },
+          emphasis: { itemStyle: { borderColor: '#21264e', borderWidth: 1.5 } },
+        },
         series: [{
           name: 'Coverage percentage',
           type: 'map',
           map: 'italy-provinces',
+          geoIndex: 0,
           roam: true,
           data,
           itemStyle: { borderColor: '#ffffff', borderWidth: 0.8 },
