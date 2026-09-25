@@ -284,7 +284,8 @@ export default function CoverageMap({
 
     const loadChart = async () => {
       if (!mapRef.current) return;
-      const echarts = await import('echarts');
+      const echartsModule = await import('echarts');
+      const echarts = (echartsModule as any).default ?? echartsModule;
       provinceGeoJsonPromise ??= fetch(GEOJSON_URL).then((response) => {
         if (!response.ok) throw new Error('Failed to load province map');
         return response.json();
@@ -365,7 +366,8 @@ export default function CoverageMap({
       };
     });
 
-    chart.setOption({
+    try {
+      chart.setOption({
       tooltip: {
         trigger: 'item',
         formatter: (params: any) => {
@@ -397,9 +399,9 @@ export default function CoverageMap({
         data,
         emphasis: { label: { show: false } },
       }],
-    }, true);
+      }, true);
 
-    if (visibleProvinces.length > 0) {
+      if (visibleProvinces.length > 0) {
       const points = geoFeatures
         .filter((feature: any) => {
           const featureCode = String(feature.properties?.prov_acr ?? feature.properties?.code ?? '').toUpperCase();
@@ -413,11 +415,14 @@ export default function CoverageMap({
           }
           return result;
         });
-      if (points.length > 0) {
-        const xs = points.map((point) => point[0]);
-        const ys = points.map((point) => point[1]);
-        chart.setOption({ geo: { boundingCoords: [[Math.min(...xs), Math.min(...ys)], [Math.max(...xs), Math.max(...ys)]] } });
+        if (points.length > 0) {
+          const xs = points.map((point) => point[0]);
+          const ys = points.map((point) => point[1]);
+          chart.setOption({ geo: { boundingCoords: [[Math.min(...xs), Math.min(...ys)], [Math.max(...xs), Math.max(...ys)]] } });
+        }
       }
+    } catch (error) {
+      setMapError(error instanceof Error ? error.message : 'Unable to render the coverage map');
     }
   }, [mapReady, zoneSummaries, selectedZone, selectedRegion, selectedBranch]);
 
