@@ -644,7 +644,7 @@ export default function CoverageView({ user }: { user: RpaUser }) {
   return (
     <div className={`px-4 pb-4 pt-0 md:p-6 max-w-7xl mx-auto ${showMap ? 'space-y-0' : 'space-y-6'}`}>
       {filterSlot ? createPortal(filterControls, filterSlot) : null}
-      <div className="sticky top-[calc(3.5rem+env(safe-area-inset-top))] md:top-0 z-30 -mx-4 mb-0 flex flex-wrap items-center justify-between gap-3 border-b border-gray-200 bg-white/95 px-4 py-3 shadow-sm backdrop-blur md:mx-0 md:mb-3 md:rounded-2xl md:border md:p-4">
+      <div className="sticky top-[calc(3.5rem+env(safe-area-inset-top))] md:top-0 z-30 isolate -mx-4 mb-0 flex flex-wrap items-center justify-between gap-3 border-b border-gray-200 bg-white px-4 py-3 shadow-sm md:mx-0 md:mb-3 md:rounded-2xl md:border md:p-4">
         <button
           onClick={() => setShowMap(!showMap)}
           className={`flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-semibold transition-all ${
