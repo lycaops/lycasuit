@@ -55,10 +55,15 @@ export default function CoverageView({ user }: { user: RpaUser }) {
     coveragePercentage: 0,
   });
   const [filterSlot, setFilterSlot] = useState<HTMLElement | null>(null);
+  const [actionsSlot, setActionsSlot] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
     setFilterSlot(document.getElementById('coverage-filter-slot'));
-    return () => setFilterSlot(null);
+    setActionsSlot(document.getElementById('coverage-actions-slot'));
+    return () => {
+      setFilterSlot(null);
+      setActionsSlot(null);
+    };
   }, []);
 
   const regions = useMemo(() => {
@@ -641,31 +646,34 @@ export default function CoverageView({ user }: { user: RpaUser }) {
     </div>
   );
 
+  const actionControls = (
+    <>
+      <button
+        onClick={() => setShowMap(!showMap)}
+        className={`flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-semibold transition-all ${
+          showMap
+            ? 'bg-[#21264E] text-white shadow-md'
+            : 'bg-white text-[#21264E] border border-gray-200 hover:bg-gray-50'
+        }`}
+      >
+        {showMap ? <Table size={16} /> : <MapIcon size={16} />}
+        {showMap ? 'Table View' : 'Map View'}
+      </button>
+      {lastUpdatedDate && (
+        <div className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 bg-gray-50 border border-gray-200 rounded-lg">
+          <span className="text-xs font-medium text-gray-600">Last Updated:</span>
+          <span className="text-sm font-semibold text-[#21264E]">
+            {lastUpdatedDate.toLocaleDateString()} {lastUpdatedDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </span>
+        </div>
+      )}
+    </>
+  );
+
   return (
     <div className={`px-4 pb-4 pt-0 md:p-6 max-w-7xl mx-auto ${showMap ? 'space-y-0' : 'space-y-6'}`}>
       {filterSlot ? createPortal(filterControls, filterSlot) : null}
-      <div className="sticky top-[calc(3.5rem+env(safe-area-inset-top))] md:top-0 z-[100] isolate -mx-4 mb-0 flex flex-wrap items-center justify-between gap-3 overflow-hidden border-b border-gray-200 bg-white px-4 py-3 shadow-[0_8px_16px_rgba(255,255,255,0.95)] md:mx-0 md:mb-3 md:rounded-2xl md:border md:p-4">
-        <button
-          onClick={() => setShowMap(!showMap)}
-          className={`flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-semibold transition-all ${
-            showMap
-              ? 'bg-[#21264E] text-white shadow-md'
-              : 'bg-white text-[#21264E] border border-gray-200 hover:bg-gray-50'
-          }`}
-        >
-          {showMap ? <Table size={16} /> : <MapIcon size={16} />}
-          {showMap ? 'Table View' : 'Map View'}
-        </button>
-
-        {lastUpdatedDate && (
-          <div className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 bg-gray-50 border border-gray-200 rounded-lg">
-            <span className="text-xs font-medium text-gray-600">Last Updated:</span>
-            <span className="text-sm font-semibold text-[#21264E]">
-              {lastUpdatedDate.toLocaleDateString()} {lastUpdatedDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-            </span>
-          </div>
-        )}
-      </div>
+      {actionsSlot ? createPortal(actionControls, actionsSlot) : null}
 
 
     {showMap ? (

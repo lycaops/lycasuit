@@ -1254,7 +1254,10 @@ export default function Dashboard() {
           )}
 
           {view === VIEWS.COVERAGE && (
-            <div id="coverage-filter-slot" className="flex flex-wrap items-center gap-2 md:gap-4" />
+            <>
+              <div id="coverage-filter-slot" className="flex flex-wrap items-center gap-2 md:gap-4" />
+              <div id="coverage-actions-slot" className="flex flex-wrap items-center gap-2 md:gap-3 md:ml-auto" />
+            </>
           )}
 
           {/* View Title for non-dashboard/kpi views */}
@@ -1358,7 +1361,7 @@ export default function Dashboard() {
         )}
 
         {/* Content */}
-        <main className={`flex-1 overflow-y-auto scroll-smooth [touch-action:pan-y] ${view === VIEWS.COVERAGE ? '-mt-14 md:mt-0' : ''}`}>
+        <main className="flex-1 overflow-y-auto scroll-smooth [touch-action:pan-y]">
           {view === VIEWS.USERS && user?.role === 'HS-ADMIN' ? (
             <UserManagement />
           ) : view === VIEWS.IMPORT && user?.role === 'HS-ADMIN' ? (
