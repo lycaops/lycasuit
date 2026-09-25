@@ -432,8 +432,8 @@ export default function CoverageMap({
         summary,
         coverage,
         itemStyle: {
-          areaColor: isVisible ? getCoverageColor(coverage) : '#f1f5f9',
-          borderColor: isVisible && hasTerritorySelection ? '#21264e' : '#ffffff',
+          areaColor: isVisible ? getCoverageColor(coverage) : '#ffffff',
+          borderColor: '#ffffff',
           borderWidth: isVisible && hasTerritorySelection ? 1.8 : 0.8,
         },
       };
@@ -441,7 +441,7 @@ export default function CoverageMap({
 
     try {
       chart.setOption({
-        backgroundColor: 'transparent',
+        backgroundColor: '#21264e',
         tooltip: {
           trigger: 'item',
           confine: true,
@@ -477,8 +477,8 @@ export default function CoverageMap({
         geo: {
           map: 'italy-provinces',
           roam: true,
-          itemStyle: { borderColor: '#ffffff', borderWidth: 0.8 },
-          emphasis: { itemStyle: { borderColor: '#21264e', borderWidth: 1.5 } },
+          itemStyle: { areaColor: '#ffffff', borderColor: '#ffffff', borderWidth: 0.8 },
+          emphasis: { itemStyle: { areaColor: 'rgba(255, 255, 255, 0.3)', borderColor: '#ffffff', borderWidth: 1.5 } },
         },
         series: [{
           name: 'Coverage percentage',
@@ -489,8 +489,8 @@ export default function CoverageMap({
           data,
           itemStyle: { borderColor: '#ffffff', borderWidth: 0.8 },
           emphasis: {
-            label: { show: true, color: '#21264e', fontSize: 10, fontWeight: 700 },
-            itemStyle: { borderColor: '#21264e', borderWidth: 1.5 },
+            label: { show: true, color: '#ffffff', fontSize: 10, fontWeight: 700 },
+            itemStyle: { areaColor: 'rgba(255, 255, 255, 0.3)', borderColor: '#ffffff', borderWidth: 1.5 },
           },
         }],
       }, true);
@@ -523,25 +523,24 @@ export default function CoverageMap({
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-2xl border border-gray-200 p-6 relative">
-        <div className="flex items-center justify-between mb-6">
-          <div>
+      <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6 relative">
+        <div className="mb-4 flex flex-col gap-3">
+          <div className="min-w-0">
             <h3 className="text-lg font-bold text-[#21264E]">Province Coverage Heatmap</h3>
             <p className="text-sm text-gray-500">Each province is colored by its current covered retailer percentage.</p>
-            <div className="mt-2 flex flex-wrap items-center gap-2 text-xs font-semibold text-[#21264E]">
-              <span className="rounded-full bg-[#21264E]/10 px-2.5 py-1">
+          </div>
+          <div className="flex min-w-0 items-center gap-2 overflow-x-auto whitespace-nowrap pb-1 text-xs font-semibold text-[#21264E]">
+              <span className="shrink-0 rounded-full bg-[#21264E]/10 px-2.5 py-1">
                 Region: {selectedRegion === 'ALL ITALY' ? 'All Italy' : selectedRegion}
               </span>
-              <span className="rounded-full bg-[#21264E]/10 px-2.5 py-1">
+              <span className="shrink-0 rounded-full bg-[#21264E]/10 px-2.5 py-1">
                 Branch: {selectedBranch === 'ALL' ? 'All branches' : selectedBranch.replace('LMIT-HS-', '')}
               </span>
-              <span className="rounded-full bg-[#21264E]/10 px-2.5 py-1">
+              <span className="shrink-0 rounded-full bg-[#21264E]/10 px-2.5 py-1">
                 Zone: {selectedZone === 'ALL' ? 'All zones' : selectedZone}
               </span>
-            </div>
           </div>
-          
-          <div className="flex flex-wrap gap-x-4 gap-y-2">
+          <div className="flex items-center gap-4 overflow-x-auto whitespace-nowrap pb-1">
             {[
               ['#c2413b', '0-20% Very Low'],
               ['#f28c28', '20-40% Low'],
@@ -550,7 +549,7 @@ export default function CoverageMap({
               ['#1f7a58', '80-100% High'],
               ['#e2e8f0', 'No Data'],
             ].map(([color, label]) => (
-              <div key={label} className="flex items-center gap-2">
+              <div key={label} className="flex shrink-0 items-center gap-2">
                 <div className="h-3 w-3 rounded-full" style={{ backgroundColor: color }} />
                 <span className="text-xs font-medium text-gray-600">{label}</span>
               </div>
@@ -558,10 +557,10 @@ export default function CoverageMap({
           </div>
         </div>
 
-        <div ref={containerRef} className="relative min-h-[600px] flex justify-center bg-gray-50 rounded-xl overflow-hidden">
-          <div ref={mapRef} className="h-[min(75vw,760px)] min-h-[600px] w-full" />
+        <div ref={containerRef} className="relative flex min-h-[420px] justify-center overflow-hidden rounded-xl bg-[#21264e] sm:min-h-[560px]">
+          <div ref={mapRef} className="h-[min(105vw,680px)] min-h-[420px] w-full sm:min-h-[560px]" />
           {mapError ? (
-            <div className="absolute inset-0 flex items-center justify-center bg-gray-50 p-6 text-center text-sm text-red-600">
+            <div className="absolute inset-0 flex items-center justify-center bg-[#21264e] p-6 text-center text-sm text-red-200">
               {mapError}
             </div>
           ) : null}
