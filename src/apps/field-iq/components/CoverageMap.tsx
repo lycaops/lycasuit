@@ -1,9 +1,13 @@
 'use client';
-import { useEffect, useMemo, useRef } from 'react';
-import * as d3 from 'd3';
-import * as topojson from 'topojson-client';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ZoneCoverageSummary } from '@fieldiq/types';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+
+declare global {
+  interface Window {
+    echarts?: any;
+  }
+}
 
 // Map province codes to names, zones, and branches (from the HTML provided)
 const PROVINCES_MAP = [
@@ -146,9 +150,10 @@ export default function CoverageMap({
   onSelectBranch,
   onSelectZone
 }: CoverageMapProps) {
-  const svgRef = useRef<SVGSVGElement>(null);
-  const tooltipRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<HTMLDivElement>(null);
+  const chartRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [mapReady, setMapReady] = useState(false);
 
   // Filter zone summaries based on selections
   const filteredZoneSummaries = useMemo(() => {
@@ -245,124 +250,121 @@ export default function CoverageMap({
   };
 
   useEffect(() => {
-    if (!svgRef.current) return;
+    let cancelled = false;
 
-    const svg = d3.select(svgRef.current);
-    svg.selectAll("*").remove();
-
-    const width = 800;
-    const height = 900;
-    
-    svg.attr("viewBox", `0 0 ${width} ${height}`)
-       .attr("width", "100%")
-       .attr("height", "auto");
-
-    const g = svg.append("g");
-
-    // Fetch TopoJSON
-    d3.json("https://cdn.jsdelivr.net/gh/openpolis/geojson-italy@master/topojson/limits_IT_provinces.topo.json").then((topo: any) => {
-      const features = (topojson.feature(topo, topo.objects.provinces) as any).features;
-      const projection = d3.geoMercator().fitSize([width, height], topojson.feature(topo, topo.objects.provinces) as any);
-      const path = d3.geoPath(projection);
-
-      g.selectAll("path")
-        .data(features)
-        .join("path")
-        .attr("d", path as any)
-        .attr("fill", (d: any) => {
-          const code = d.properties.prov_acr;
-          const provinceInfo = BY_CODE[code];
-          
-          if (!provinceInfo) return "#f3f4f6";
-
-          // Filtering logic
-          if (selectedRegion !== 'ALL ITALY') {
-            const branchRegion = BRANCH_TO_REGION[provinceInfo.branch];
-            if (branchRegion !== selectedRegion) {
-              return "#f3f4f6";
-            }
+    const loadChart = async () => {
+      if (!mapRef.current) return;
+      if (!window.echarts) {
+        await new Promise<void>((resolve, reject) => {
+          const existing = document.querySelector<HTMLScriptElement>('script[data-echarts="true"]');
+          if (existing) {
+            existing.addEventListener('load', () => resolve(), { once: true });
+            existing.addEventListener('error', () => reject(new Error('Failed to load ECharts')), { once: true });
+            return;
           }
-
-          // Branch Filter
-          if (selectedBranch !== 'ALL' && provinceInfo.branch !== selectedBranch) {
-            return "#f3f4f6";
-          }
-
-          const summary = zoneSummaries.find(s => s.zone === provinceInfo.zone && s.branch === provinceInfo.branch);
-          
-          if (!summary) return "#f3f4f6";
-
-          // Highlight selected zone
-          if (selectedZone !== 'ALL' && summary.zone !== selectedZone) {
-            return "#f3f4f6";
-          }
-
-          return getCoverageColor(summary.coverage_percentage);
-        })
-        .attr("stroke", "#ffffff")
-        .attr("stroke-width", 0.5)
-        .style("cursor", "pointer")
-        .on("mouseover", function(event, d: any) {
-          const code = d.properties.prov_acr;
-          const provinceInfo = BY_CODE[code];
-          const summary = provinceInfo ? zoneSummaries.find(s => s.zone === provinceInfo.zone && s.branch === provinceInfo.branch) : null;
-
-          d3.select(this)
-            .attr("stroke-width", 1.5)
-            .attr("opacity", 0.8);
-
-          if (tooltipRef.current && provinceInfo) {
-            tooltipRef.current.innerHTML = `
-              <div class="font-bold text-[#21264E]">${provinceInfo.name} (${code})</div>
-              <div class="text-xs text-gray-600">${provinceInfo.branch.replace('LMIT-HS-', '')} - ${provinceInfo.zone}</div>
-              ${summary ? `<div class="mt-1 font-semibold ${summary.coverage_percentage >= 80 ? 'text-emerald-600' : summary.coverage_percentage >= 50 ? 'text-amber-600' : 'text-red-600'}">Coverage: ${summary.coverage_percentage.toFixed(1)}%</div>` : '<div class="text-xs text-gray-400">No data</div>'}
-            `;
-            tooltipRef.current.style.display = "block";
-          }
-        })
-        .on("mousemove", (event) => {
-          if (tooltipRef.current && containerRef.current) {
-            const containerRect = containerRef.current.getBoundingClientRect();
-            const tooltipEl = tooltipRef.current;
-
-            const tooltipWidth = tooltipEl.offsetWidth || 0;
-            const tooltipHeight = tooltipEl.offsetHeight || 0;
-
-            let x = event.clientX - containerRect.left + 15;
-            let y = event.clientY - containerRect.top - 15;
-
-            if (x + tooltipWidth > containerRect.width) {
-              x = containerRect.width - tooltipWidth - 8;
-            }
-            if (x < 8) x = 8;
-
-            if (y + tooltipHeight > containerRect.height) {
-              y = containerRect.height - tooltipHeight - 8;
-            }
-            if (y < 8) y = 8;
-
-            tooltipEl.style.left = `${x}px`;
-            tooltipEl.style.top = `${y}px`;
-          }
-        })
-        .on("mouseleave", function() {
-          d3.select(this)
-            .attr("stroke-width", 0.5)
-            .attr("opacity", 1);
-          if (tooltipRef.current) {
-            tooltipRef.current.style.display = "none";
-          }
-        })
-        .on("click", (event, d: any) => {
-          const code = d.properties.prov_acr;
-          const provinceInfo = BY_CODE[code];
-          if (provinceInfo) {
-            onSelectBranch(provinceInfo.branch);
-            onSelectZone(provinceInfo.zone);
-          }
+          const script = document.createElement('script');
+          script.src = 'https://cdn.jsdelivr.net/npm/echarts@6.0.0/dist/echarts.min.js';
+          script.async = true;
+          script.dataset.echarts = 'true';
+          script.onload = () => resolve();
+          script.onerror = () => reject(new Error('Failed to load ECharts'));
+          document.head.appendChild(script);
         });
+      }
+
+      const response = await fetch('/italy-provinces.json');
+      if (!response.ok) throw new Error('Failed to load province map');
+      const geoJson = await response.json();
+      if (cancelled || !mapRef.current || !window.echarts) return;
+
+      window.echarts.registerMap('italy-provinces', geoJson);
+      const chart = window.echarts.init(mapRef.current);
+      chartRef.current = chart;
+      setMapReady(true);
+      chart.on('click', (params: any) => {
+        const province = BY_CODE[params.data?.code || params.name];
+        if (province) {
+          onSelectBranch(province.branch);
+          onSelectZone(province.zone);
+        }
+      });
+
+      const resizeObserver = new ResizeObserver(() => chart.resize());
+      resizeObserver.observe(mapRef.current);
+      chartRef.current.resizeObserver = resizeObserver;
+    };
+
+    loadChart().catch(() => undefined);
+
+    return () => {
+      cancelled = true;
+      if (chartRef.current) {
+        chartRef.current.resizeObserver?.disconnect();
+        chartRef.current.dispose();
+        chartRef.current = null;
+      }
+      setMapReady(false);
+    };
+  }, [onSelectBranch, onSelectZone]);
+
+  useEffect(() => {
+    const chart = chartRef.current;
+    if (!chart || !mapReady) return;
+
+    const data = PROVINCES_MAP.map((province) => {
+      const summary = zoneSummaries.find((item) => item.zone === province.zone && item.branch === province.branch);
+      const isVisible = (selectedRegion === 'ALL ITALY' || BRANCH_TO_REGION[province.branch] === selectedRegion)
+        && (selectedBranch === 'ALL' || province.branch === selectedBranch)
+        && (selectedZone === 'ALL' || province.zone === selectedZone);
+
+      return {
+        name: province.name,
+        code: province.code,
+        value: summary?.coverage_percentage ?? 0,
+        branch: province.branch,
+        zone: province.zone,
+        coverage: summary?.coverage_percentage,
+        itemStyle: { areaColor: isVisible && summary ? getCoverageColor(summary.coverage_percentage) : '#e5e7eb' },
+      };
     });
-  }, [zoneSummaries, selectedZone, selectedRegion, selectedBranch]);
+
+    chart.setOption({
+      tooltip: {
+        trigger: 'item',
+        formatter: (params: any) => {
+          const province = BY_CODE[params.data?.code || params.name];
+          const summary = province ? zoneSummaries.find((item) => item.zone === province.zone && item.branch === province.branch) : null;
+          if (!province) return params.name;
+          return `<strong>${province.name} (${province.code})</strong><br/>${province.branch.replace('LMIT-HS-', '')} - ${province.zone}<br/>Coverage: ${summary ? `${summary.coverage_percentage.toFixed(1)}%` : 'No data'}`;
+        },
+      },
+      visualMap: {
+        min: 0,
+        max: 100,
+        left: 12,
+        bottom: 12,
+        text: ['100%', '0%'],
+        calculable: true,
+        inRange: { color: ['#c11007', '#ff8904', '#ffdf20', '#58d56d', '#065f46'] },
+      },
+      geo: {
+        map: 'italy-provinces',
+        roam: true,
+        silent: true,
+        itemStyle: { borderColor: '#ffffff', borderWidth: 0.8 },
+        emphasis: { itemStyle: { borderColor: '#21264e', borderWidth: 1.5 } },
+      },
+      series: [{
+        name: 'Coverage percentage',
+        type: 'map',
+        map: 'italy-provinces',
+        geoIndex: 0,
+        roam: true,
+        data,
+        emphasis: { label: { show: false } },
+      }],
+    }, true);
+  }, [mapReady, zoneSummaries, selectedZone, selectedRegion, selectedBranch]);
 
   return (
     <div className="space-y-6">
@@ -390,12 +392,7 @@ export default function CoverageMap({
         </div>
 
         <div ref={containerRef} className="relative min-h-[600px] flex justify-center bg-gray-50 rounded-xl overflow-hidden">
-          <svg ref={svgRef}></svg>
-          <div
-            ref={tooltipRef}
-            className="absolute hidden pointer-events-none bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-50 text-sm"
-            style={{ minWidth: '150px' }}
-          ></div>
+          <div ref={mapRef} className="h-[min(75vw,760px)] min-h-[600px] w-full" />
         </div>
       </div>
 
