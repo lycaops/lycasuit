@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { supabase } from '@fieldiq/lib/supabase';
-import { Filter, AlertTriangle, Eye, EyeOff, Map as MapIcon, Table, FileDown, FileSpreadsheet } from 'lucide-react';
+import { Filter, AlertTriangle, Eye, EyeOff, Map as MapIcon, Table, FileDown, FileSpreadsheet, Globe, Shield, Building2 } from 'lucide-react';
 import { normalizeBranch, NORTH_REGION, SOUTH_REGION } from '@fieldiq/data/mockData';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
@@ -591,12 +591,12 @@ export default function CoverageView({ user }: { user: RpaUser }) {
   return (
     <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
       {/* Filters (moved to top - matching KPI page layout) */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-4">
+      <div className="bg-white rounded-2xl border border-gray-200 p-4 md:p-6 mb-6">
+        <div className="flex flex-wrap items-center justify-between gap-3 md:gap-4">
+          <div className="flex flex-wrap items-center gap-2 md:gap-4">
             <button
               onClick={() => setShowMap(!showMap)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+              className={`flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-semibold transition-all ${
                 showMap
                   ? 'bg-[#21264E] text-white shadow-md'
                   : 'bg-white text-[#21264E] border border-gray-200 hover:bg-gray-50'
@@ -606,12 +606,12 @@ export default function CoverageView({ user }: { user: RpaUser }) {
               {showMap ? 'Table View' : 'Map View'}
             </button>
 
-            <div className="flex items-center gap-2 min-w-[140px]">
-              <label className="text-sm font-semibold text-[#21264E]">Region</label>
+            <div className="flex items-center gap-2 min-w-max">
+              <Globe size={16} className="text-[#21264E]" />
             <select
               value={selectedRegion}
               onChange={(e) => handleRegionChange(e.target.value)}
-              className="px-3 py-2 border border-gray-200 rounded-lg text-sm text-[#21264E] font-medium"
+              className="text-xs md:text-sm border border-gray-200 rounded-lg px-2 md:px-3 py-1.5 md:py-2 bg-white text-[#21264E] focus:ring-2 focus:ring-[#245bc1] outline-none"
               disabled={!canChangeRegion}
             >
               {regions.map((region) => (
@@ -622,12 +622,12 @@ export default function CoverageView({ user }: { user: RpaUser }) {
             </select>
           </div>
 
-          <div className="flex items-center gap-2 min-w-[180px] max-w-[220px]">
-            <label className="text-sm font-semibold text-[#21264E]">Branch</label>
+          <div className="flex items-center gap-2 min-w-max">
+            <Shield size={16} className="text-[#21264E]" />
             <select
               value={selectedBranch}
               onChange={(e) => handleBranchChange(e.target.value)}
-              className="px-3 py-2 border border-gray-200 rounded-lg text-sm text-[#21264E] font-medium"
+              className="text-xs md:text-sm border border-gray-200 rounded-lg px-2 md:px-3 py-1.5 md:py-2 bg-white text-[#21264E] focus:ring-2 focus:ring-[#245bc1] outline-none"
               disabled={!canChangeBranch}
             >
               <option value="ALL">{selectedRegion === 'ALL ITALY' ? 'All Branches' : `All ${selectedRegion} Branches`}</option>
@@ -639,12 +639,12 @@ export default function CoverageView({ user }: { user: RpaUser }) {
             </select>
           </div>
 
-          <div className="flex items-center gap-2">
-            <label className="text-sm font-semibold text-[#21264E]">Zone</label>
+          <div className="flex items-center gap-2 min-w-max">
+            <Building2 size={16} className="text-[#21264E]" />
             <select
               value={selectedZone}
               onChange={(e) => handleZoneChange(e.target.value)}
-              className="px-3 py-2 border border-gray-200 rounded-lg text-sm text-[#21264E] font-medium"
+              className="text-xs md:text-sm border border-gray-200 rounded-lg px-2 md:px-3 py-1.5 md:py-2 bg-white text-[#21264E] focus:ring-2 focus:ring-[#245bc1] outline-none"
               disabled={isZoneManager || (!isAsm && selectedBranch === 'ALL')}
             >
               {isZoneManager ? (
@@ -662,7 +662,7 @@ export default function CoverageView({ user }: { user: RpaUser }) {
             </select>
           </div>
           {lastUpdatedDate && (
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg ml-auto">
+            <div className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 bg-gray-50 border border-gray-200 rounded-lg ml-auto">
               <span className="text-xs font-medium text-gray-600">Last Updated:</span>
               <span className="text-sm font-semibold text-[#21264E]">
                 {lastUpdatedDate.toLocaleDateString()} {lastUpdatedDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
