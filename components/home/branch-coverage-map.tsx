@@ -264,7 +264,17 @@ export function BranchCoverageMap() {
       if (cancelled) return
       chart = echarts.init(host)
       chartRef.current = chart
-      echarts.registerMap("italy-provinces", geoJsonRef.current)
+      const normalizedGeoJson = {
+        ...geoJsonRef.current,
+        features: (geoJsonRef.current.features ?? []).map((feature: any) => ({
+          ...feature,
+          properties: {
+            ...(feature.properties ?? {}),
+            name: feature.properties?.prov_name ?? feature.properties?.name ?? "",
+          },
+        })),
+      }
+      echarts.registerMap("italy-provinces", normalizedGeoJson)
       resizeObserver = new ResizeObserver(() => chart.resize())
       resizeObserver.observe(host)
     }

@@ -344,8 +344,19 @@ export default function CoverageMap({
       const geoJson = await provinceGeoJsonPromise;
       if (cancelled || !mapRef.current) return;
 
-      geoJsonRef.current = geoJson;
-      echarts.registerMap('italy-provinces', geoJson);
+      const normalizedGeoJson = {
+        ...geoJson,
+        features: (geoJson.features ?? []).map((feature: any) => ({
+          ...feature,
+          properties: {
+            ...(feature.properties ?? {}),
+            name: feature.properties?.prov_name ?? feature.properties?.name ?? '',
+          },
+        })),
+      };
+
+      geoJsonRef.current = normalizedGeoJson;
+      echarts.registerMap('italy-provinces', normalizedGeoJson);
       const chart = echarts.init(mapRef.current);
       chartRef.current = chart;
       setMapError(null);
