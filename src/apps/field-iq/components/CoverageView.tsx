@@ -677,7 +677,6 @@ export default function CoverageView({ user }: { user: RpaUser }) {
             </div>
           </div>
         </div>
-    </div>
 
       <div className="flex items-center gap-2 text-[#21264E] font-bold">
         <Globe size={18} />
