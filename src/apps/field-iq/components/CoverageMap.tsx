@@ -154,6 +154,7 @@ export default function CoverageMap({
   const chartRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [mapReady, setMapReady] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
 
   // Filter zone summaries based on selections
   const filteredZoneSummaries = useMemo(() => {
@@ -263,7 +264,7 @@ export default function CoverageMap({
             return;
           }
           const script = document.createElement('script');
-          script.src = 'https://cdn.jsdelivr.net/npm/echarts@6.0.0/dist/echarts.min.js';
+          script.src = 'https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js';
           script.async = true;
           script.dataset.echarts = 'true';
           script.onload = () => resolve();
@@ -280,6 +281,7 @@ export default function CoverageMap({
       window.echarts.registerMap('italy-provinces', geoJson);
       const chart = window.echarts.init(mapRef.current);
       chartRef.current = chart;
+      setMapError(null);
       setMapReady(true);
       chart.on('click', (params: any) => {
         const province = BY_CODE[params.data?.code || params.name];
@@ -294,7 +296,11 @@ export default function CoverageMap({
       chartRef.current.resizeObserver = resizeObserver;
     };
 
-    loadChart().catch(() => undefined);
+    loadChart().catch((error: unknown) => {
+      if (!cancelled) {
+        setMapError(error instanceof Error ? error.message : 'Unable to load the coverage map');
+      }
+    });
 
     return () => {
       cancelled = true;
@@ -393,6 +399,11 @@ export default function CoverageMap({
 
         <div ref={containerRef} className="relative min-h-[600px] flex justify-center bg-gray-50 rounded-xl overflow-hidden">
           <div ref={mapRef} className="h-[min(75vw,760px)] min-h-[600px] w-full" />
+          {mapError ? (
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-50 p-6 text-center text-sm text-red-600">
+              {mapError}
+            </div>
+          ) : null}
         </div>
       </div>
 
