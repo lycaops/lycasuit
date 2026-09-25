@@ -1253,6 +1253,10 @@ export default function Dashboard() {
             </div>
           )}
 
+          {view === VIEWS.COVERAGE && (
+            <div id="coverage-filter-slot" className="flex flex-wrap items-center gap-2 md:gap-4" />
+          )}
+
           {/* View Title for non-dashboard/kpi views */}
           {view === VIEWS.IMPORT && (
             <div className="flex items-center gap-2 text-[#21264E] font-bold">
@@ -1270,6 +1274,12 @@ export default function Dashboard() {
             <div className="flex items-center gap-2 text-[#21264E] font-bold">
               <Trophy size={18} />
               <span>ISDM</span>
+            </div>
+          )}
+          {view === VIEWS.COVERAGE && (
+            <div className="flex items-center gap-2 text-[#21264E] font-bold">
+              <Globe size={18} />
+              <span>Coverage</span>
             </div>
           )}
           {view === VIEWS.RETAILER_PERFORMANCE && (

@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { supabase } from '@fieldiq/lib/supabase';
@@ -53,6 +54,12 @@ export default function CoverageView({ user }: { user: RpaUser }) {
     redFlagged: 0,
     coveragePercentage: 0,
   });
+  const [filterSlot, setFilterSlot] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    setFilterSlot(document.getElementById('coverage-filter-slot'));
+    return () => setFilterSlot(null);
+  }, []);
 
   const regions = useMemo(() => {
     return ['ALL ITALY', 'NORTH', 'SOUTH'];
@@ -588,10 +595,56 @@ export default function CoverageView({ user }: { user: RpaUser }) {
     inactive: coverage.filter((c) => c.status === 'inactive').length,
   };
 
+  const filterControls = (
+    <div className="flex flex-wrap items-center gap-2 md:gap-4">
+      <div className="flex items-center gap-2 min-w-max">
+        <Globe size={16} className="text-[#21264E]" />
+        <select
+          value={selectedRegion}
+          onChange={(e) => handleRegionChange(e.target.value)}
+          className="text-xs md:text-sm border border-gray-200 rounded-lg px-2 md:px-3 py-1.5 md:py-2 bg-white text-[#21264E] focus:ring-2 focus:ring-[#245bc1] outline-none"
+          disabled={!canChangeRegion}
+        >
+          {regions.map((region) => <option key={region} value={region}>{region}</option>)}
+        </select>
+      </div>
+      <div className="flex items-center gap-2 min-w-max">
+        <Shield size={16} className="text-[#21264E]" />
+        <select
+          value={selectedBranch}
+          onChange={(e) => handleBranchChange(e.target.value)}
+          className="text-xs md:text-sm border border-gray-200 rounded-lg px-2 md:px-3 py-1.5 md:py-2 bg-white text-[#21264E] focus:ring-2 focus:ring-[#245bc1] outline-none"
+          disabled={!canChangeBranch}
+        >
+          <option value="ALL">{selectedRegion === 'ALL ITALY' ? 'All Branches' : `All ${selectedRegion} Branches`}</option>
+          {branches.map((branch) => <option key={branch} value={branch}>{branch.replace('LMIT-HS-', '')}</option>)}
+        </select>
+      </div>
+      <div className="flex items-center gap-2 min-w-max">
+        <Building2 size={16} className="text-[#21264E]" />
+        <select
+          value={selectedZone}
+          onChange={(e) => handleZoneChange(e.target.value)}
+          className="text-xs md:text-sm border border-gray-200 rounded-lg px-2 md:px-3 py-1.5 md:py-2 bg-white text-[#21264E] focus:ring-2 focus:ring-[#245bc1] outline-none"
+          disabled={isZoneManager || (!isAsm && selectedBranch === 'ALL')}
+        >
+          {isZoneManager ? (
+            <option value={selectedZone}>{selectedZone}</option>
+          ) : (
+            <>
+              <option value="ALL">All Zones</option>
+              {zones.map((zone) => <option key={zone} value={zone}>{zone}</option>)}
+            </>
+          )}
+        </select>
+      </div>
+    </div>
+  );
+
   return (
     <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
-      <div className="sticky top-0 z-30 -mx-4 mb-3 flex flex-col gap-3 border-b border-gray-200 bg-[#f4f7fb]/95 px-4 py-3 backdrop-blur md:-mx-6 md:px-6">
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-gray-200 bg-white p-3 md:p-4">
+      {filterSlot ? createPortal(filterControls, filterSlot) : null}
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-gray-200 bg-white p-3 md:p-4">
         <button
           onClick={() => setShowMap(!showMap)}
           className={`flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-semibold transition-all ${
@@ -612,76 +665,8 @@ export default function CoverageView({ user }: { user: RpaUser }) {
             </span>
           </div>
         )}
-        </div>
-
-        {/* Filters (matching the ISDM page layout) */}
-        <div className="rounded-2xl border border-gray-200 bg-white p-3 md:p-4">
-          <div className="flex flex-wrap items-center justify-between gap-3 md:gap-4">
-            <div className="flex flex-wrap items-center gap-2 md:gap-4">
-            <div className="flex items-center gap-2 min-w-max">
-              <Globe size={16} className="text-[#21264E]" />
-            <select
-              value={selectedRegion}
-              onChange={(e) => handleRegionChange(e.target.value)}
-              className="text-xs md:text-sm border border-gray-200 rounded-lg px-2 md:px-3 py-1.5 md:py-2 bg-white text-[#21264E] focus:ring-2 focus:ring-[#245bc1] outline-none"
-              disabled={!canChangeRegion}
-            >
-              {regions.map((region) => (
-                <option key={region} value={region}>
-                  {region}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex items-center gap-2 min-w-max">
-            <Shield size={16} className="text-[#21264E]" />
-            <select
-              value={selectedBranch}
-              onChange={(e) => handleBranchChange(e.target.value)}
-              className="text-xs md:text-sm border border-gray-200 rounded-lg px-2 md:px-3 py-1.5 md:py-2 bg-white text-[#21264E] focus:ring-2 focus:ring-[#245bc1] outline-none"
-              disabled={!canChangeBranch}
-            >
-              <option value="ALL">{selectedRegion === 'ALL ITALY' ? 'All Branches' : `All ${selectedRegion} Branches`}</option>
-              {branches.map((branch) => (
-                <option key={branch} value={branch}>
-                  {branch.replace('LMIT-HS-', '')}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex items-center gap-2 min-w-max">
-            <Building2 size={16} className="text-[#21264E]" />
-            <select
-              value={selectedZone}
-              onChange={(e) => handleZoneChange(e.target.value)}
-              className="text-xs md:text-sm border border-gray-200 rounded-lg px-2 md:px-3 py-1.5 md:py-2 bg-white text-[#21264E] focus:ring-2 focus:ring-[#245bc1] outline-none"
-              disabled={isZoneManager || (!isAsm && selectedBranch === 'ALL')}
-            >
-              {isZoneManager ? (
-                <option value={selectedZone}>{selectedZone}</option>
-              ) : (
-                <>
-                  <option value="ALL">All Zones</option>
-                  {zones.map((zone) => (
-                    <option key={zone} value={zone}>
-                      {zone}
-                    </option>
-                  ))}
-                </>
-              )}
-            </select>
-          </div>
-        </div>
-            </div>
-          </div>
-        </div>
-
-      <div className="flex items-center gap-2 text-[#21264E] font-bold">
-        <Globe size={18} />
-        <h1>Coverage</h1>
       </div>
+
 
     {showMap ? (
       <div className="space-y-6">
