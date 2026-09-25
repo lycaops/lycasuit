@@ -1358,7 +1358,7 @@ export default function Dashboard() {
         )}
 
         {/* Content */}
-        <main className="flex-1 overflow-y-auto scroll-smooth [touch-action:pan-y]">
+        <main className={`flex-1 overflow-y-auto scroll-smooth [touch-action:pan-y] ${view === VIEWS.COVERAGE ? '-mt-14 md:mt-0' : ''}`}>
           {view === VIEWS.USERS && user?.role === 'HS-ADMIN' ? (
             <UserManagement />
           ) : view === VIEWS.IMPORT && user?.role === 'HS-ADMIN' ? (
