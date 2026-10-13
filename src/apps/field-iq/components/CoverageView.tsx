@@ -122,6 +122,41 @@ export default function CoverageView({ user }: { user: RpaUser }) {
     return filtered;
   }, [zoneSummaries, selectedRegion, selectedBranch, selectedZone]);
 
+  const branchCoverageSummaries = useMemo(() => {
+    const summariesByBranch = new Map<string, {
+      branch: string;
+      total_retailers: number;
+      uao: number;
+      covered_retailers: number;
+      not_covered_retailers: number;
+      red_flagged_retailers: number;
+    }>();
+
+    filteredZoneSummaries.forEach((summary) => {
+      const branchSummary = summariesByBranch.get(summary.branch) || {
+        branch: summary.branch,
+        total_retailers: 0,
+        uao: 0,
+        covered_retailers: 0,
+        not_covered_retailers: 0,
+        red_flagged_retailers: 0,
+      };
+      branchSummary.total_retailers += summary.total_retailers;
+      branchSummary.uao += summary.uao;
+      branchSummary.covered_retailers += summary.covered_retailers;
+      branchSummary.not_covered_retailers += summary.not_covered_retailers;
+      branchSummary.red_flagged_retailers += summary.red_flagged_retailers;
+      summariesByBranch.set(summary.branch, branchSummary);
+    });
+
+    return Array.from(summariesByBranch.values()).map((summary) => ({
+      ...summary,
+      coverage_percentage: summary.total_retailers > 0
+        ? (summary.covered_retailers / summary.total_retailers) * 100
+        : 0,
+    })).sort((a, b) => a.branch.localeCompare(b.branch));
+  }, [filteredZoneSummaries]);
+
   const filteredSummaryStats = useMemo(() => {
     const totalRetailers = filteredZoneSummaries.reduce((sum, summary) => sum + summary.total_retailers, 0);
     const uaoRetailers = filteredZoneSummaries.reduce((sum, summary) => sum + summary.uao, 0);
@@ -893,80 +928,38 @@ export default function CoverageView({ user }: { user: RpaUser }) {
 
       {/* Content based on zone selection */}
       {selectedZone === 'ALL' ? (
-        /* Zone Summaries */
+        /* Branch Coverage Summaries */
         <div className="bg-white rounded-2xl border border-gray-200 p-6">
-          <h3 className="text-lg font-bold text-[#21264E] mb-4">Branch & Zone Coverage Summary</h3>
+          <h3 className="text-lg font-bold text-[#21264E] mb-4">Branch Coverage Details</h3>
 
-          <div className="grid gap-3 md:hidden">
-            {filteredZoneSummaries.length === 0 ? (
-              <p className="py-8 text-center text-sm text-gray-500">No data available</p>
-            ) : filteredZoneSummaries.map((summary, idx) => (
-              <article key={idx} className="rounded-xl border border-gray-200 bg-white px-3 py-2.5 shadow-sm">
-                <div className="flex items-center justify-between gap-2 border-b border-gray-100 pb-2">
-                  <div>
-                    <p className="text-[9px] font-semibold uppercase tracking-wide text-gray-400">Branch / Zone</p>
-                    <p className="mt-0.5 text-xs font-bold text-[#21264E]">{summary.branch.replace('LMIT-HS-', '')} / {summary.zone}</p>
+          {branchCoverageSummaries.length === 0 ? (
+            <p className="py-8 text-center text-sm text-gray-500">No data available</p>
+          ) : (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              {branchCoverageSummaries.map((summary) => (
+                <article key={summary.branch} className="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+                  <div className="border-b border-slate-100 pb-2">
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">Branch</p>
+                    <p className="mt-0.5 truncate text-sm font-bold text-slate-900">{summary.branch.replace('LMIT-HS-', '')}</p>
                   </div>
-                  <span className="rounded-full bg-[#d6eeff] px-2 py-1 text-[10px] font-semibold text-[#245bc1]">{summary.region}</span>
-                </div>
-                <div className="mt-2 grid grid-cols-4 gap-2 text-center">
-                  {[
-                    ['Total', summary.total_retailers],
-                    ['UAO', summary.uao],
-                    ['Covered', summary.covered_retailers],
-                    ['Coverage', `${summary.coverage_percentage.toFixed(1)}%`],
-                  ].map(([label, value]) => (
-                    <div key={label}>
-                      <p className="text-[9px] font-semibold uppercase tracking-wide text-gray-400">{label}</p>
-                      <p className="mt-0.5 text-xs font-semibold text-[#21264E]">{value}</p>
-                    </div>
-                  ))}
-                </div>
-              </article>
-            ))}
-          </div>
-          <div className="hidden overflow-x-auto md:block">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="text-left py-3 px-4 font-semibold text-[#21264E]">Branch</th>
-                  <th className="text-left py-3 px-4 font-semibold text-[#21264E]">Zone</th>
-                  <th className="text-left py-3 px-4 font-semibold text-[#21264E]">Region</th>
-                  <th className="text-right py-3 px-4 font-semibold text-[#21264E]">Total Retailers</th>
-                  <th className="text-right py-3 px-4 font-semibold text-[#21264E]">UAO</th>
-                  <th className="text-right py-3 px-4 font-semibold text-[#21264E]">Covered</th>
-                  <th className="text-right py-3 px-4 font-semibold text-[#21264E]">Not Covered</th>
-                  <th className="text-right py-3 px-4 font-semibold text-[#21264E]">Red Flagged</th>
-                  <th className="text-right py-3 px-4 font-semibold text-[#21264E]">Coverage %</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredZoneSummaries.length === 0 ? (
-                  <tr>
-                    <td colSpan={9} className="text-center py-8 text-gray-500">No data available</td>
-                  </tr>
-                ) : (
-                  filteredZoneSummaries.map((summary, idx) => (
-                    <tr key={idx} className="border-b border-gray-100 hover:bg-gray-50">
-                      <td className="py-3 px-4 text-[#21264E] font-medium">
-                        {summary.branch.replace('LMIT-HS-', '')}
-                      </td>
-                      <td className="py-3 px-4 text-[#21264E]">{summary.zone}</td>
-                      <td className="py-3 px-4 text-[#21264E]">{summary.region}</td>
-                      <td className="py-3 px-4 text-right text-[#21264E]">{summary.total_retailers}</td>
-                      <td className="py-3 px-4 text-right text-[#21264E]">{summary.uao}</td>
-                      <td className="py-3 px-4 text-right text-emerald-600 font-medium">{summary.covered_retailers}</td>
-                      <td className="py-3 px-4 text-right text-orange-600">{summary.not_covered_retailers}</td>
-                      <td className="py-3 px-4 text-right text-red-600">{summary.red_flagged_retailers}</td>
-                      <td className="py-3 px-4 text-right text-[#21264E] font-medium">
-                        {summary.coverage_percentage.toFixed(1)}%
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+                  <div className="mt-3 grid grid-cols-3 gap-x-2 gap-y-3 text-center">
+                    {[
+                      ['Total Retailers', summary.total_retailers, 'text-slate-800'],
+                      ['UAO', summary.uao, 'text-slate-800'],
+                      ['Covered', summary.covered_retailers, 'text-emerald-700'],
+                      ['Not Covered', summary.not_covered_retailers, 'text-orange-700'],
+                      ['Red Flagged', summary.red_flagged_retailers, 'text-red-700'],
+                      ['Coverage %', `${summary.coverage_percentage.toFixed(1)}%`, 'text-[#245bc1]'],
+                    ].map(([label, value, color]) => (
+                      <div key={String(label)} className="min-w-0">
+                        <p className="text-[9px] font-semibold uppercase tracking-wide text-slate-400">{label}</p>
+                        <p className={`mt-0.5 truncate text-xs font-semibold ${color}`}>{typeof value === 'number' ? value.toLocaleString() : value}</p>
+                      </div>
+                    ))}
+                  </div>
+                </article>
+              ))}
+            </div>
         </div>
       ) : (
         /* Retailer Details for Selected Zone */
