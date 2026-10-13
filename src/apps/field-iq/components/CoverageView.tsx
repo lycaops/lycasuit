@@ -965,14 +965,14 @@ export default function CoverageView({ user }: { user: RpaUser }) {
           {coverageDetailTiles.length === 0 ? (
             <p className="py-8 text-center text-sm text-gray-500">No data available</p>
           ) : (
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-1 gap-3">
               {coverageDetailTiles.map((summary) => (
-                <article key={summary.key} className="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
-                  <div className="border-b border-slate-100 pb-2">
-                    <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">{summary.label}</p>
-                    <p className="mt-0.5 truncate text-sm font-bold text-slate-900">{summary.name}</p>
+                <article key={summary.key} className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+                  <div className="bg-[#006AE0] px-4 py-3">
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-white/75">{summary.label}</p>
+                    <p className="mt-0.5 truncate text-sm font-bold text-white">{summary.name}</p>
                   </div>
-                  <div className="mt-3 grid grid-cols-3 grid-rows-2 gap-x-2 gap-y-3 text-center xl:grid-rows-2">
+                  <div className="grid grid-cols-3 grid-rows-2 gap-x-2 gap-y-3 px-4 py-3 text-center">
                     {[
                       ['Total Retailers', summary.total_retailers, 'text-slate-800'],
                       ['UAO', summary.uao, 'text-slate-800'],
