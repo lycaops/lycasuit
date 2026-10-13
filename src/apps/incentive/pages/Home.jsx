@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@incentive/components/Layout';
 import RetailerTable from '@incentive/components/RetailerTable';
@@ -10,7 +10,6 @@ import { formatCurrency, formatNumber, formatPercent, getNumber, normalizePercen
 import { Search, Database, Filter, ArrowDownWideNarrow, ChevronDown } from 'lucide-react';
 import Loader from '@/components/Loader';
 
-function formatIncentiveMonth(value) {
 const ZONE_DETAIL_FIELDS = [
   ['retailer_count', 'Retailers', 'count'],
   ['normal_retailer_count', 'Normal retailers', 'count'],
@@ -52,8 +51,8 @@ const ZONE_DETAIL_FIELDS = [
   ['fake_port_out_pct_avg', 'Average fake port-out percentage', 'percent'],
 ];
 
+function formatIncentiveMonth(value) {
   const match = /^(\d{4})-(\d{2})$/.exec(value);
-  const [expandedZones, setExpandedZones] = useState({});
   if (!match) return value;
 
   const [, year, month] = match;
@@ -85,11 +84,7 @@ export default function Home() {
   } = useApp();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const availableYears = useMemo(
-    () => Array.from(new Set(months.map((value) => value.slice(0, 4)))).sort((a, b) => b.localeCompare(a)),
-    [months],
-  );
-  const [year, setYear] = useState(String(new Date().getFullYear()));
+  const currentYear = String(new Date().getFullYear());
   const [month, setMonth] = useState('');
   const [query, setQuery] = useState('');
   const assignedBranch = user?.role === 'ASM'
@@ -99,19 +94,15 @@ export default function Home() {
   const [zoneFilter, setZoneFilter] = useState('');
   const [groupFilter, setGroupFilter] = useState('');
   const [sortByTotalPaid, setSortByTotalPaid] = useState(false);
-  const yearMonths = months.filter((value) => value.startsWith(`${year}-`));
+  const [expandedZones, setExpandedZones] = useState({});
+  const currentYearMonths = months.filter((value) => value.startsWith(`${currentYear}-`));
   const monthZoneSummaries = zoneSummaries.filter((row) =>
     row.month === month && (!branchFilter || row.accmgrid === branchFilter) && (!zoneFilter || row.hotspotid === zoneFilter),
   );
 
   useEffect(() => {
-    if (availableYears.length && !availableYears.includes(year)) setYear(availableYears[0]);
-  }, [availableYears, year]);
-
-  useEffect(() => {
-    if (!availableYears.includes(year)) return;
-    loadZoneSummaries(year).catch((error) => console.error('Failed to load zone summaries:', error));
-  }, [availableYears, year, loadZoneSummaries]);
+    loadZoneSummaries(currentYear).catch((error) => console.error('Failed to load zone summaries:', error));
+  }, [currentYear, loadZoneSummaries]);
 
   useEffect(() => {
     if (assignedBranch) setBranchFilter(assignedBranch);
@@ -183,23 +174,6 @@ export default function Home() {
           <>
             <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch gap-3">
               <select
-                value={year}
-                onChange={(e) => {
-                  setYear(e.target.value);
-                  setMonth('');
-                  setRecords([]);
-                  setQuery('');
-                  setBranchFilter(assignedBranch);
-                  setZoneFilter('');
-                  setGroupFilter('');
-                }}
-                aria-label={t('select_incentive_year')}
-                className="w-full sm:w-auto rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-[#006AE0] bg-white sm:min-w-[140px]"
-              >
-                <option value="">{t('select_incentive_year')}</option>
-                {availableYears.map((value) => <option key={value} value={value}>{value}</option>)}
-              </select>
-              <select
                 value={month}
                 onChange={(e) => {
                   setMonth(e.target.value);
@@ -210,10 +184,10 @@ export default function Home() {
                   setGroupFilter('');
                 }}
                 className="w-full sm:w-auto rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-[#006AE0] bg-white sm:min-w-[180px]"
-                disabled={!year || loadingZoneSummaries}
+                disabled={loadingZoneSummaries}
               >
                 <option value="">{t('select_incentive_month')}</option>
-                {yearMonths.map((value) => <option key={value} value={value}>{formatIncentiveMonth(value)}</option>)}
+                {currentYearMonths.map((value) => <option key={value} value={value}>{formatIncentiveMonth(value)}</option>)}
               </select>
               <div className="relative flex-1 min-w-0">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
