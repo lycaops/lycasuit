@@ -157,6 +157,34 @@ export default function CoverageView({ user }: { user: RpaUser }) {
     })).sort((a, b) => a.branch.localeCompare(b.branch));
   }, [filteredZoneSummaries]);
 
+  const coverageDetailTiles = useMemo(() => {
+    if (selectedBranch !== 'ALL') {
+      return filteredZoneSummaries.map((summary) => ({
+        key: summary.zone,
+        label: 'Zone',
+        name: summary.zone,
+        total_retailers: summary.total_retailers,
+        uao: summary.uao,
+        covered_retailers: summary.covered_retailers,
+        not_covered_retailers: summary.not_covered_retailers,
+        red_flagged_retailers: summary.red_flagged_retailers,
+        coverage_percentage: summary.coverage_percentage,
+      }));
+    }
+
+    return branchCoverageSummaries.map((summary) => ({
+      key: summary.branch,
+      label: 'Branch',
+      name: summary.branch.replace('LMIT-HS-', ''),
+      total_retailers: summary.total_retailers,
+      uao: summary.uao,
+      covered_retailers: summary.covered_retailers,
+      not_covered_retailers: summary.not_covered_retailers,
+      red_flagged_retailers: summary.red_flagged_retailers,
+      coverage_percentage: summary.coverage_percentage,
+    }));
+  }, [selectedBranch, filteredZoneSummaries, branchCoverageSummaries]);
+
   const filteredSummaryStats = useMemo(() => {
     const totalRetailers = filteredZoneSummaries.reduce((sum, summary) => sum + summary.total_retailers, 0);
     const uaoRetailers = filteredZoneSummaries.reduce((sum, summary) => sum + summary.uao, 0);
@@ -930,19 +958,21 @@ export default function CoverageView({ user }: { user: RpaUser }) {
       {selectedZone === 'ALL' ? (
         /* Branch Coverage Summaries */
         <div className="bg-white rounded-2xl border border-gray-200 p-6">
-          <h3 className="text-lg font-bold text-[#21264E] mb-4">Branch Coverage Details</h3>
+          <h3 className="text-lg font-bold text-[#21264E] mb-4">
+            {selectedBranch === 'ALL' ? 'Branch Coverage Details' : 'Zone-wise Coverage Details'}
+          </h3>
 
-          {branchCoverageSummaries.length === 0 ? (
+          {coverageDetailTiles.length === 0 ? (
             <p className="py-8 text-center text-sm text-gray-500">No data available</p>
           ) : (
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-              {branchCoverageSummaries.map((summary) => (
-                <article key={summary.branch} className="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {coverageDetailTiles.map((summary) => (
+                <article key={summary.key} className="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
                   <div className="border-b border-slate-100 pb-2">
-                    <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">Branch</p>
-                    <p className="mt-0.5 truncate text-sm font-bold text-slate-900">{summary.branch.replace('LMIT-HS-', '')}</p>
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">{summary.label}</p>
+                    <p className="mt-0.5 truncate text-sm font-bold text-slate-900">{summary.name}</p>
                   </div>
-                  <div className="mt-3 grid grid-cols-3 gap-x-2 gap-y-3 text-center">
+                  <div className="mt-3 grid grid-cols-3 grid-rows-2 gap-x-2 gap-y-3 text-center xl:grid-rows-2">
                     {[
                       ['Total Retailers', summary.total_retailers, 'text-slate-800'],
                       ['UAO', summary.uao, 'text-slate-800'],
