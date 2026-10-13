@@ -960,6 +960,7 @@ export default function CoverageView({ user }: { user: RpaUser }) {
                 </article>
               ))}
             </div>
+          )}
         </div>
       ) : (
         /* Retailer Details for Selected Zone */
