@@ -110,10 +110,11 @@ export function AppProvider({ children }) {
     setMonths((data || []).map((row) => row.month).filter(Boolean));
   }, []);
 
-  const loadZoneSummaries = useCallback(async (year) => {
+  const loadZoneSummaries = useCallback(async (month) => {
     const requestId = ++zoneSummaryRequest.current;
-    if (!year) {
+    if (!month) {
       setZoneSummaries([]);
+      setZoneSummariesError(null);
       setLoadingZoneSummaries(false);
       return;
     }
@@ -125,9 +126,7 @@ export function AppProvider({ children }) {
         const { data, error } = await supabase
           .from('incentive_zone_monthly_summary')
           .select('*')
-          .gte('month', `${year}-01`)
-          .lte('month', `${year}-12`)
-          .order('month')
+          .eq('month', month)
           .order('accmgrid')
           .order('hotspotid')
           .range(offset, offset + 999);
@@ -166,6 +165,13 @@ export function AppProvider({ children }) {
   }, []);
 
   const loadRecords = useCallback(async (filters = {}) => {
+    const retailerId = filters.retailerId?.trim();
+    if (!filters.month || !retailerId) {
+      setRecords([]);
+      setHeaders([]);
+      setRecordsError(null);
+      return;
+    }
     setLoadingRecords(true);
     setRecordsError(null);
     try {
@@ -175,10 +181,10 @@ export function AppProvider({ children }) {
       if (url && anonKey && url !== 'http://localhost' && filters.month) {
         const { data, error } = await supabase.rpc('search_incentive_records', {
           p_month: filters.month,
-          p_retailer_id: filters.retailerId || null,
+          p_retailer_id: retailerId,
           p_accmgrid: filters.branch || null,
           p_hotspotid: filters.zone || null,
-          p_limit: 10000,
+          p_limit: 500,
         });
         if (error) throw error;
         mapped = (data || []).map((r) => {

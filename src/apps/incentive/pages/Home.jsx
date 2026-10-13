@@ -87,6 +87,7 @@ export default function Home() {
   const currentYear = String(new Date().getFullYear());
   const [month, setMonth] = useState('');
   const [query, setQuery] = useState('');
+  const [hasSearched, setHasSearched] = useState(false);
   const assignedBranch = user?.role === 'ASM'
     ? String(user.branches?.[0] || user.branch || '')
     : '';
@@ -101,8 +102,8 @@ export default function Home() {
   );
 
   useEffect(() => {
-    loadZoneSummaries(currentYear).catch((error) => console.error('Failed to load zone summaries:', error));
-  }, [currentYear, loadZoneSummaries]);
+    loadZoneSummaries(month).catch((error) => console.error('Failed to load zone summaries:', error));
+  }, [month, loadZoneSummaries]);
 
   useEffect(() => {
     if (assignedBranch) setBranchFilter(assignedBranch);
@@ -119,7 +120,8 @@ export default function Home() {
   }, [month, branchFilter, loadFilterOptions]);
 
   const runSearch = async () => {
-    if (!month) return;
+    if (!month || !query.trim()) return;
+    setHasSearched(true);
     await loadRecords({ month, retailerId: query, branch: branchFilter, zone: zoneFilter });
   };
 
@@ -156,9 +158,9 @@ export default function Home() {
               <p className="font-semibold">Failed to load data from Supabase</p>
               <p className="text-red-600 mt-0.5">{recordsError}</p>
               <p className="mt-2 text-red-600/80">
-                Make sure your <code>VITE_SUPABASE_URL</code> and{' '}
-                <code>VITE_SUPABASE_ANON_KEY</code> env vars are set correctly and the SQL
-                migration has been applied.
+                {recordsError.toLowerCase().includes('timeout')
+                  ? 'The search took too long. Enter a retailer ID or narrow the branch or zone filters.'
+                  : 'Check the Supabase connection, access permissions, and that the latest database migrations are applied.'}
               </p>
             </div>
           </div>
@@ -179,6 +181,7 @@ export default function Home() {
                   setMonth(e.target.value);
                   setRecords([]);
                   setQuery('');
+                  setHasSearched(false);
                   setBranchFilter(assignedBranch);
                   setZoneFilter('');
                   setGroupFilter('');
@@ -193,7 +196,11 @@ export default function Home() {
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   value={query}
-                  onChange={(e) => setQuery(e.target.value)}
+                  onChange={(e) => {
+                    setQuery(e.target.value);
+                    setRecords([]);
+                    setHasSearched(false);
+                  }}
                   placeholder={t('search_retailer_id_placeholder')}
                   onKeyDown={(e) => { if (e.key === 'Enter') runSearch(); }}
                   className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-200 text-sm outline-none focus:border-[#006AE0] bg-white"
@@ -201,7 +208,7 @@ export default function Home() {
               </div>
               <button
                 onClick={runSearch}
-                disabled={!month || loadingRecords}
+                disabled={!month || !query.trim() || loadingRecords}
                 className="inline-flex w-full sm:w-auto items-center gap-2 justify-center rounded-lg bg-[#006AE0] px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
               >
                 <Search className="w-4 h-4" /> {t('search_retailer')}
@@ -219,6 +226,8 @@ export default function Home() {
                     onChange={(e) => {
                       setBranchFilter(e.target.value);
                       setZoneFilter('');
+                      setRecords([]);
+                      setHasSearched(false);
                     }}
                     className="w-full sm:w-auto rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[#006AE0] bg-white sm:min-w-[140px]"
                   >
@@ -233,7 +242,11 @@ export default function Home() {
                 {hasZoneData && (
                   <select
                     value={zoneFilter}
-                    onChange={(e) => setZoneFilter(e.target.value)}
+                    onChange={(e) => {
+                      setZoneFilter(e.target.value);
+                      setRecords([]);
+                      setHasSearched(false);
+                    }}
                     className="w-full sm:w-auto rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[#006AE0] bg-white sm:min-w-[140px]"
                   >
                     <option value="">{t('all_zones')}</option>
@@ -249,6 +262,8 @@ export default function Home() {
                     onClick={() => {
                       setBranchFilter('');
                       setZoneFilter('');
+                      setRecords([]);
+                      setHasSearched(false);
                     }}
                     className="text-xs font-medium text-slate-500 hover:text-slate-700 hover:underline sm:ml-auto w-full sm:w-auto text-center sm:text-right"
                   >
@@ -260,6 +275,17 @@ export default function Home() {
 
             {month && monthZoneSummaries.length > 0 && (
               <Dashboard records={filteredRecords} summaryRows={monthZoneSummaries} />
+            )}
+            {month && loadingZoneSummaries && (
+              <div role="status" className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600">
+                <Loader size={20} weight={5} inherit />
+                {t('loading_month_details')}
+              </div>
+            )}
+            {month && !loadingZoneSummaries && !zoneSummariesError && monthZoneSummaries.length === 0 && (
+              <div className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-500">
+                {t('no_month_details')}
+              </div>
             )}
             {zoneSummariesError && (
               <div role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -384,13 +410,13 @@ export default function Home() {
                     </div>
                   </div>
                   <RetailerTable records={sortedRecords} onSelect={handleSelect} />
-                  {filteredRecords.length === 0 && (
-                    <div className="rounded-[12px] border border-[#E4E9F1] bg-white p-8 text-center text-sm text-slate-400">
-                      {t('no_results')}
-                    </div>
-                  )}
                 </div>
               </>
+            )}
+            {hasSearched && !loadingRecords && !recordsError && filteredRecords.length === 0 && (
+              <div className="rounded-[12px] border border-[#E4E9F1] bg-white p-8 text-center text-sm text-slate-500">
+                {t('no_results')}
+              </div>
             )}
           </>
         </>
