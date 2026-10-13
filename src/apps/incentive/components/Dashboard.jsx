@@ -22,10 +22,25 @@ function StatCard({ icon: Icon, label, value, color, bg }) {
   );
 }
 
-export default function Dashboard({ records: recs }) {
+export default function Dashboard({ records: recs, summaryRows }) {
   const { t, lang, records: ctxRecords } = useApp();
   const records = recs || ctxRecords;
-  const stats = useMemo(() => computeDatasetStats(records), [records]);
+  const stats = useMemo(() => {
+    if (!summaryRows) return computeDatasetStats(records);
+    return summaryRows.reduce((total, row) => ({
+      totalRetailers: total.totalRetailers + Number(row.retailer_count || 0),
+      totalCommission: total.totalCommission + Number(row.total_comm || 0),
+      totalBonuses: total.totalBonuses + Number(row.quality_bonus_m_1 || 0) + Number(row.volume_bonus_m_1 || 0) + Number(row.t3ren_bonus || 0),
+      totalDeductions: total.totalDeductions + Number(row.portout_deduction || 0) + Number(row.usage_clawback || 0),
+      totalPaid: total.totalPaid + Number(row.total_paid_sbt_bt_vou || 0),
+    }), {
+      totalRetailers: 0,
+      totalCommission: 0,
+      totalBonuses: 0,
+      totalDeductions: 0,
+      totalPaid: 0,
+    });
+  }, [records, summaryRows]);
 
   const fmt = (v) => (v === null ? "—" : formatCurrency(v, lang));
 

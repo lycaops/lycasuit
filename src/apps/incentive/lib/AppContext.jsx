@@ -1,5 +1,5 @@
 'use client';
-import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { t as translate } from './translations';
 import supabase from '@incentive/api/supabaseClient';
 import { getText, getNumber } from './csvUtils';
@@ -92,6 +92,10 @@ export function AppProvider({ children }) {
   const [loadingRecords, setLoadingRecords] = useState(false);
   const [recordsError, setRecordsError] = useState(null);
   const [months, setMonths] = useState([]);
+  const [zoneSummaries, setZoneSummaries] = useState([]);
+  const [loadingZoneSummaries, setLoadingZoneSummaries] = useState(false);
+  const [zoneSummariesError, setZoneSummariesError] = useState(null);
+  const zoneSummaryRequest = useRef(0);
   const [filterOptions, setFilterOptions] = useState({ branches: [], zones: [] });
 
   const t = useCallback((key) => translate(lang, key), [lang]);
@@ -104,6 +108,42 @@ export function AppProvider({ children }) {
     const { data, error } = await supabase.rpc('get_incentive_months');
     if (error) throw error;
     setMonths((data || []).map((row) => row.month).filter(Boolean));
+  }, []);
+
+  const loadZoneSummaries = useCallback(async (year) => {
+    const requestId = ++zoneSummaryRequest.current;
+    if (!year) {
+      setZoneSummaries([]);
+      setLoadingZoneSummaries(false);
+      return;
+    }
+    setLoadingZoneSummaries(true);
+    setZoneSummariesError(null);
+    try {
+      const summaries = [];
+      for (let offset = 0; ; offset += 1000) {
+        const { data, error } = await supabase
+          .from('incentive_zone_monthly_summary')
+          .select('*')
+          .gte('month', `${year}-01`)
+          .lte('month', `${year}-12`)
+          .order('month')
+          .order('accmgrid')
+          .order('hotspotid')
+          .range(offset, offset + 999);
+        if (error) throw error;
+        summaries.push(...(data || []));
+        if (!data || data.length < 1000) break;
+      }
+      if (requestId === zoneSummaryRequest.current) setZoneSummaries(summaries);
+    } catch (error) {
+      if (requestId === zoneSummaryRequest.current) {
+        setZoneSummariesError(error?.message || 'Failed to load zone summaries');
+        setZoneSummaries([]);
+      }
+    } finally {
+      if (requestId === zoneSummaryRequest.current) setLoadingZoneSummaries(false);
+    }
   }, []);
 
   const loadFilterOptions = useCallback(async (month, branch = '') => {
@@ -212,8 +252,12 @@ export function AppProvider({ children }) {
       loadingRecords,
       recordsError,
       months,
+      zoneSummaries,
+      loadingZoneSummaries,
+      zoneSummariesError,
       filterOptions,
       loadMonths,
+      loadZoneSummaries,
       loadFilterOptions,
     }),
     [
@@ -227,8 +271,12 @@ export function AppProvider({ children }) {
       loadingRecords,
       recordsError,
       months,
+      zoneSummaries,
+      loadingZoneSummaries,
+      zoneSummariesError,
       filterOptions,
       loadMonths,
+      loadZoneSummaries,
       loadFilterOptions,
     ],
   );
