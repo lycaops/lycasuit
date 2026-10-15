@@ -92,6 +92,7 @@ export function AppProvider({ children }) {
   const [loadingRecords, setLoadingRecords] = useState(false);
   const [recordsError, setRecordsError] = useState(null);
   const [months, setMonths] = useState([]);
+  const [selectedMonth, setSelectedMonth] = useState('');
   const [zoneSummaries, setZoneSummaries] = useState([]);
   const [loadingZoneSummaries, setLoadingZoneSummaries] = useState(false);
   const [zoneSummariesError, setZoneSummariesError] = useState(null);
@@ -257,7 +258,10 @@ export function AppProvider({ children }) {
       loadRecords,
       loadingRecords,
       recordsError,
+      setRecordsError,
       months,
+      selectedMonth,
+      setSelectedMonth,
       zoneSummaries,
       loadingZoneSummaries,
       zoneSummariesError,
@@ -277,6 +281,7 @@ export function AppProvider({ children }) {
       loadingRecords,
       recordsError,
       months,
+      selectedMonth,
       zoneSummaries,
       loadingZoneSummaries,
       zoneSummariesError,

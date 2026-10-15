@@ -13,7 +13,8 @@ import { AppProvider } from '@incentive/lib/AppContext';
 import Login from '@incentive/pages/Login';
 import ForgotPassword from '@incentive/pages/ForgotPassword';
 import ResetPassword from '@incentive/pages/ResetPassword';
-import Home from '@incentive/pages/Home';
+import MonthDashboard from '@incentive/pages/MonthDashboard';
+import RetailerSearch from '@incentive/pages/RetailerSearch';
 import Statement from '@incentive/pages/Statement';
 import SchemeReference from '@incentive/pages/SchemeReference';
 import Calculator from '@incentive/pages/Calculator';
@@ -52,7 +53,8 @@ const AuthenticatedApp = () => {
       <Route
         element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}
       >
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<MonthDashboard />} />
+        <Route path="/retailer-search" element={<RetailerSearch />} />
         <Route path="/statement" element={<Statement />} />
         <Route path="/scheme" element={<SchemeReference />} />
         <Route path="/calculator" element={<Calculator />} />

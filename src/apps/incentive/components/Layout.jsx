@@ -16,6 +16,7 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  Search,
 } from 'lucide-react';
 
 const LOGO_URL = '/logo.png';
@@ -31,6 +32,7 @@ export default function Layout({ children }) {
 
   const navItems = [
     { to: '/', label: t('nav_dashboard'), icon: LayoutDashboard },
+    { to: '/retailer-search', label: t('search_retailer'), icon: Search },
     { to: '/calculator', label: t('nav_calculator'), icon: CalcIcon },
     { to: '/statement', label: t('nav_statement'), icon: FileText },
     { to: '/scheme', label: t('nav_scheme'), icon: BookOpen },
@@ -62,7 +64,7 @@ export default function Layout({ children }) {
             {showSidebarLabels && 'Back to Home'}
           </button>
           {navItems.map((item) => {
-            const active = location.pathname === item.to;
+            const active = item.to === '/' ? location.pathname === '/' : location.pathname.startsWith(item.to);
             const Icon = item.icon;
             return (
               <button
