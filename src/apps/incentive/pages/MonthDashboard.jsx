@@ -6,7 +6,7 @@ import Dashboard from '@incentive/components/Dashboard';
 import Loader from '@/components/Loader';
 import { useApp } from '@incentive/lib/AppContext';
 import { formatCurrency, formatNumber, formatPercent, normalizePercent } from '@incentive/lib/csvUtils';
-import { ArrowRight, ChevronDown } from 'lucide-react';
+import { Activity, ArrowRight, Building2, ChevronDown, MapPin, Users } from 'lucide-react';
 
 const ZONE_DETAIL_FIELDS = [
   ['retailer_count', 'Retailers', 'count'],
@@ -190,75 +190,91 @@ export default function MonthDashboard() {
                 <h2 id="zone-summary-heading" className="text-sm font-semibold text-slate-800">{t('zone_month_summary')}</h2>
                 <span className="text-xs text-slate-500">{monthRows.length} {t('zones')}</span>
               </div>
-              <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
-                <table className="min-w-[980px] w-full text-left text-sm">
-                  <thead className="bg-slate-50 text-xs uppercase text-slate-500">
-                    <tr>
-                      <th className="px-4 py-3">{t('branch')}</th>
-                      <th className="px-4 py-3">{t('zone')}</th>
-                      <th className="px-4 py-3 text-right">{t('total_retailers')}</th>
-                      <th className="px-4 py-3 text-right">{t('activations')}</th>
-                      <th className="px-4 py-3 text-right">{t('total_commission')}</th>
-                      <th className="px-4 py-3 text-right">{t('total_bonuses')}</th>
-                      <th className="px-4 py-3 text-right">{t('total_deductions')}</th>
-                      <th className="px-4 py-3 text-right">{t('total_paid')}</th>
-                      <th className="px-4 py-3 text-right">{t('details')}</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {monthRows.map((row) => {
-                      const key = `${row.month}-${row.accmgrid}-${row.hotspotid}`;
-                      const expanded = Boolean(expandedZones[key]);
-                      return (
-                        <React.Fragment key={key}>
-                          <tr>
-                            <td className="px-4 py-3 font-medium text-slate-800">{row.accmgrid || '—'}</td>
-                            <td className="px-4 py-3 text-slate-600">{row.hotspotid || '—'}</td>
-                            <td className="px-4 py-3 text-right tabular-nums">{formatNumber(Number(row.retailer_count || 0), lang)}</td>
-                            <td className="px-4 py-3 text-right tabular-nums">{formatNumber(Number(row.total_noofactivations || 0), lang)}</td>
-                            <td className="px-4 py-3 text-right tabular-nums">{formatCurrency(Number(row.total_comm || 0), lang)}</td>
-                            <td className="px-4 py-3 text-right tabular-nums">{formatCurrency(Number(row.quality_bonus_m_1 || 0) + Number(row.volume_bonus_m_1 || 0) + Number(row.t3ren_bonus || 0), lang)}</td>
-                            <td className="px-4 py-3 text-right tabular-nums">{formatCurrency(Number(row.portout_deduction || 0) + Number(row.usage_clawback || 0), lang)}</td>
-                            <td className="px-4 py-3 text-right font-semibold tabular-nums">{formatCurrency(Number(row.total_paid_sbt_bt_vou || 0), lang)}</td>
-                            <td className="px-4 py-3 text-right">
-                              <button
-                                type="button"
-                                onClick={() => setExpandedZones((current) => ({ ...current, [key]: !current[key] }))}
-                                aria-expanded={expanded}
-                                className="inline-flex items-center gap-1 text-xs font-medium text-[#006AE0] hover:underline"
-                              >
-                                <ChevronDown className={`h-4 w-4 transition-transform ${expanded ? 'rotate-180' : ''}`} />
-                                {expanded ? t('hide_metrics') : t('all_metrics')}
-                              </button>
-                            </td>
-                          </tr>
-                          {expanded && (
-                            <tr>
-                              <td colSpan={9} className="bg-slate-50 px-4 py-4">
-                                <dl className="grid grid-cols-2 gap-x-5 gap-y-3 sm:grid-cols-3 lg:grid-cols-5">
-                                  {ZONE_DETAIL_FIELDS.map(([field, label, kind]) => {
-                                    const value = Number(row[field] || 0);
-                                    const formatted = kind === 'currency'
-                                      ? formatCurrency(value, lang)
-                                      : kind === 'percent'
-                                        ? formatPercent(normalizePercent(value))
-                                        : formatNumber(value, lang);
-                                    return (
-                                      <div key={field} className="min-w-0">
-                                        <dt className="text-[10px] uppercase text-slate-500">{label}</dt>
-                                        <dd className="mt-0.5 truncate text-sm font-medium tabular-nums text-slate-800">{formatted}</dd>
-                                      </div>
-                                    );
-                                  })}
-                                </dl>
-                              </td>
-                            </tr>
-                          )}
-                        </React.Fragment>
-                      );
-                    })}
-                  </tbody>
-                </table>
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+                {monthRows.map((row) => {
+                  const key = `${row.month}-${row.accmgrid}-${row.hotspotid}`;
+                  const expanded = Boolean(expandedZones[key]);
+                  const bonuses = Number(row.quality_bonus_m_1 || 0) + Number(row.volume_bonus_m_1 || 0) + Number(row.t3ren_bonus || 0);
+                  const deductions = Number(row.portout_deduction || 0) + Number(row.usage_clawback || 0);
+                  return (
+                    <article key={key} className="min-w-0 rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md">
+                      <header className="flex min-w-0 items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase text-slate-500">
+                            <Building2 className="h-3.5 w-3.5 text-[#006AE0]" /> {t('branch')}
+                          </p>
+                          <p className="mt-1 truncate text-sm font-medium text-slate-700">{row.accmgrid || '—'}</p>
+                        </div>
+                        <div className="flex min-w-0 items-center gap-1.5 rounded-md bg-blue-50 px-2.5 py-1.5 text-xs font-semibold text-[#006AE0]">
+                          <MapPin className="h-3.5 w-3.5 shrink-0" />
+                          <span className="truncate">{row.hotspotid || '—'}</span>
+                        </div>
+                      </header>
+
+                      <div className="mt-4 border-t border-slate-100 pt-3">
+                        <p className="text-[10px] font-semibold uppercase text-slate-500">{t('total_paid')}</p>
+                        <p className="mt-0.5 truncate text-2xl font-semibold tabular-nums text-[#21264e]">
+                          {formatCurrency(Number(row.total_paid_sbt_bt_vou || 0), lang)}
+                        </p>
+                      </div>
+
+                      <dl className="mt-4 grid grid-cols-3 divide-x divide-slate-100 border-y border-slate-100 py-3">
+                        <div className="min-w-0 pr-2">
+                          <dt className="flex items-center gap-1 text-[10px] uppercase text-slate-500"><Users className="h-3 w-3" /> {t('total_retailers')}</dt>
+                          <dd className="mt-1 truncate text-sm font-semibold tabular-nums text-slate-800">{formatNumber(Number(row.retailer_count || 0), lang)}</dd>
+                        </div>
+                        <div className="min-w-0 px-2">
+                          <dt className="flex items-center gap-1 text-[10px] uppercase text-slate-500"><Activity className="h-3 w-3" /> {t('activations')}</dt>
+                          <dd className="mt-1 truncate text-sm font-semibold tabular-nums text-slate-800">{formatNumber(Number(row.total_noofactivations || 0), lang)}</dd>
+                        </div>
+                        <div className="min-w-0 pl-2">
+                          <dt className="text-[10px] uppercase text-slate-500">{t('total_commission')}</dt>
+                          <dd className="mt-1 truncate text-sm font-semibold tabular-nums text-slate-800">{formatCurrency(Number(row.total_comm || 0), lang)}</dd>
+                        </div>
+                      </dl>
+
+                      <div className="flex items-center justify-between gap-3 py-3 text-xs">
+                        <div className="min-w-0">
+                          <span className="text-slate-500">{t('total_bonuses')} </span>
+                          <span className="font-medium tabular-nums text-emerald-700">{formatCurrency(bonuses, lang)}</span>
+                        </div>
+                        <div className="min-w-0 text-right">
+                          <span className="text-slate-500">{t('total_deductions')} </span>
+                          <span className="font-medium tabular-nums text-rose-700">{formatCurrency(deductions, lang)}</span>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => setExpandedZones((current) => ({ ...current, [key]: !current[key] }))}
+                        aria-expanded={expanded}
+                        className="inline-flex w-full items-center justify-between border-t border-slate-100 pt-3 text-xs font-semibold text-[#006AE0] hover:text-[#0058be]"
+                      >
+                        {expanded ? t('hide_metrics') : t('all_metrics')}
+                        <ChevronDown className={`h-4 w-4 transition-transform ${expanded ? 'rotate-180' : ''}`} />
+                      </button>
+
+                      {expanded && (
+                        <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-3 border-t border-slate-100 pt-3 sm:grid-cols-3">
+                          {ZONE_DETAIL_FIELDS.map(([field, label, kind]) => {
+                            const value = Number(row[field] || 0);
+                            const formatted = kind === 'currency'
+                              ? formatCurrency(value, lang)
+                              : kind === 'percent'
+                                ? formatPercent(normalizePercent(value))
+                                : formatNumber(value, lang);
+                            return (
+                              <div key={field} className="min-w-0">
+                                <dt className="text-[10px] uppercase text-slate-500">{label}</dt>
+                                <dd className="mt-0.5 truncate text-sm font-medium tabular-nums text-slate-800">{formatted}</dd>
+                              </div>
+                            );
+                          })}
+                        </dl>
+                      )}
+                    </article>
+                  );
+                })}
               </div>
             </section>
           </>
