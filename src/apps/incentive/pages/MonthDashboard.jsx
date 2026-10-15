@@ -60,6 +60,39 @@ function getMonthOptions(year, lang) {
   });
 }
 
+function aggregateRowsByBranch(rows) {
+  const grouped = new Map();
+  const summedFields = ZONE_DETAIL_FIELDS
+    .filter(([, , kind]) => kind !== 'percent')
+    .map(([field]) => field);
+
+  for (const row of rows) {
+    const branch = row.accmgrid || '';
+    if (!grouped.has(branch)) {
+      const summary = { ...row, accmgrid: branch, hotspotid: '', usage_percentage_avg: 0, fake_port_out_pct_avg: 0 };
+      for (const field of summedFields) summary[field] = 0;
+      summary._usagePercentageTotal = 0;
+      summary._fakePortOutPercentageTotal = 0;
+      grouped.set(branch, summary);
+    }
+
+    const summary = grouped.get(branch);
+    for (const field of summedFields) summary[field] += Number(row[field] || 0);
+    const retailerCount = Number(row.retailer_count || 0);
+    summary._usagePercentageTotal += Number(row.usage_percentage_avg || 0) * retailerCount;
+    summary._fakePortOutPercentageTotal += Number(row.fake_port_out_pct_avg || 0) * retailerCount;
+  }
+
+  return Array.from(grouped.values()).map((summary) => {
+    const retailerCount = Number(summary.retailer_count || 0);
+    summary.usage_percentage_avg = retailerCount ? summary._usagePercentageTotal / retailerCount : 0;
+    summary.fake_port_out_pct_avg = retailerCount ? summary._fakePortOutPercentageTotal / retailerCount : 0;
+    delete summary._usagePercentageTotal;
+    delete summary._fakePortOutPercentageTotal;
+    return summary;
+  });
+}
+
 export default function MonthDashboard() {
   const {
     t,
@@ -79,6 +112,21 @@ export default function MonthDashboard() {
   const monthOptions = getMonthOptions(currentYear, lang);
   const monthRows = zoneSummaries.filter((row) => row.month === selectedMonth);
   const [expandedZones, setExpandedZones] = useState({});
+  const [reportMode, setReportMode] = useState('zone');
+  const [branchFilter, setBranchFilter] = useState('');
+  const [zoneFilter, setZoneFilter] = useState('');
+  const branches = Array.from(new Set(monthRows.map((row) => row.accmgrid).filter(Boolean))).sort();
+  const zones = Array.from(new Set(
+    monthRows
+      .filter((row) => !branchFilter || row.accmgrid === branchFilter)
+      .map((row) => row.hotspotid)
+      .filter(Boolean),
+  )).sort();
+  const filteredMonthRows = monthRows.filter((row) =>
+    (!branchFilter || row.accmgrid === branchFilter)
+    && (!zoneFilter || row.hotspotid === zoneFilter),
+  );
+  const reportRows = reportMode === 'branch' ? aggregateRowsByBranch(filteredMonthRows) : filteredMonthRows;
 
   useEffect(() => {
     if (selectedMonth && !selectedMonth.startsWith(`${currentYear}-`)) {
@@ -93,6 +141,8 @@ export default function MonthDashboard() {
     setRecords([]);
     setSelectedRetailer(null);
     setExpandedZones({});
+    setBranchFilter('');
+    setZoneFilter('');
   };
 
   const openRetailerSearch = () => {
@@ -184,14 +234,54 @@ export default function MonthDashboard() {
 
         {selectedMonth && !loadingZoneSummaries && monthRows.length > 0 && (
           <>
-            <Dashboard summaryRows={monthRows} />
+            <Dashboard summaryRows={filteredMonthRows} />
             <section aria-labelledby="zone-summary-heading" className="space-y-3">
-              <div className="flex items-center justify-between gap-3">
-                <h2 id="zone-summary-heading" className="text-sm font-semibold text-slate-800">{t('zone_month_summary')}</h2>
-                <span className="text-xs text-slate-500">{monthRows.length} {t('zones')}</span>
+              <div className="flex flex-col gap-3 border-b border-slate-200 pb-3 lg:flex-row lg:items-center lg:justify-between">
+                <div className="flex items-center justify-between gap-3">
+                  <h2 id="zone-summary-heading" className="text-sm font-semibold text-slate-800">
+                    {t(reportMode === 'branch' ? 'branch_month_summary' : 'zone_month_summary')}
+                  </h2>
+                  <span className="text-xs text-slate-500">{reportRows.length} {t(reportMode === 'branch' ? 'branches' : 'zones')}</span>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <div role="group" aria-label={t('report_view')} className="inline-flex rounded-lg border border-slate-200 bg-white p-1">
+                    {['branch', 'zone'].map((mode) => (
+                      <button
+                        key={mode}
+                        type="button"
+                        onClick={() => setReportMode(mode)}
+                        aria-pressed={reportMode === mode}
+                        className={`rounded-md px-3 py-1.5 text-xs font-semibold transition-colors ${reportMode === mode ? 'bg-[#21264e] text-white' : 'text-slate-600 hover:bg-slate-50'}`}
+                      >
+                        {t(mode === 'branch' ? 'by_branch' : 'by_zone')}
+                      </button>
+                    ))}
+                  </div>
+                  <select
+                    value={branchFilter}
+                    onChange={(event) => {
+                      setBranchFilter(event.target.value);
+                      setZoneFilter('');
+                    }}
+                    aria-label={t('branch')}
+                    className="min-w-36 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 outline-none focus:border-[#006AE0]"
+                  >
+                    <option value="">{t('all_branches')}</option>
+                    {branches.map((branch) => <option key={branch} value={branch}>{branch}</option>)}
+                  </select>
+                  <select
+                    value={zoneFilter}
+                    onChange={(event) => setZoneFilter(event.target.value)}
+                    aria-label={t('zone')}
+                    className="min-w-36 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 outline-none focus:border-[#006AE0]"
+                  >
+                    <option value="">{t('all_zones')}</option>
+                    {zones.map((zone) => <option key={zone} value={zone}>{zone}</option>)}
+                  </select>
+                </div>
               </div>
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-                {monthRows.map((row) => {
+                {reportRows.map((row) => {
                   const key = `${row.month}-${row.accmgrid}-${row.hotspotid}`;
                   const expanded = Boolean(expandedZones[key]);
                   const bonuses = Number(row.quality_bonus_m_1 || 0) + Number(row.volume_bonus_m_1 || 0) + Number(row.t3ren_bonus || 0);
@@ -207,7 +297,7 @@ export default function MonthDashboard() {
                         </div>
                         <div className="flex min-w-0 items-center gap-1.5 rounded-md bg-blue-50 px-2.5 py-1.5 text-xs font-semibold text-[#006AE0]">
                           <MapPin className="h-3.5 w-3.5 shrink-0" />
-                          <span className="truncate">{row.hotspotid || '—'}</span>
+                          <span className="truncate">{reportMode === 'branch' ? t('all_zones') : row.hotspotid || '—'}</span>
                         </div>
                       </header>
 
