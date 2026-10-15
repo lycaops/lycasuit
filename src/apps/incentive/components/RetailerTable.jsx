@@ -52,11 +52,9 @@ export default function RetailerTable({ onSelect, records: recs }) {
             : null;
         const belowRenewalThreshold = renewalRate !== null && renewalRate < 30;
         return (
-          <button
+          <article
             key={r._id || i}
-            type="button"
-            onClick={() => select(r)}
-            className="w-full rounded-[12px] border border-[#E4E9F1] bg-white px-4 py-3 text-left transition-colors hover:border-[#B9C6DB] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#006AE0]/40"
+            className="w-full rounded-[12px] border border-[#E4E9F1] bg-white px-4 py-3 text-left"
           >
             <div className="flex items-start justify-between gap-3">
               <span className="min-w-0 truncate text-sm font-bold text-slate-900 sm:text-[15px]">
@@ -103,12 +101,16 @@ export default function RetailerTable({ onSelect, records: recs }) {
                 </p>
                 <p className="mt-0.5 truncate text-sm font-semibold text-[#46286e]">{cfmt(totalDeductions)}</p>
               </div>
-              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[#006AE0] px-3 py-1 text-xs font-semibold text-white">
+              <button
+                type="button"
+                onClick={() => select(r)}
+                className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[#006AE0] px-3 py-1 text-xs font-semibold text-white transition-colors hover:bg-[#0058be] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#006AE0]/40"
+              >
                 {t("view_statement")}
                 <ChevronRight className="h-3.5 w-3.5" />
-              </span>
+              </button>
             </div>
-          </button>
+          </article>
         );
       })}
       {records.length > limit && (
