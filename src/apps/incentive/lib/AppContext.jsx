@@ -167,7 +167,9 @@ export function AppProvider({ children }) {
 
   const loadRecords = useCallback(async (filters = {}) => {
     const retailerId = filters.retailerId?.trim();
-    if (!filters.month || !retailerId) {
+    const branch = filters.branch?.trim();
+    const zone = filters.zone?.trim();
+    if (!filters.month || (!retailerId && !branch && !zone)) {
       setRecords([]);
       setHeaders([]);
       setRecordsError(null);
@@ -180,15 +182,21 @@ export function AppProvider({ children }) {
       const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
       let mapped = [];
       if (url && anonKey && url !== 'http://localhost' && filters.month) {
-        const { data, error } = await supabase.rpc('search_incentive_records', {
-          p_month: filters.month,
-          p_retailer_id: retailerId,
-          p_accmgrid: filters.branch || null,
-          p_hotspotid: filters.zone || null,
-          p_limit: 500,
-        });
-        if (error) throw error;
-        mapped = (data || []).map((r) => {
+        const rows = [];
+        for (let offset = 0; ; offset += 500) {
+          const { data, error } = await supabase.rpc('search_incentive_records', {
+            p_month: filters.month,
+            p_retailer_id: retailerId || null,
+            p_accmgrid: branch || null,
+            p_hotspotid: zone || null,
+            p_limit: 500,
+            p_offset: offset,
+          });
+          if (error) throw error;
+          rows.push(...(data || []));
+          if (!data || data.length < 500) break;
+        }
+        mapped = rows.map((r) => {
           const display = toDisplayRow(r);
           const rawGroup = r.incentive_group || 'special';
           const incentiveGroup =

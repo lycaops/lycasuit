@@ -47,6 +47,7 @@ export default function RetailerSearch() {
   const [sortByTotalPaid, setSortByTotalPaid] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [filterError, setFilterError] = useState('');
+  const [searchValidationError, setSearchValidationError] = useState('');
 
   useEffect(() => {
     if (!selectedMonth) return;
@@ -56,32 +57,34 @@ export default function RetailerSearch() {
     });
   }, [selectedMonth, branchFilter, loadFilterOptions]);
 
-  useEffect(() => {
-    if (isFixedBranchRole && !branchFilter && filterOptions.branches.length === 1) {
-      setBranchFilter(filterOptions.branches[0]);
-    }
-  }, [isFixedBranchRole, branchFilter, filterOptions.branches]);
-
-  useEffect(() => {
-    if (isZoneManager && !zoneFilter && filterOptions.zones.length === 1) {
-      setZoneFilter(filterOptions.zones[0]);
-    }
-  }, [isZoneManager, zoneFilter, filterOptions.zones]);
+  const effectiveBranchFilter = branchFilter || (
+    !isZoneManager && filterOptions.branches.length === 1 ? filterOptions.branches[0] : ''
+  );
+  const effectiveZoneFilter = zoneFilter || (
+    isZoneManager && filterOptions.zones.length === 1 ? filterOptions.zones[0] : ''
+  );
 
   const resetResults = () => {
     setRecords([]);
     setRecordsError(null);
     setHasSearched(false);
+    setSearchValidationError('');
   };
 
   const runSearch = async () => {
-    if (!selectedMonth || !query.trim()) return;
+    if (!selectedMonth) return;
+    if (!query.trim() && !effectiveBranchFilter && !effectiveZoneFilter) {
+      setHasSearched(false);
+      setSearchValidationError(t('search_criteria_required'));
+      return;
+    }
+    setSearchValidationError('');
     setHasSearched(true);
     await loadRecords({
       month: selectedMonth,
-      retailerId: query,
-      branch: branchFilter || null,
-      zone: zoneFilter || null,
+      retailerId: query.trim() || null,
+      branch: effectiveBranchFilter || null,
+      zone: effectiveZoneFilter || null,
     });
   };
 
@@ -106,6 +109,7 @@ export default function RetailerSearch() {
     : filteredRecords;
   const showBranchFilter = !isZoneManager && !isFixedBranchRole && filterOptions.branches.length > 1;
   const showZoneFilter = !isZoneManager && filterOptions.zones.length > 1;
+  const showFixedBranchScope = isFixedBranchRole || (!isZoneManager && filterOptions.branches.length === 1);
   const scopeDescription = isZoneManager
     ? `${t('zone')}: ${user?.zone_name || user?.zone || profile?.territory || '—'}`
     : isFixedBranchRole
@@ -163,7 +167,7 @@ export default function RetailerSearch() {
                 <button
                   type="button"
                   onClick={runSearch}
-                  disabled={!query.trim() || loadingRecords}
+                  disabled={loadingRecords}
                   className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#006AE0] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#0058be] disabled:cursor-not-allowed disabled:opacity-45"
                 >
                   <Search className="h-4 w-4" /> {t('search_retailer')}
@@ -204,9 +208,9 @@ export default function RetailerSearch() {
                       {filterOptions.zones.map((zone) => <option key={zone} value={zone}>{zone}</option>)}
                     </select>
                   )}
-                  {(isFixedBranchRole || isZoneManager) && (
+                  {(showFixedBranchScope || isZoneManager) && (
                     <span className="rounded-lg bg-slate-100 px-3 py-2 text-xs font-medium text-slate-600">
-                      {isZoneManager ? `${t('zone')}: ${filterOptions.zones[0] || scopeDescription.split(': ').at(-1)}` : `${t('branch')}: ${filterOptions.branches[0] || scopeDescription.split(': ').at(-1)}`}
+                      {isZoneManager ? `${t('zone')}: ${effectiveZoneFilter || scopeDescription.split(': ').at(-1)}` : `${t('branch')}: ${effectiveBranchFilter || scopeDescription.split(': ').at(-1)}`}
                     </span>
                   )}
                   {(branchFilter || zoneFilter) && (
@@ -217,6 +221,7 @@ export default function RetailerSearch() {
                 </div>
               )}
               {filterError && <p role="alert" className="text-sm text-red-700">{filterError}</p>}
+              {searchValidationError && <p role="alert" className="text-sm text-red-700">{searchValidationError}</p>}
             </section>
 
             {recordsError && (
