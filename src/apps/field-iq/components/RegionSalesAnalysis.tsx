@@ -25,19 +25,19 @@ interface RegionSalesAnalysisProps {
 }
 
 interface RegionMonthlyRow {
-  branch: string;
-  zone: string;
+  branch?: string;
+  zone?: string;
   year: number;
   ga_cnt: number;
   port_in: number;
   port_out: number;
   add_gara: number;
   incentive: number;
-  postcode: string;
-  city: string;
+  postcode?: string;
+  city?: string;
   province: string;
   region: string;
-  retailer_count: number;
+  retailer_count?: number;
 }
 
 type MetricKey = 'ga_cnt' | 'port_in' | 'port_out' | 'add_gara' | 'incentive';
@@ -80,6 +80,9 @@ const REGION_NAMES: Record<string, string> = {
 const zoneAllocations = new Map(
   italyProvinceAllocations.features.map((feature) => [feature.properties.code, feature.properties]),
 );
+const provinceNames = new Map(
+  italyProvinceAllocations.features.map((feature) => [feature.properties.code, feature.properties.name]),
+);
 
 const loadProvinceMap = () => {
   provinceMapPromise ??= fetch('/maps/italy-provinces.json').then((response) => {
@@ -101,6 +104,11 @@ const textKey = (value: unknown) => String(value ?? '')
   .replace(/[^a-z0-9]+/gi, '')
   .toLowerCase();
 
+const provinceLabel = (code: unknown) => {
+  const provinceCode = String(code ?? '');
+  return provinceNames.get(provinceCode) ? `${provinceNames.get(provinceCode)} (${provinceCode})` : provinceCode || 'Unspecified province';
+};
+
 const regionLabel = (value: unknown) => {
   const code = String(value ?? '').trim().toUpperCase();
   if (!code) return 'Unspecified region';
@@ -119,7 +127,7 @@ const formatValue = (value: number, metric: MetricKey) => metric === 'incentive'
   : value.toLocaleString(undefined, { maximumFractionDigits: 0 });
 
 const getLocationLabel = (row: RegionMonthlyRow, level: GeographyLevel) => {
-  if (level === 'province') return row.province || 'Unspecified province';
+  if (level === 'province') return provinceLabel(row.province);
   if (level === 'postcode') return row.postcode || 'Unspecified postcode';
   return row.city || 'Unspecified city';
 };
@@ -132,13 +140,12 @@ function ProvinceSalesMap({ rows, metric }: { rows: RegionMonthlyRow[]; metric: 
   const [mapError, setMapError] = useState('');
 
   const provinceData = useMemo(() => {
-    const grouped = new Map<string, { value: number; region: string; zones: Map<string, number> }>();
+    const grouped = new Map<string, { value: number; region: string }>();
     rows.forEach((row) => {
       const key = textKey(row.province);
       if (!key) return;
-      const entry = grouped.get(key) ?? { value: 0, region: row.region || '', zones: new Map<string, number>() };
+      const entry = grouped.get(key) ?? { value: 0, region: row.region || '' };
       entry.value += numberValue(row[metric]);
-      if (row.zone) entry.zones.set(row.zone, (entry.zones.get(row.zone) ?? 0) + numberValue(row[metric]));
       if (!entry.region && row.region) entry.region = row.region;
       grouped.set(key, entry);
     });
@@ -197,14 +204,12 @@ function ProvinceSalesMap({ rows, metric }: { rows: RegionMonthlyRow[]; metric: 
         const code = String(properties.prov_acr ?? properties.code ?? '');
         const province = provinceData.get(textKey(provinceName)) ?? provinceData.get(textKey(code));
         const allocation = zoneAllocations.get(code);
-        const topZone = [...(province?.zones.entries() ?? [])].sort((a, b) => b[1] - a[1])[0]?.[0] ?? 'No zone data';
         return {
           name: provinceName,
           value: province?.value ?? 0,
           region: province?.region ? regionLabel(province.region) : properties.reg_name || 'Unknown',
           branch: allocation?.branch ?? 'Unassigned',
           allocatedZone: allocation?.zone ?? 'Unassigned',
-          zone: topZone,
           code,
         };
       });
@@ -215,7 +220,7 @@ function ProvinceSalesMap({ rows, metric }: { rows: RegionMonthlyRow[]; metric: 
           confine: true,
           formatter: (params: any) => {
             const item = params.data ?? {};
-            return `<strong>${escapeHtml(params.name)}</strong><br/>Province: ${escapeHtml(item.code || '—')}<br/>Region: ${escapeHtml(item.region)}<br/>Allocated branch / zone: ${escapeHtml(item.branch)} / ${escapeHtml(item.allocatedZone)}<br/>Top sales zone: ${escapeHtml(item.zone)}<br/>${escapeHtml(METRICS.find((entry) => entry.key === metric)?.label)}: ${escapeHtml(formatValue(numberValue(item.value), metric))}`;
+            return `<strong>${escapeHtml(params.name)}</strong><br/>Province: ${escapeHtml(item.code || '—')}<br/>Region: ${escapeHtml(item.region)}<br/>Allocated branch / zone: ${escapeHtml(item.branch)} / ${escapeHtml(item.allocatedZone)}<br/>${escapeHtml(METRICS.find((entry) => entry.key === metric)?.label)}: ${escapeHtml(formatValue(numberValue(item.value), metric))}`;
           },
         },
         visualMap: {
@@ -261,13 +266,16 @@ function ProvinceSalesMap({ rows, metric }: { rows: RegionMonthlyRow[]; metric: 
 
 export default function RegionSalesAnalysis({ user, region, branch, zone }: RegionSalesAnalysisProps) {
   const [rows, setRows] = useState<RegionMonthlyRow[]>([]);
+  const [detailRows, setDetailRows] = useState<RegionMonthlyRow[]>([]);
   const [availableYears, setAvailableYears] = useState<string[]>([]);
   const [loadingYears, setLoadingYears] = useState(true);
   const [loading, setLoading] = useState(true);
+  const [loadingDetails, setLoadingDetails] = useState(false);
   const [loadError, setLoadError] = useState('');
   const [selectedYear, setSelectedYear] = useState('');
   const [mapMetric, setMapMetric] = useState<MetricKey>('port_in');
-  const [geographyLevel, setGeographyLevel] = useState<GeographyLevel>('city');
+  const [geographyLevel, setGeographyLevel] = useState<GeographyLevel>('province');
+  const [selectedProvince, setSelectedProvince] = useState('');
   const [search, setSearch] = useState('');
   const [reloadKey, setReloadKey] = useState(0);
 
@@ -331,6 +339,7 @@ export default function RegionSalesAnalysis({ user, region, branch, zone }: Regi
     const fetchRows = async () => {
       setLoading(true);
       setRows([]);
+      setDetailRows([]);
       if (!selectedYear || loadingYears || loadError) {
         setLoading(false);
         return;
@@ -345,32 +354,15 @@ export default function RegionSalesAnalysis({ user, region, branch, zone }: Regi
           : regionBranches;
       }
 
-      let query = supabase
-        .from('retailer_region_yearly')
-        .select('branch, zone, year, ga_cnt, port_in, port_out, add_gara, incentive, postcode, city, province, region')
-        .eq('year', Number(selectedYear))
-        .order('branch', { ascending: true })
-        .order('zone', { ascending: true })
-        .order('province', { ascending: true })
-        .order('city', { ascending: true })
-        .order('postcode', { ascending: true })
-        .order('region', { ascending: true });
-      if (scopedBranches) query = query.in('branch', scopedBranches);
-      if (branch) query = query.eq('branch', branch);
-      if (zone) query = query.eq('zone', zone);
-      if (user.role === 'ZONE-MANAGER') query = query.eq('zone', zone);
-
-      const result: RegionMonthlyRow[] = [];
-      const pageSize = 1000;
-      for (let offset = 0; ; offset += pageSize) {
-        const { data, error } = await query.range(offset, offset + pageSize - 1);
-        if (error) throw new Error(error.message);
-        const page = (data ?? []) as RegionMonthlyRow[];
-        result.push(...page);
-        if (page.length < pageSize) break;
-      }
+      const { data, error } = await supabase.rpc('retailer_region_province_report', {
+        p_year: Number(selectedYear),
+        p_branches: scopedBranches,
+        p_branch: branch || null,
+        p_zone: zone || null,
+      });
+      if (error) throw new Error(error.message);
       if (cancelled) return;
-      setRows(result);
+      setRows((data ?? []).map((row: Omit<RegionMonthlyRow, 'year'>) => ({ ...row, year: Number(selectedYear) })));
       setLoading(false);
     };
 
@@ -384,10 +376,66 @@ export default function RegionSalesAnalysis({ user, region, branch, zone }: Regi
     return () => { cancelled = true; };
   }, [user, region, branch, zone, selectedYear, loadingYears, loadError, reloadKey]);
 
+  useEffect(() => {
+    let cancelled = false;
+    const fetchDetailRows = async () => {
+      setDetailRows([]);
+      if (geographyLevel === 'province' || !selectedProvince || !selectedYear || loading || loadError) {
+        setLoadingDetails(false);
+        return;
+      }
+      setLoadingDetails(true);
+
+      let query = supabase
+        .from('retailer_region_yearly')
+        .select('branch, zone, year, ga_cnt, port_in, port_out, add_gara, incentive, postcode, city, province, region')
+        .eq('year', Number(selectedYear))
+        .eq('province', selectedProvince)
+        .order('city', { ascending: true })
+        .order('postcode', { ascending: true });
+
+      const allowedBranches = (user.branches ?? []).map(normalizeBranch).filter(Boolean);
+      if (!ALL_BRANCH_ROLES.includes(user.role)) query = query.in('branch', allowedBranches);
+      if (region === 'NORTH') query = query.in('branch', NORTH_REGION);
+      if (region === 'SOUTH') query = query.in('branch', SOUTH_REGION);
+      if (branch) query = query.eq('branch', branch);
+      if (zone) query = query.eq('zone', zone);
+      if (user.role === 'ZONE-MANAGER') query = query.eq('zone', zone);
+
+      const result: RegionMonthlyRow[] = [];
+      const pageSize = 1000;
+      for (let offset = 0; ; offset += pageSize) {
+        const { data, error } = await query.range(offset, offset + pageSize - 1);
+        if (error) throw new Error(error.message);
+        const page = (data ?? []) as RegionMonthlyRow[];
+        result.push(...page);
+        if (page.length < pageSize) break;
+      }
+      if (!cancelled) {
+        setDetailRows(result);
+        setLoadingDetails(false);
+      }
+    };
+
+    fetchDetailRows().catch((error: unknown) => {
+      if (!cancelled) {
+        setLoadError(error instanceof Error ? error.message : 'Unable to load location detail.');
+        setLoadingDetails(false);
+      }
+    });
+    return () => { cancelled = true; };
+  }, [user, region, branch, zone, selectedYear, geographyLevel, selectedProvince, loading, loadError]);
+
   const filteredRows = useMemo(
     () => rows.filter((row) => !selectedYear || String(row.year) === selectedYear),
     [rows, selectedYear],
   );
+  const filteredDetailRows = useMemo(
+    () => detailRows.filter((row) => !selectedYear || String(row.year) === selectedYear),
+    [detailRows, selectedYear],
+  );
+  const provinceOptions = useMemo(() => [...new Set(filteredRows.map((row) => row.province).filter(Boolean))]
+    .sort((a, b) => provinceLabel(a).localeCompare(provinceLabel(b))), [filteredRows]);
 
   const totals = useMemo(() => filteredRows.reduce((result, row) => {
     NUMBER_FIELDS.forEach((field) => { result[field] += numberValue(row[field]); });
@@ -396,7 +444,7 @@ export default function RegionSalesAnalysis({ user, region, branch, zone }: Regi
 
   const cityPerformance = useMemo(() => {
     const grouped = new Map<string, number>();
-    filteredRows.forEach((row) => {
+    filteredDetailRows.forEach((row) => {
       const city = row.city?.trim() || 'Unspecified city';
       grouped.set(city, (grouped.get(city) ?? 0) + numberValue(row.ga_cnt));
     });
@@ -404,7 +452,7 @@ export default function RegionSalesAnalysis({ user, region, branch, zone }: Regi
       .map(([city, ga_cnt]) => ({ city, ga_cnt }))
       .sort((a, b) => b.ga_cnt - a.ga_cnt)
       .slice(0, 10);
-  }, [filteredRows]);
+  }, [filteredDetailRows]);
 
   const regionalPerformance = useMemo(() => {
     const grouped = new Map<string, { region: string; ga_cnt: number; port_in: number; port_out: number; incentive: number }>();
@@ -423,7 +471,8 @@ export default function RegionSalesAnalysis({ user, region, branch, zone }: Regi
 
   const locationRows = useMemo(() => {
     const grouped = new Map<string, RegionMonthlyRow & { label: string }>();
-    filteredRows.forEach((row) => {
+    const sourceRows = geographyLevel === 'province' ? filteredRows : filteredDetailRows;
+    sourceRows.forEach((row) => {
       const label = getLocationLabel(row, geographyLevel);
       const key = geographyLevel === 'postcode'
         ? `${textKey(row.postcode)}|${textKey(row.city)}|${textKey(row.province)}`
@@ -450,7 +499,7 @@ export default function RegionSalesAnalysis({ user, region, branch, zone }: Regi
       .filter((row) => [row.label, row.city, row.postcode, row.province, row.region, row.branch, row.zone]
         .some((value) => String(value ?? '').toLowerCase().includes(search.trim().toLowerCase())))
       .sort((a, b) => b.ga_cnt - a.ga_cnt);
-  }, [filteredRows, geographyLevel, search]);
+  }, [filteredRows, filteredDetailRows, geographyLevel, search]);
 
   const hasData = !loading && !loadError && filteredRows.length > 0;
   const metricLabel = METRICS.find((entry) => entry.key === mapMetric)?.label ?? 'Metric';
@@ -517,21 +566,31 @@ export default function RegionSalesAnalysis({ user, region, branch, zone }: Regi
             <section className="rounded-3xl border border-[#21264E]/10 bg-white p-5 shadow-sm">
               <div className="mb-4">
                 <h2 className="text-lg font-semibold text-[#21264E]">Best GA performing cities</h2>
-                <p className="text-sm text-slate-500">Top cities by gross activations in {selectedYear}.</p>
+                <p className="text-sm text-slate-500">
+                  {selectedProvince
+                    ? `Top cities in ${provinceLabel(selectedProvince)} during ${selectedYear}.`
+                    : 'Select a province in Location detail to load city performance.'}
+                </p>
               </div>
-              <div className="h-[360px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={cityPerformance} layout="vertical" margin={{ left: 10, right: 24 }}>
-                    <CartesianGrid stroke="#e5e7eb" strokeDasharray="3 3" />
-                    <XAxis type="number" tick={{ fontSize: 11 }} />
-                    <YAxis type="category" dataKey="city" width={110} tick={{ fontSize: 11 }} />
-                    <Tooltip formatter={(value: number) => Number(value).toLocaleString()} />
-                    <Bar dataKey="ga_cnt" name="Gross activations" radius={[0, 6, 6, 0]}>
-                      {cityPerformance.map((item, index) => <Cell key={item.city} fill={COLORS[index % COLORS.length]} />)}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
+              {selectedProvince ? (
+                <div className="h-[360px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={cityPerformance} layout="vertical" margin={{ left: 10, right: 24 }}>
+                      <CartesianGrid stroke="#e5e7eb" strokeDasharray="3 3" />
+                      <XAxis type="number" tick={{ fontSize: 11 }} />
+                      <YAxis type="category" dataKey="city" width={110} tick={{ fontSize: 11 }} />
+                      <Tooltip formatter={(value: number) => Number(value).toLocaleString()} />
+                      <Bar dataKey="ga_cnt" name="Gross activations" radius={[0, 6, 6, 0]}>
+                        {cityPerformance.map((item, index) => <Cell key={item.city} fill={COLORS[index % COLORS.length]} />)}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <div className="flex h-[360px] items-center justify-center rounded-xl bg-slate-50 px-6 text-center text-sm text-slate-500">
+                  Choose City or Postcode in Location detail, then select a province to load the scoped detail.
+                </div>
+              )}
             </section>
 
             <section className="rounded-3xl border border-[#21264E]/10 bg-white p-5 shadow-sm">
@@ -592,18 +651,57 @@ export default function RegionSalesAnalysis({ user, region, branch, zone }: Regi
               <div className="flex flex-col gap-2 sm:flex-row">
                 <label className="flex items-center gap-2 text-sm text-[#21264E]">
                   Group by
-                  <select value={geographyLevel} onChange={(event) => setGeographyLevel(event.target.value as GeographyLevel)} className="rounded-lg border border-gray-200 bg-white px-3 py-2">
+                  <select
+                    value={geographyLevel}
+                    onChange={(event) => {
+                      setGeographyLevel(event.target.value as GeographyLevel);
+                      setSelectedProvince('');
+                      setSearch('');
+                    }}
+                    className="rounded-lg border border-gray-200 bg-white px-3 py-2"
+                  >
                     <option value="province">Province</option>
                     <option value="city">City</option>
                     <option value="postcode">Postcode</option>
                   </select>
                 </label>
+                {geographyLevel !== 'province' && (
+                  <label className="flex items-center gap-2 text-sm text-[#21264E]">
+                    Province
+                    <select
+                      value={selectedProvince}
+                      onChange={(event) => setSelectedProvince(event.target.value)}
+                      className="max-w-[220px] rounded-lg border border-gray-200 bg-white px-3 py-2"
+                    >
+                      <option value="">Select province</option>
+                      {provinceOptions.map((code) => (
+                        <option key={code} value={code}>{provinceLabel(code)}</option>
+                      ))}
+                    </select>
+                  </label>
+                )}
                 <label className="relative">
                   <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search location…" className="w-full rounded-lg border border-gray-200 py-2 pl-9 pr-3 text-sm sm:w-56" />
+                  <input
+                    value={search}
+                    onChange={(event) => setSearch(event.target.value)}
+                    placeholder="Search location…"
+                    disabled={geographyLevel !== 'province' && (!selectedProvince || loadingDetails)}
+                    className="w-full rounded-lg border border-gray-200 py-2 pl-9 pr-3 text-sm disabled:bg-slate-50 sm:w-56"
+                  />
                 </label>
               </div>
             </div>
+            {geographyLevel !== 'province' && !selectedProvince && (
+              <p className="border-t border-slate-100 px-5 py-4 text-sm text-slate-500">
+                Select a province to fetch city or postcode rows for that province only.
+              </p>
+            )}
+            {loadingDetails && (
+              <p className="border-t border-slate-100 px-5 py-4 text-sm text-slate-500" role="status">
+                Loading details for {provinceLabel(selectedProvince)}…
+              </p>
+            )}
             <div className="max-h-[520px] overflow-auto">
               <table className="w-full min-w-[900px] text-left text-sm">
                 <thead className="sticky top-0 bg-slate-50 text-xs uppercase text-slate-500">
@@ -625,7 +723,7 @@ export default function RegionSalesAnalysis({ user, region, branch, zone }: Regi
                       <td className="px-4 py-3 font-semibold text-[#21264E]">{row.label}</td>
                       <td className="px-4 py-3">{row.city || '—'}{row.postcode ? ` (${row.postcode})` : ''}</td>
                       <td className="px-4 py-3">{row.province?.trim().toUpperCase() || '—'} / {regionLabel(row.region)}</td>
-                      <td className="px-4 py-3">{row.branch.replace('LMIT-HS-', '')} / {row.zone || '—'}</td>
+                      <td className="px-4 py-3">{row.branch?.replace('LMIT-HS-', '') || 'Selected territory'} / {row.zone || 'All zones'}</td>
                       <td className="px-4 py-3 text-right">{row.ga_cnt.toLocaleString()}</td>
                       <td className="px-4 py-3 text-right">{row.port_in.toLocaleString()}</td>
                       <td className="px-4 py-3 text-right">{row.port_out.toLocaleString()}</td>
