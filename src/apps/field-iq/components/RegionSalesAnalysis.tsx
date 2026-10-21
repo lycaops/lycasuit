@@ -27,7 +27,6 @@ interface RegionSalesAnalysisProps {
 interface RegionMonthlyRow {
   branch: string;
   zone: string;
-  month: string;
   year: number;
   ga_cnt: number;
   port_in: number;
@@ -303,7 +302,7 @@ export default function RegionSalesAnalysis({ user, region, branch, zone }: Regi
           : regionBranches;
       }
 
-      const { data, error } = await supabase.rpc('retailer_region_monthly_years', {
+      const { data, error } = await supabase.rpc('retailer_region_years', {
         p_branches: scopedBranches,
         p_branch: branch || null,
         p_zone: zone || null,
@@ -347,10 +346,15 @@ export default function RegionSalesAnalysis({ user, region, branch, zone }: Regi
       }
 
       let query = supabase
-        .from('retailer_region_monthly')
-        .select('branch, zone, month, year, ga_cnt, port_in, port_out, add_gara, incentive, postcode, city, province, region, retailer_count')
+        .from('retailer_region_yearly')
+        .select('branch, zone, year, ga_cnt, port_in, port_out, add_gara, incentive, postcode, city, province, region')
         .eq('year', Number(selectedYear))
-        .order('month', { ascending: false });
+        .order('branch', { ascending: true })
+        .order('zone', { ascending: true })
+        .order('province', { ascending: true })
+        .order('city', { ascending: true })
+        .order('postcode', { ascending: true })
+        .order('region', { ascending: true });
       if (scopedBranches) query = query.in('branch', scopedBranches);
       if (branch) query = query.eq('branch', branch);
       if (zone) query = query.eq('zone', zone);
