@@ -5,7 +5,9 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
-  Cell,
+  Legend,
+  Line,
+  LineChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -42,6 +44,19 @@ interface RegionMonthlyRow {
 
 type MetricKey = 'ga_cnt' | 'port_in' | 'port_out' | 'add_gara' | 'incentive';
 type GeographyLevel = 'city' | 'province' | 'postcode';
+interface CityPerformanceRow {
+  city: string;
+  province: string;
+  ga_cnt: number;
+  port_in: number;
+  port_out: number;
+}
+interface YearlyTrendRow {
+  year: number;
+  ga_cnt: number;
+  port_in: number;
+  port_out: number;
+}
 
 const METRICS: { key: MetricKey; label: string }[] = [
   { key: 'ga_cnt', label: 'Gross activations' },
@@ -53,7 +68,7 @@ const METRICS: { key: MetricKey; label: string }[] = [
 
 const NUMBER_FIELDS: MetricKey[] = ['ga_cnt', 'port_in', 'port_out', 'add_gara', 'incentive'];
 const ALL_BRANCH_ROLES = ['HS-ADMIN', 'PM-ADMIN', 'COUNTRY-MANAGER', 'UK-ADMIN'];
-const COLORS = ['#245bc1', '#08a884', '#f59e0b', '#7c3aed', '#e11d48', '#0891b2', '#65a30d', '#ea580c', '#4f46e5', '#0f766e'];
+const COLORS = ['#006AE0', '#08DC7D', '#46286E', '#FFD54F', '#06B6D4'];
 let provinceMapPromise: Promise<any> | null = null;
 const REGION_NAMES: Record<string, string> = {
   ABR: 'Abruzzo',
@@ -130,6 +145,18 @@ const getLocationLabel = (row: RegionMonthlyRow, level: GeographyLevel) => {
   if (level === 'province') return provinceLabel(row.province);
   if (level === 'postcode') return row.postcode || 'Unspecified postcode';
   return row.city || 'Unspecified city';
+};
+
+const getScopedBranches = (user: RpaUser, region: string) => {
+  const assignedBranches = (user.branches ?? []).map(normalizeBranch).filter(Boolean);
+  let scopedBranches: string[] | null = ALL_BRANCH_ROLES.includes(user.role) ? null : assignedBranches;
+  if (region === 'NORTH' || region === 'SOUTH') {
+    const regionBranches = region === 'NORTH' ? NORTH_REGION : SOUTH_REGION;
+    scopedBranches = scopedBranches
+      ? scopedBranches.filter((assigned) => regionBranches.includes(assigned))
+      : regionBranches;
+  }
+  return scopedBranches;
 };
 
 function ProvinceSalesMap({ rows, metric }: { rows: RegionMonthlyRow[]; metric: MetricKey }) {
@@ -268,12 +295,18 @@ export default function RegionSalesAnalysis({ user, region, branch, zone }: Regi
   const [rows, setRows] = useState<RegionMonthlyRow[]>([]);
   const [detailRows, setDetailRows] = useState<RegionMonthlyRow[]>([]);
   const [availableYears, setAvailableYears] = useState<string[]>([]);
+  const [cityRows, setCityRows] = useState<CityPerformanceRow[]>([]);
+  const [yearlyTrend, setYearlyTrend] = useState<YearlyTrendRow[]>([]);
   const [loadingYears, setLoadingYears] = useState(true);
   const [loading, setLoading] = useState(true);
+  const [loadingCities, setLoadingCities] = useState(false);
+  const [loadingTrend, setLoadingTrend] = useState(false);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [loadError, setLoadError] = useState('');
+  const [cityError, setCityError] = useState('');
+  const [trendError, setTrendError] = useState('');
   const [selectedYear, setSelectedYear] = useState('');
-  const [mapMetric, setMapMetric] = useState<MetricKey>('port_in');
+  const [mapMetric, setMapMetric] = useState<MetricKey>('ga_cnt');
   const [geographyLevel, setGeographyLevel] = useState<GeographyLevel>('province');
   const [selectedProvince, setSelectedProvince] = useState('');
   const [search, setSearch] = useState('');
@@ -302,13 +335,7 @@ export default function RegionSalesAnalysis({ user, region, branch, zone }: Regi
         return;
       }
 
-      let scopedBranches: string[] | null = ALL_BRANCH_ROLES.includes(user.role) ? null : allowedBranches;
-      if (region === 'NORTH' || region === 'SOUTH') {
-        const regionBranches = region === 'NORTH' ? NORTH_REGION : SOUTH_REGION;
-        scopedBranches = scopedBranches
-          ? scopedBranches.filter((assigned) => regionBranches.includes(assigned))
-          : regionBranches;
-      }
+      const scopedBranches = getScopedBranches(user, region);
 
       const { data, error } = await supabase.rpc('retailer_region_years', {
         p_branches: scopedBranches,
@@ -345,14 +372,7 @@ export default function RegionSalesAnalysis({ user, region, branch, zone }: Regi
         return;
       }
 
-      const allowedBranches = (user.branches ?? []).map(normalizeBranch).filter(Boolean);
-      let scopedBranches: string[] | null = ALL_BRANCH_ROLES.includes(user.role) ? null : allowedBranches;
-      if (region === 'NORTH' || region === 'SOUTH') {
-        const regionBranches = region === 'NORTH' ? NORTH_REGION : SOUTH_REGION;
-        scopedBranches = scopedBranches
-          ? scopedBranches.filter((assigned) => regionBranches.includes(assigned))
-          : regionBranches;
-      }
+      const scopedBranches = getScopedBranches(user, region);
 
       const { data, error } = await supabase.rpc('retailer_region_province_report', {
         p_year: Number(selectedYear),
@@ -378,6 +398,71 @@ export default function RegionSalesAnalysis({ user, region, branch, zone }: Regi
 
   useEffect(() => {
     let cancelled = false;
+    const fetchCities = async () => {
+      setCityRows([]);
+      setCityError('');
+      if (!selectedYear || loadingYears) {
+        setLoadingCities(false);
+        return;
+      }
+      setLoadingCities(true);
+      const { data, error } = await supabase.rpc('retailer_region_city_report', {
+        p_year: Number(selectedYear),
+        p_branches: getScopedBranches(user, region),
+        p_branch: branch || null,
+        p_zone: zone || null,
+      });
+      if (error) throw new Error(error.message);
+      if (cancelled) return;
+      setCityRows(((data ?? []) as CityPerformanceRow[]).map((row) => ({
+        ...row,
+        ga_cnt: numberValue(row.ga_cnt),
+        port_in: numberValue(row.port_in),
+        port_out: numberValue(row.port_out),
+      })));
+      setLoadingCities(false);
+    };
+    fetchCities().catch((error: unknown) => {
+      if (!cancelled) {
+        setCityError(error instanceof Error ? error.message : 'Unable to load city performance.');
+        setLoadingCities(false);
+      }
+    });
+    return () => { cancelled = true; };
+  }, [user, region, branch, zone, selectedYear, loadingYears, reloadKey]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const fetchYearlyTrend = async () => {
+      setYearlyTrend([]);
+      setTrendError('');
+      setLoadingTrend(true);
+      const { data, error } = await supabase.rpc('retailer_region_yearly_trend', {
+        p_branches: getScopedBranches(user, region),
+        p_branch: branch || null,
+        p_zone: zone || null,
+      });
+      if (error) throw new Error(error.message);
+      if (cancelled) return;
+      setYearlyTrend(((data ?? []) as YearlyTrendRow[]).map((row) => ({
+        year: numberValue(row.year),
+        ga_cnt: numberValue(row.ga_cnt),
+        port_in: numberValue(row.port_in),
+        port_out: numberValue(row.port_out),
+      })));
+      setLoadingTrend(false);
+    };
+    fetchYearlyTrend().catch((error: unknown) => {
+      if (!cancelled) {
+        setTrendError(error instanceof Error ? error.message : 'Unable to load year-over-year trends.');
+        setLoadingTrend(false);
+      }
+    });
+    return () => { cancelled = true; };
+  }, [user, region, branch, zone, reloadKey]);
+
+  useEffect(() => {
+    let cancelled = false;
     const fetchDetailRows = async () => {
       setDetailRows([]);
       if (geographyLevel === 'province' || !selectedProvince || !selectedYear || loading || loadError) {
@@ -394,8 +479,8 @@ export default function RegionSalesAnalysis({ user, region, branch, zone }: Regi
         .order('city', { ascending: true })
         .order('postcode', { ascending: true });
 
-      const allowedBranches = (user.branches ?? []).map(normalizeBranch).filter(Boolean);
-      if (!ALL_BRANCH_ROLES.includes(user.role)) query = query.in('branch', allowedBranches);
+      const scopedBranches = getScopedBranches(user, region);
+      if (scopedBranches) query = query.in('branch', scopedBranches);
       if (region === 'NORTH') query = query.in('branch', NORTH_REGION);
       if (region === 'SOUTH') query = query.in('branch', SOUTH_REGION);
       if (branch) query = query.eq('branch', branch);
@@ -442,18 +527,6 @@ export default function RegionSalesAnalysis({ user, region, branch, zone }: Regi
     return result;
   }, { ga_cnt: 0, port_in: 0, port_out: 0, add_gara: 0, incentive: 0 }), [filteredRows]);
 
-  const cityPerformance = useMemo(() => {
-    const grouped = new Map<string, number>();
-    filteredDetailRows.forEach((row) => {
-      const city = row.city?.trim() || 'Unspecified city';
-      grouped.set(city, (grouped.get(city) ?? 0) + numberValue(row.ga_cnt));
-    });
-    return [...grouped.entries()]
-      .map(([city, ga_cnt]) => ({ city, ga_cnt }))
-      .sort((a, b) => b.ga_cnt - a.ga_cnt)
-      .slice(0, 10);
-  }, [filteredDetailRows]);
-
   const regionalPerformance = useMemo(() => {
     const grouped = new Map<string, { region: string; ga_cnt: number; port_in: number; port_out: number; incentive: number }>();
     filteredRows.forEach((row) => {
@@ -468,6 +541,12 @@ export default function RegionSalesAnalysis({ user, region, branch, zone }: Regi
     });
     return [...grouped.values()].sort((a, b) => b.ga_cnt - a.ga_cnt);
   }, [filteredRows]);
+
+  const provincePerformance = useMemo(() => [...filteredRows]
+    .sort((a, b) => numberValue(b.ga_cnt) - numberValue(a.ga_cnt))
+    .slice(0, 15), [filteredRows]);
+
+  const maxCityGa = Math.max(1, ...cityRows.map((row) => row.ga_cnt));
 
   const locationRows = useMemo(() => {
     const grouped = new Map<string, RegionMonthlyRow & { label: string }>();
@@ -564,32 +643,35 @@ export default function RegionSalesAnalysis({ user, region, branch, zone }: Regi
 
           <div className="grid gap-5 xl:grid-cols-2">
             <section className="rounded-3xl border border-[#21264E]/10 bg-white p-5 shadow-sm">
-              <div className="mb-4">
+              <div className="mb-4 flex items-start justify-between gap-3">
+                <div>
                 <h2 className="text-lg font-semibold text-[#21264E]">Best GA performing cities</h2>
-                <p className="text-sm text-slate-500">
-                  {selectedProvince
-                    ? `Top cities in ${provinceLabel(selectedProvince)} during ${selectedYear}.`
-                    : 'Select a province in Location detail to load city performance.'}
-                </p>
+                  <p className="text-sm text-slate-500">All cities in the selected territory for {selectedYear}, ordered by gross activations.</p>
+                </div>
+                <span className="shrink-0 rounded-full bg-[#006AE0]/10 px-3 py-1 text-xs font-bold text-[#006AE0]">
+                  {cityRows.length.toLocaleString()} cities
+                </span>
               </div>
-              {selectedProvince ? (
-                <div className="h-[360px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={cityPerformance} layout="vertical" margin={{ left: 10, right: 24 }}>
-                      <CartesianGrid stroke="#e5e7eb" strokeDasharray="3 3" />
-                      <XAxis type="number" tick={{ fontSize: 11 }} />
-                      <YAxis type="category" dataKey="city" width={110} tick={{ fontSize: 11 }} />
-                      <Tooltip formatter={(value: number) => Number(value).toLocaleString()} />
-                      <Bar dataKey="ga_cnt" name="Gross activations" radius={[0, 6, 6, 0]}>
-                        {cityPerformance.map((item, index) => <Cell key={item.city} fill={COLORS[index % COLORS.length]} />)}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
+              {cityError ? (
+                <p className="rounded-lg bg-red-50 p-4 text-sm text-red-700" role="alert">{cityError}</p>
+              ) : loadingCities ? (
+                <p className="flex h-[360px] items-center justify-center rounded-xl bg-slate-50 text-sm text-slate-500" role="status">Loading city summaries…</p>
+              ) : cityRows.length ? (
+                <div className="max-h-[420px] space-y-2 overflow-y-auto pr-2">
+                  {cityRows.map((item, index) => (
+                    <div key={`${item.province}-${item.city}-${index}`} className="grid grid-cols-[minmax(110px,1fr)_minmax(90px,2fr)_auto] items-center gap-3 text-sm">
+                      <span className="truncate font-medium text-[#21264E]" title={`${item.city} (${provinceLabel(item.province)})`}>
+                        {item.city} <span className="text-xs text-slate-400">{item.province}</span>
+                      </span>
+                      <div className="h-3 overflow-hidden rounded-full bg-slate-100">
+                        <div className="h-full rounded-full bg-[#006AE0]" style={{ width: `${Math.max(1, item.ga_cnt / maxCityGa * 100)}%` }} />
+                      </div>
+                      <span className="min-w-[4rem] text-right font-semibold tabular-nums text-[#21264E]">{item.ga_cnt.toLocaleString()}</span>
+                    </div>
+                  ))}
                 </div>
               ) : (
-                <div className="flex h-[360px] items-center justify-center rounded-xl bg-slate-50 px-6 text-center text-sm text-slate-500">
-                  Choose City or Postcode in Location detail, then select a province to load the scoped detail.
-                </div>
+                <p className="flex h-[360px] items-center justify-center rounded-xl bg-slate-50 text-sm text-slate-500">No city records for this territory and year.</p>
               )}
             </section>
 
@@ -621,6 +703,53 @@ export default function RegionSalesAnalysis({ user, region, branch, zone }: Regi
                     ))}
                   </tbody>
                 </table>
+              </div>
+            </section>
+          </div>
+
+          <div className="grid gap-5 xl:grid-cols-2">
+            <section className="rounded-3xl border border-[#21264E]/10 bg-white p-5 shadow-sm">
+              <div className="mb-4">
+                <h2 className="text-lg font-semibold text-[#21264E]">Year-over-year sales & MNP</h2>
+                <p className="text-sm text-slate-500">Compare gross activations, port-ins and port-outs across available years.</p>
+              </div>
+              {trendError ? (
+                <p className="rounded-lg bg-red-50 p-4 text-sm text-red-700" role="alert">{trendError}</p>
+              ) : loadingTrend ? (
+                <p className="flex h-[340px] items-center justify-center rounded-xl bg-slate-50 text-sm text-slate-500" role="status">Loading yearly trend…</p>
+              ) : (
+                <div className="h-[340px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={yearlyTrend} margin={{ top: 12, right: 16, left: 4, bottom: 4 }}>
+                      <CartesianGrid stroke="#e5e7eb" strokeDasharray="3 3" />
+                      <XAxis dataKey="year" tick={{ fill: '#21264E', fontSize: 12 }} />
+                      <YAxis tick={{ fill: '#21264E', fontSize: 11 }} />
+                      <Tooltip formatter={(value: number) => Number(value).toLocaleString()} />
+                      <Legend />
+                      <Line type="monotone" dataKey="ga_cnt" name="GA" stroke="#006AE0" strokeWidth={3} dot={{ r: 4 }} />
+                      <Line type="monotone" dataKey="port_in" name="Port-in" stroke="#08DC7D" strokeWidth={3} dot={{ r: 4 }} />
+                      <Line type="monotone" dataKey="port_out" name="Port-out" stroke="#46286E" strokeWidth={3} dot={{ r: 4 }} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+            </section>
+
+            <section className="rounded-3xl border border-[#21264E]/10 bg-white p-5 shadow-sm">
+              <div className="mb-4">
+                <h2 className="text-lg font-semibold text-[#21264E]">Leading provinces by GA</h2>
+                <p className="text-sm text-slate-500">Top 15 provinces in the selected area for {selectedYear}.</p>
+              </div>
+              <div className="h-[340px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={provincePerformance} layout="vertical" margin={{ top: 4, right: 20, left: 4, bottom: 4 }}>
+                    <CartesianGrid stroke="#e5e7eb" strokeDasharray="3 3" />
+                    <XAxis type="number" tick={{ fill: '#21264E', fontSize: 11 }} />
+                    <YAxis type="category" dataKey="province" tickFormatter={(code: string) => provinceLabel(code)} width={150} tick={{ fill: '#21264E', fontSize: 10 }} />
+                    <Tooltip formatter={(value: number) => Number(value).toLocaleString()} labelFormatter={(code) => provinceLabel(code)} />
+                    <Bar dataKey="ga_cnt" name="GA" fill="#006AE0" radius={[0, 6, 6, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
             </section>
           </div>
