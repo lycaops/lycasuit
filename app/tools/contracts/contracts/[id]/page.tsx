@@ -2,6 +2,7 @@ import { requireUser } from "@/lib/auth"
 import { createClient } from "@/lib/supabase/server"
 import { ContractDetailContent } from "@/components/contracts/contract-detail-content"
 import type { Contract } from "@/lib/types"
+import { getContractFeaturePermissions } from "@/lib/contracts/access"
 
 export default async function ContractDetailPage({
   params,
@@ -12,6 +13,7 @@ export default async function ContractDetailPage({
 }) {
   const { id } = await params
   const user = await requireUser()
+  const permissions = await getContractFeaturePermissions(user.id)
   const supabase = await createClient()
   const sp = searchParams ? await searchParams : undefined
   const isEdit = sp?.edit === "1"
@@ -25,5 +27,5 @@ export default async function ContractDetailPage({
   if (error || !data) notFound()
   const contract = data as Contract
 
-  return <ContractDetailContent contract={contract} user={user} isEdit={isEdit} />
+  return <ContractDetailContent contract={contract} user={user} isEdit={isEdit} permissions={permissions} />
 }

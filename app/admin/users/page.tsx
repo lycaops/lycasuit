@@ -9,12 +9,13 @@ export default async function AdminUsersPage() {
   const me = await requirePlatformAdmin()
   const supabase = await createClient()
 
-  const [{ data: users }, { data: roles }, { data: tools }, { data: access }, { data: branches }, { data: zones }] =
+  const [{ data: users }, { data: roles }, { data: tools }, { data: access }, { data: contractPermissions }, { data: branches }, { data: zones }] =
     await Promise.all([
       supabase.from("app_users").select("*").order("full_name"),
       supabase.from("app_roles").select("*").order("rank"),
       supabase.from("app_tools").select("*").order("sort_order"),
       supabase.from("user_tool_access").select("user_id, tool_key, can_access"),
+      supabase.from("user_contract_permissions").select("user_id, can_download_draft, can_remote_sign, can_device_sign"),
       supabase.from("branches").select("code, name").order("code"),
       supabase.from("zones").select("code, name, branch_id, branches(code)").eq("is_active", true).order("name"),
     ])
@@ -38,6 +39,7 @@ export default async function AdminUsersPage() {
           roles={roles ?? []}
           tools={tools ?? []}
           access={access ?? []}
+          contractPermissions={contractPermissions ?? []}
           branches={branches ?? []}
           zones={zones ?? []}
         />

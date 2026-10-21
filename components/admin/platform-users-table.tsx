@@ -6,17 +6,30 @@ import Link from "next/link"
 import { Check, Pencil, Plus, Search, ShieldCheck, ShieldOff, Trash2 } from "lucide-react"
 import Loader from "@/components/Loader"
 import { toast } from "sonner"
-import { deletePlatformUser, setToolAccess, updatePlatformUser } from "@/app/admin/users/actions"
+import { deletePlatformUser, setContractFeaturePermissions, setToolAccess, updatePlatformUser } from "@/app/admin/users/actions"
 import { Button } from "@/components/ui/button"
 import { PlatformUserForm, type PlatformBranch, type PlatformRole, type PlatformTool, type PlatformUserRow } from "@/components/admin/platform-user-form"
 
 interface AccessRow { user_id: string; tool_key: string; can_access: boolean }
+interface ContractPermissionsRow {
+  user_id: string
+  can_download_draft: boolean
+  can_remote_sign: boolean
+  can_device_sign: boolean
+}
+
+const defaultContractPermissions = {
+  can_download_draft: true,
+  can_remote_sign: true,
+  can_device_sign: true,
+}
 
 export function PlatformUsersTable({
   users,
   roles,
   tools,
   access,
+  contractPermissions,
   branches,
   zones,
 }: {
@@ -24,6 +37,7 @@ export function PlatformUsersTable({
   roles: PlatformRole[]
   tools: PlatformTool[]
   access: AccessRow[]
+  contractPermissions: ContractPermissionsRow[]
   branches: PlatformBranch[]
   zones: { code: string; name: string; branch_id: string; branches?: { code: string } | null }[]
 }) {
@@ -43,6 +57,11 @@ export function PlatformUsersTable({
     }
     return m
   }, [access])
+
+  const contractPermissionMap = useMemo(
+    () => new Map(contractPermissions.map((row) => [row.user_id, row])),
+    [contractPermissions],
+  )
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -73,6 +92,25 @@ export function PlatformUsersTable({
     setBusyId(user.id)
     startTransition(async () => {
       const result = await updatePlatformUser(user.id, { role })
+      if (!result.ok) toast.error(result.error)
+      else router.refresh()
+      setBusyId(null)
+    })
+  }
+
+  function toggleContractPermission(
+    user: PlatformUserRow,
+    permission: keyof typeof defaultContractPermissions,
+  ) {
+    const current = contractPermissionMap.get(user.id) ?? defaultContractPermissions
+    const next = { ...current, [permission]: !current[permission] }
+    setBusyId(user.id)
+    startTransition(async () => {
+      const result = await setContractFeaturePermissions(user.id, {
+        can_download_draft: next.can_download_draft,
+        can_remote_sign: next.can_remote_sign,
+        can_device_sign: next.can_device_sign,
+      })
       if (!result.ok) toast.error(result.error)
       else router.refresh()
       setBusyId(null)
@@ -135,6 +173,9 @@ export function PlatformUsersTable({
                   {t.name.split(" ")[0]}
                 </th>
               ))}
+              <th className="px-2 py-3 text-center font-medium">Draft</th>
+              <th className="px-2 py-3 text-center font-medium">Remote sign</th>
+              <th className="px-2 py-3 text-center font-medium">Device sign</th>
               <th className="px-3 py-3 text-center font-medium">Status</th>
               <th className="px-3 py-3 text-right font-medium">Actions</th>
             </tr>
@@ -142,6 +183,7 @@ export function PlatformUsersTable({
           <tbody>
             {filtered.map((u) => {
               const granted = accessMap.get(u.id) ?? new Set<string>()
+              const featurePermissions = contractPermissionMap.get(u.id) ?? defaultContractPermissions
               const busy = busyId === u.id
               return (
                 <tr key={u.id} className="border-b border-[#21264E]/5 last:border-0">
@@ -190,6 +232,31 @@ export function PlatformUsersTable({
                           }}
                         >
                           {on && <Check className="h-3.5 w-3.5 text-white" />}
+                        </button>
+                      </td>
+                    )
+                  })}
+
+                  {([
+                    ["can_download_draft", "draft download"],
+                    ["can_remote_sign", "remote signing"],
+                    ["can_device_sign", "device signing"],
+                  ] as const).map(([permission, label]) => {
+                    const on = featurePermissions[permission]
+                    return (
+                      <td key={permission} className="px-2 py-3 text-center">
+                        <button
+                          disabled={busy}
+                          onClick={() => toggleContractPermission(u, permission)}
+                          aria-label={`${on ? "Revoke" : "Grant"} ${label} for ${u.full_name}`}
+                          title={`${on ? "Revoke" : "Grant"} ${label}`}
+                          className="inline-flex h-6 w-6 items-center justify-center rounded border transition disabled:opacity-50"
+                          style={{
+                            backgroundColor: on ? "#08DC7D" : "transparent",
+                            borderColor: on ? "#08DC7D" : "#21264E26",
+                          }}
+                        >
+                          {on && <Check className="h-3.5 w-3.5 text-[#21264E]" />}
                         </button>
                       </td>
                     )

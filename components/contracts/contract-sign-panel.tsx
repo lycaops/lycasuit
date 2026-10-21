@@ -4,7 +4,7 @@ import { useRef, useState, useTransition, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, ArrowLeft, CheckCircle2, Copy, Link2, ExternalLink, Mail, PenTool } from "lucide-react"
+import { ArrowRight, ArrowLeft, CheckCircle2, Link2, Mail, PenTool } from "lucide-react"
 import {
   Card,
   CardContent,
@@ -12,7 +12,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
 import Loader from "@/components/Loader"
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
 import { SignaturePad, type SignaturePadHandle } from "./signature-pad"
@@ -26,7 +25,15 @@ import {
 } from "@/app/tools/contracts/contracts/actions"
 import { useI18n } from "@/lib/i18n/i18n-context"
 
-export function ContractSignPanel({ contractId }: { contractId: string }) {
+export function ContractSignPanel({
+  contractId,
+  canRemoteSign,
+  canDeviceSign,
+}: {
+  contractId: string
+  canRemoteSign: boolean
+  canDeviceSign: boolean
+}) {
   const router = useRouter()
   const { t } = useI18n()
   const retailerRef = useRef<SignaturePadHandle>(null)
@@ -40,7 +47,6 @@ export function ContractSignPanel({ contractId }: { contractId: string }) {
   const [otp, setOtp] = useState("")
   const [otpSentTo, setOtpSentTo] = useState<string | null>(null)
   const [otpVerifiedAt, setOtpVerifiedAt] = useState<string | null>(null)
-  const [remoteLink, setRemoteLink] = useState<string | null>(null)
   const [autoRefreshActive, setAutoRefreshActive] = useState(false)
   const [signingState, setSigningState] = useState<null | {
     retailerSignaturePath: string | null
@@ -93,7 +99,7 @@ export function ContractSignPanel({ contractId }: { contractId: string }) {
 
   useEffect(() => {
     const shouldPoll =
-      (!!remoteLink || !!signingState?.signLinkSentAt) &&
+      !!signingState?.signLinkSentAt &&
       !signingState?.signLinkUsedAt &&
       !(!!signingState?.retailerSignaturePath && !!signingState?.otpVerifiedAt)
 
@@ -119,7 +125,7 @@ export function ContractSignPanel({ contractId }: { contractId: string }) {
       cancelled = true
       window.clearInterval(id)
     }
-  }, [remoteLink, refreshSigningState, router, signingState, step, otpVerifiedAt])
+  }, [refreshSigningState, router, signingState, step, otpVerifiedAt])
 
   function onNext() {
     const retailerData = retailerRef.current?.toDataUrl()
@@ -195,13 +201,8 @@ export function ContractSignPanel({ contractId }: { contractId: string }) {
         toast.error(res.error)
         return
       }
-      setRemoteLink(res.data!.url)
       await refreshSigningState()
-      if (res.data!.emailed && res.data!.sentTo) {
-        toast.success(t("signingLinkSent").replace("{email}", res.data!.sentTo))
-      } else {
-        toast.success(t("signingLinkGenerated"))
-      }
+      toast.success(t("signingLinkSent").replace("{email}", res.data!.sentTo))
     })
   }
 
@@ -274,7 +275,7 @@ export function ContractSignPanel({ contractId }: { contractId: string }) {
                 <div className="text-sm font-semibold text-brand-navy">{t("chooseRetailerMethod")}</div>
                 <div className="mt-1 text-xs sm:text-sm text-slate-600">{t("chooseRetailerMethodDesc")}</div>
                 <div className="mt-4 flex flex-col gap-3">
-                  <button
+                  {canRemoteSign ? <button
                     type="button"
                     onClick={() => setMethod("remote")}
                     className="flex items-start gap-3 rounded-lg border-2 border-[#E8F4FE] bg-white p-3 sm:p-4 text-left transition-colors hover:border-[#245bc1]/40 hover:bg-[#F4FAFF]"
@@ -284,8 +285,8 @@ export function ContractSignPanel({ contractId }: { contractId: string }) {
                       <span className="block text-sm font-semibold text-brand-navy">{t("methodEmailTitle")}</span>
                       <span className="mt-0.5 block text-xs sm:text-sm text-slate-600">{t("methodEmailDesc")}</span>
                     </span>
-                  </button>
-                  <button
+                  </button> : null}
+                  {canDeviceSign ? <button
                     type="button"
                     onClick={() => setMethod("device")}
                     className="flex items-start gap-3 rounded-lg border-2 border-[#E8F4FE] bg-white p-3 sm:p-4 text-left transition-colors hover:border-[#245bc1]/40 hover:bg-[#F4FAFF]"
@@ -295,7 +296,10 @@ export function ContractSignPanel({ contractId }: { contractId: string }) {
                       <span className="block text-sm font-semibold text-brand-navy">{t("methodDeviceTitle")}</span>
                       <span className="mt-0.5 block text-xs sm:text-sm text-slate-600">{t("methodDeviceDesc")}</span>
                     </span>
-                  </button>
+                  </button> : null}
+                  {!canRemoteSign && !canDeviceSign ? (
+                    <p className="text-xs sm:text-sm text-slate-600">{t("signingMethodsUnavailable")}</p>
+                  ) : null}
                 </div>
               </div>
             ) : method === "remote" ? (
@@ -318,39 +322,6 @@ export function ContractSignPanel({ contractId }: { contractId: string }) {
                   {t("sendLink")}
                 </Button>
               </div>
-
-              {remoteLink ? (
-                <div className="mt-3 sm:mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
-                  <Input readOnly value={remoteLink} className="text-xs sm:text-sm" />
-                  <div className="flex gap-2 w-full sm:w-auto">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={async () => {
-                        try {
-                          await navigator.clipboard.writeText(remoteLink)
-                          toast.success(t("linkCopied"))
-                        } catch {
-                          toast.error(t("linkCopyError"))
-                        }
-                      }}
-                      className="flex-1 sm:flex-none sm:w-auto border-[#E8F4FE]"
-                    >
-                      <Copy className="mr-2 h-4 w-4" />
-                      {t("copy")}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => window.open(remoteLink, "_blank", "noreferrer")}
-                      className="flex-1 sm:flex-none sm:w-auto border-[#E8F4FE]"
-                    >
-                      <ExternalLink className="mr-2 h-4 w-4" />
-                      {t("open")}
-                    </Button>
-                  </div>
-                </div>
-              ) : null}
 
                 <div className="mt-3 sm:mt-4 flex justify-start border-t border-[#E8F4FE] pt-3">
                   <Button

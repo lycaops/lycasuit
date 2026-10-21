@@ -9,6 +9,7 @@ import { requireUser } from "@/lib/auth"
 import { buildContractPdf } from "@/lib/pdf/build-pdf"
 import type { ContractFields } from "@/lib/pdf/contract-text"
 import type { Contract } from "@/lib/types"
+import { requireContractFeaturePermission } from "@/lib/contracts/access"
 
 export type ActionResult<T = undefined> =
   | { ok: true; data?: T }
@@ -274,7 +275,8 @@ export async function saveRetailerSignatureAction(input: {
   gdpr: boolean
 }): Promise<ActionResult<{ retailerSignaturePath: string }>> {
   try {
-    await requireUser()
+    const user = await requireUser()
+    await requireContractFeaturePermission(user.id, "can_device_sign")
     const supabase = await createClient()
     const nowIso = new Date().toISOString()
 
@@ -367,14 +369,13 @@ export async function sendRetailerSigningLinkAction(
   id: string,
 ): Promise<
   ActionResult<{
-    url: string
-    emailed: boolean
-    sentTo: string | null
+    sentTo: string
     expiresAt: string
   }>
 > {
   try {
     const user = await requireUser()
+    await requireContractFeaturePermission(user.id, "can_remote_sign")
     const supabase = await createClient()
 
     const { data: contractRow, error: contractErr } = await supabase
@@ -394,6 +395,10 @@ export async function sendRetailerSigningLinkAction(
     }
     if (contract.retailer_signature_path && contract.otp_verified_at) {
       return { ok: false, error: "Retailer signing is already completed." }
+    }
+    const resendKey = process.env.RESEND_API_KEY
+    if (!resendKey) {
+      return { ok: false, error: "Email is not configured. Set RESEND_API_KEY to enable remote signing." }
     }
 
     const token = crypto.randomBytes(32).toString("hex")
@@ -427,14 +432,6 @@ export async function sendRetailerSigningLinkAction(
       })
       .eq("id", id)
     if (updErr) return { ok: false, error: updErr.message }
-
-    const resendKey = process.env.RESEND_API_KEY
-    if (!resendKey) {
-      return {
-        ok: true,
-        data: { url, emailed: false, sentTo: null, expiresAt: expiresAt.toISOString() },
-      }
-    }
 
     const retailerName = `${contract.contact_first_name ?? ""} ${contract.contact_last_name ?? ""}`.trim()
     const retailerCode = (contract.id ?? "").split("-")[0]?.toUpperCase() ?? ""
@@ -494,31 +491,43 @@ export async function sendRetailerSigningLinkAction(
     })
 
     const from = process.env.RESEND_FROM_EMAIL ?? "onboarding@resend.dev"
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${resendKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from,
-        to: [contract.email],
-        subject: "Link per la firma del contratto",
-        html,
-        text: `Gentile ${contract.contact_first_name},\n\nPer firmare il contratto apri questo link:\n${url}\n\nBozza contratto (PDF):\n${draftDownloadUrl}\n\nIl link scade il ${expiresAt.toLocaleString("it-IT")}.\n\nUniversal Service 2006 S.R.L`,
-      }),
-    })
+    let res: Response
+    try {
+      res = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${resendKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from,
+          to: [contract.email],
+          subject: "Link per la firma del contratto",
+          html,
+          text: `Gentile ${contract.contact_first_name},\n\nPer firmare il contratto apri questo link:\n${url}\n\nBozza contratto (PDF):\n${draftDownloadUrl}\n\nIl link scade il ${expiresAt.toLocaleString("it-IT")}.\n\nUniversal Service 2006 S.R.L`,
+        }),
+      })
+    } catch {
+      await supabase.from("contracts").update({
+        sign_link_hash: null,
+        sign_link_sent_at: null,
+        sign_link_expires_at: null,
+      }).eq("id", id)
+      return { ok: false, error: "Could not send the signing email. Please try again." }
+    }
 
     if (!res.ok) {
-      return {
-        ok: true,
-        data: { url, emailed: false, sentTo: null, expiresAt: expiresAt.toISOString() },
-      }
+      await supabase.from("contracts").update({
+        sign_link_hash: null,
+        sign_link_sent_at: null,
+        sign_link_expires_at: null,
+      }).eq("id", id)
+      return { ok: false, error: "Signing email could not be delivered. Please try again." }
     }
 
     return {
       ok: true,
-      data: { url, emailed: true, sentTo: contract.email, expiresAt: expiresAt.toISOString() },
+      data: { sentTo: contract.email, expiresAt: expiresAt.toISOString() },
     }
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : "Unknown error" }
@@ -536,6 +545,9 @@ export async function finalizeContractAction(input: {
 }): Promise<ActionResult<{ pdfPath: string }>> {
   try {
     const staffUser = await requireUser()
+    if (input.retailerSignature) {
+      await requireContractFeaturePermission(staffUser.id, "can_device_sign")
+    }
     const supabase = await createClient()
     const signedAtIso = new Date().toISOString()
 
@@ -1340,6 +1352,7 @@ export async function getDraftContractPdfAction(
 ): Promise<ActionResult<{ base64: string; filename: string }>> {
   try {
     const user = await requireUser()
+    await requireContractFeaturePermission(user.id, "can_download_draft")
     const supabase = await createClient()
 
     const { data: contractRow, error: contractErr } = await supabase
@@ -1369,6 +1382,7 @@ export async function getDraftContractPdfUrlAction(
 ): Promise<ActionResult<{ url: string }>> {
   try {
     const user = await requireUser()
+    await requireContractFeaturePermission(user.id, "can_download_draft")
     const supabase = await createClient()
 
     const { data: contractRow, error: contractErr } = await supabase
@@ -1409,6 +1423,7 @@ export async function sendDraftContractEmailAction(
 ): Promise<ActionResult<{ sentTo: string[] }>> {
   try {
     const user = await requireUser()
+    await requireContractFeaturePermission(user.id, "can_download_draft")
     const supabase = await createClient()
 
     const { data: contractRow, error: contractErr } = await supabase

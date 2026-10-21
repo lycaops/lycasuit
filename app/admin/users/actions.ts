@@ -225,6 +225,28 @@ export async function setToolAccess(userId: string, tools: string[]): Promise<Ac
   return result
 }
 
+export async function setContractFeaturePermissions(
+  userId: string,
+  permissions: {
+    can_download_draft: boolean
+    can_remote_sign: boolean
+    can_device_sign: boolean
+  },
+): Promise<ActionResult> {
+  const admin = await requirePlatformAdmin()
+  const supabase = await createClient()
+  const { error } = await supabase.from("user_contract_permissions").upsert({
+    user_id: userId,
+    ...permissions,
+    granted_by: admin.id,
+    updated_at: new Date().toISOString(),
+  })
+
+  if (error) return { ok: false, error: error.message }
+  revalidatePath("/admin/users")
+  return { ok: true }
+}
+
 async function setToolAccessFor(userId: string, tools: string[]): Promise<ActionResult> {
   const supabase = await createClient()
   const { data: allTools } = await supabase.from("app_tools").select("key")

@@ -32,9 +32,11 @@ function base64ToBlob(base64: string, contentType: string) {
 export function ContractActions({
   contractId,
   status,
+  canDownloadDraft,
 }: {
   contractId: string
   status: string
+  canDownloadDraft: boolean
 }) {
   const { t } = useI18n()
   const [pendingDownload, startDownload] = useTransition()
@@ -138,7 +140,7 @@ export function ContractActions({
   return (
     <div className="flex flex-col w-full gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
       {status !== "SIGNED" ? (
-        <>
+        canDownloadDraft ? <>
           <Button
             onClick={downloadDraft}
             variant="outline"
@@ -178,7 +180,7 @@ export function ContractActions({
             )}
             {t("whatsapp")}
           </Button>
-        </>
+        </> : null
       ) : (
         <>
           <Button onClick={download} disabled={pendingDownload} className="w-full sm:w-auto">

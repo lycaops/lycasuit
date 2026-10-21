@@ -153,7 +153,7 @@ export const translations = {
     copyUrl: "Copy URL",
     whatsapp: "WhatsApp",
     signingLinkSent: "Signing link sent to {email}",
-    signingLinkGenerated: "Signing link generated. Copy and share it with the retailer.",
+    signingLinkGenerated: "Signing link sent only to the retailer by email.",
 
     // Contract Finalization
     contractFinalization: "Contract Finalization",
@@ -179,7 +179,7 @@ export const translations = {
     sendSigningLink: "Send Signing Link",
     retailerCompleted: "Retailer completed signing",
     remoteSigningLinkLabel: "Remote signing link",
-    remoteSigningLinkDesc: "Send a link to the retailer to sign and complete OTP from their own device.",
+    remoteSigningLinkDesc: "The signing link is emailed directly to the retailer and is never shown here.",
     sendLink: "Send link",
     copy: "Copy",
     linkCopied: "Link copied",
@@ -203,6 +203,7 @@ export const translations = {
     methodEmailDesc: "Email a secure signing link to the retailer — they sign and verify the OTP on their own device.",
     methodDeviceTitle: "Collect signature on this device",
     methodDeviceDesc: "Capture the retailer's signature here, then proceed with OTP validation.",
+    signingMethodsUnavailable: "No retailer signing methods have been enabled for your account. Contact your administrator.",
     changeMethod: "Change method",
     backToMethod: "Back to options",
     signatureRequired: "Signature required",
@@ -404,7 +405,7 @@ export const translations = {
     copyUrl: "Copia URL",
     whatsapp: "WhatsApp",
     signingLinkSent: "Link per la firma inviato a {email}",
-    signingLinkGenerated: "Link per la firma generato. Copialo e condividilo con il rivenditore.",
+    signingLinkGenerated: "Link per la firma inviato solo al rivenditore via email.",
 
     // Contract Finalization
     contractFinalization: "Finalizzazione Contratto",
@@ -430,7 +431,7 @@ export const translations = {
     sendSigningLink: "Invia Link per la Firma",
     retailerCompleted: "Il rivenditore ha completato la firma",
     remoteSigningLinkLabel: "Link per la firma remota",
-    remoteSigningLinkDesc: "Invia un link al rivenditore per firmare e completare l'OTP dal proprio dispositivo.",
+    remoteSigningLinkDesc: "Il link per la firma viene inviato direttamente al rivenditore via email e non viene mostrato qui.",
     sendLink: "Invia link",
     copy: "Copia",
     linkCopied: "Link copiato",
@@ -454,6 +455,7 @@ export const translations = {
     methodEmailDesc: "Invia via email un link sicuro al rivenditore: firmerà e verificherà l'OTP dal proprio dispositivo.",
     methodDeviceTitle: "Raccogli la firma su questo dispositivo",
     methodDeviceDesc: "Acquisisci la firma del rivenditore qui, poi procedi con la verifica OTP.",
+    signingMethodsUnavailable: "Nessun metodo di firma è abilitato per il tuo account. Contatta l'amministratore.",
     changeMethod: "Cambia metodo",
     backToMethod: "Torna alle opzioni",
     signatureRequired: "Firma richiesta",

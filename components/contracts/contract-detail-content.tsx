@@ -16,14 +16,16 @@ import { ContractSignPanel } from "@/components/contracts/contract-sign-panel"
 import { ContractActions } from "@/components/contracts/contract-actions"
 import { useI18n } from "@/lib/i18n/i18n-context"
 import type { AppUser, Contract } from "@/lib/types"
+import type { ContractFeaturePermissions } from "@/lib/contracts/access"
 
 interface ContractDetailContentProps {
   contract: Contract
   user: AppUser
   isEdit: boolean
+  permissions: ContractFeaturePermissions
 }
 
-export function ContractDetailContent({ contract, user, isEdit }: ContractDetailContentProps) {
+export function ContractDetailContent({ contract, user, isEdit, permissions }: ContractDetailContentProps) {
   const { t, language } = useI18n()
 
   const statusTone =
@@ -138,7 +140,7 @@ export function ContractDetailContent({ contract, user, isEdit }: ContractDetail
           </Card>
         )}
         <div className="lg:col-span-2 flex flex-col gap-4 md:gap-6">
-          {contract.status !== "SIGNED" && (
+          {contract.status !== "SIGNED" && permissions.can_download_draft && (
             <Card className="gap-0">
               <CardHeader className="p-4 pb-3 md:p-6 md:pb-4">
                 <CardTitle className="text-lg md:text-xl">{t("draftActions")}</CardTitle>
@@ -147,13 +149,17 @@ export function ContractDetailContent({ contract, user, isEdit }: ContractDetail
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-4 pt-0 md:p-6 md:pt-0">
-                <ContractActions contractId={contract.id} status={contract.status} />
+                <ContractActions contractId={contract.id} status={contract.status} canDownloadDraft={permissions.can_download_draft} />
               </CardContent>
             </Card>
           )}
 
           {contract.status !== "SIGNED" ? (
-            <ContractSignPanel contractId={contract.id} />
+            <ContractSignPanel
+              contractId={contract.id}
+              canRemoteSign={permissions.can_remote_sign}
+              canDeviceSign={permissions.can_device_sign}
+            />
           ) : (
             <Card className="gap-0">
               <CardHeader className="p-4 pb-3 md:p-6 md:pb-4">
@@ -163,7 +169,7 @@ export function ContractDetailContent({ contract, user, isEdit }: ContractDetail
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-4 pt-0 md:p-6 md:pt-0">
-                <ContractActions contractId={contract.id} status={contract.status} />
+                <ContractActions contractId={contract.id} status={contract.status} canDownloadDraft={permissions.can_download_draft} />
               </CardContent>
             </Card>
           )}
