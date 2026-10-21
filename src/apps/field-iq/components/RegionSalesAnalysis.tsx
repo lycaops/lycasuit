@@ -339,7 +339,7 @@ function ProvinceSalesMap({ rows, metric }: { rows: RegionMonthlyRow[]; metric: 
         <p className="text-sm text-slate-500">Select a sales or MNP metric. Hover over a province to see its region and retailer-coverage zone.</p>
       </div>
       {mapError && <p className="mb-3 text-sm text-red-700" role="alert">{mapError}</p>}
-      <div ref={mapRef} className="h-[300px] w-full rounded-2xl bg-slate-50 sm:h-[420px] lg:h-[520px]" />
+      <div ref={mapRef} className="h-[300px] w-full rounded-2xl bg-[#21264e] sm:h-[420px] lg:h-[520px]" />
     </section>
   );
 }
