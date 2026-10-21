@@ -12,14 +12,15 @@ import ISDM from '@fieldiq/components/ISDM';
 import CoverageView from '@fieldiq/components/CoverageView';
 import RetailerPerformanceReport from '@fieldiq/components/RetailerPerformanceReport';
 import PlanActivationReport from '@fieldiq/components/PlanActivationReport';
+import RegionSalesAnalysis from '@fieldiq/components/RegionSalesAnalysis';
 import {
-  LayoutDashboard, Upload, LogOut, Search, User, Building2, Shield, FileDown, ChevronLeft, ChevronRight, Users, TrendingUp, Globe, Menu, X, Trophy, Activity, BarChart2, Home,
+  LayoutDashboard, Upload, LogOut, Search, User, Building2, Shield, FileDown, ChevronLeft, ChevronRight, Users, TrendingUp, Globe, Menu, X, Trophy, Activity, BarChart2, Home, MapPinned,
 } from 'lucide-react';
 import { generatePDF } from '@fieldiq/utils/pdfExport';
 import { ALL_BRANCHES, BRANCH_TO_ZONES, normalizeBranch, NORTH_REGION, SOUTH_REGION } from '@fieldiq/data/mockData';
 import Loader from '@/components/Loader';
 
-const VIEWS = { DASHBOARD: 'dashboard', KPI: 'kpi', ISDM: 'isdm', IMPORT: 'import', USERS: 'users', COVERAGE: 'coverage', RETAILER_PERFORMANCE: 'retailer_performance', PLAN_ACTIVATION: 'plan_activation' } as const;
+const VIEWS = { DASHBOARD: 'dashboard', KPI: 'kpi', ISDM: 'isdm', IMPORT: 'import', USERS: 'users', COVERAGE: 'coverage', RETAILER_PERFORMANCE: 'retailer_performance', PLAN_ACTIVATION: 'plan_activation', REGION_SALES: 'region_sales' } as const;
 type View = (typeof VIEWS)[keyof typeof VIEWS];
 
 export default function Dashboard() {
@@ -845,6 +846,15 @@ export default function Dashboard() {
               <BarChart2 size={20} />
               {(!sidebarCollapsed || mobileMenuOpen) && 'Plan Activation Report'}
             </button>
+            <button
+              onClick={() => { setView(VIEWS.REGION_SALES); setMobileMenuOpen(false); }}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
+                view === VIEWS.REGION_SALES ? 'bg-white/15 text-white' : 'text-white/60 hover:bg-white/10 hover:text-white'
+              }`}
+            >
+              <MapPinned size={20} />
+              {(!sidebarCollapsed || mobileMenuOpen) && 'Region Sales Analysis'}
+            </button>
             {user?.role === 'HS-ADMIN' && (
               <button
                 onClick={() => { setView(VIEWS.IMPORT); setMobileMenuOpen(false); }}
@@ -1041,7 +1051,7 @@ export default function Dashboard() {
             </div>
           )}
 
-          {view === VIEWS.PLAN_ACTIVATION && (
+          {(view === VIEWS.PLAN_ACTIVATION || view === VIEWS.REGION_SALES) && (
             <div className="flex flex-wrap items-center gap-4">
               <div className="flex items-center gap-2 min-w-[140px]">
                 <Globe size={16} className="text-[#21264E]" />
@@ -1135,7 +1145,7 @@ export default function Dashboard() {
             </div>
           )}
 
-          {view === VIEWS.PLAN_ACTIVATION && (
+          {(view === VIEWS.PLAN_ACTIVATION || view === VIEWS.REGION_SALES) && (
             <div className="w-full md:w-auto flex items-center gap-2">
               <Building2 size={16} className="text-[#21264E]" />
               {isZoneManager ? (
@@ -1297,6 +1307,12 @@ export default function Dashboard() {
               <span>Plan Activation Report</span>
             </div>
           )}
+          {view === VIEWS.REGION_SALES && (
+            <div className="flex items-center gap-2 text-[#21264E] font-bold">
+              <MapPinned size={18} />
+              <span>Region Sales Analysis</span>
+            </div>
+          )}
 
           {/* Retailer selector - only show for DASHBOARD */}
           {view === VIEWS.DASHBOARD && (
@@ -1372,6 +1388,8 @@ export default function Dashboard() {
             <RetailerPerformanceReport user={user} region={perfRegion} branch={perfBranch} zone={perfZone} />
           ) : view === VIEWS.PLAN_ACTIVATION ? (
             <PlanActivationReport user={user} region={planRegion} branch={planBranch} zone={planZone} />
+          ) : view === VIEWS.REGION_SALES ? (
+            <RegionSalesAnalysis user={user} region={planRegion} branch={planBranch} zone={planZone} />
           ) : view === VIEWS.KPI ? (
             <KPIAnalysis user={user} branch={kpiBranch} zone={kpiZone} region={kpiRegion} />
           ) : view === VIEWS.ISDM ? (
