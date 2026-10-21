@@ -323,6 +323,17 @@ export function ContractSignPanel({
                 </Button>
               </div>
 
+              {autoRefreshActive && signingState?.signLinkExpiresAt &&
+              new Date(signingState.signLinkExpiresAt).getTime() > Date.now() ? (
+                <div
+                  role="status"
+                  className="mt-3 flex items-center gap-3 rounded-md border border-[#D6EEFF] bg-white px-3 py-2 text-xs sm:text-sm text-brand-navy"
+                >
+                  <Loader size={28} weight={24} inherit label={t("waitingForRetailerSignature")} />
+                  <span>{t("waitingForRetailerSignature")}</span>
+                </div>
+              ) : null}
+
                 <div className="mt-3 sm:mt-4 flex justify-start border-t border-[#E8F4FE] pt-3">
                   <Button
                     type="button"
