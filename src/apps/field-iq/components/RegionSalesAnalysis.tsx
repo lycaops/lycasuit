@@ -333,13 +333,13 @@ function ProvinceSalesMap({ rows, metric }: { rows: RegionMonthlyRow[]; metric: 
   }, [mapReady, metric, provinceData]);
 
   return (
-    <section className="rounded-3xl border border-[#21264E]/10 bg-white p-5 shadow-sm">
+    <section className="min-w-0 rounded-3xl border border-[#21264E]/10 bg-white p-4 shadow-sm sm:p-5">
       <div className="mb-4">
         <h2 className="text-lg font-semibold text-[#21264E]">Italy province heatmap</h2>
         <p className="text-sm text-slate-500">Select a sales or MNP metric. Hover over a province to see its region and retailer-coverage zone.</p>
       </div>
       {mapError && <p className="mb-3 text-sm text-red-700" role="alert">{mapError}</p>}
-      <div ref={mapRef} className="h-[360px] rounded-2xl bg-slate-50 sm:h-[460px] lg:h-[520px]" />
+      <div ref={mapRef} className="h-[300px] w-full rounded-2xl bg-slate-50 sm:h-[420px] lg:h-[520px]" />
     </section>
   );
 }
@@ -634,21 +634,21 @@ export default function RegionSalesAnalysis({ user, region, branch, zone }: Regi
   const metricLabel = METRICS.find((entry) => entry.key === mapMetric)?.label ?? 'Metric';
 
   return (
-    <div className="space-y-5 p-3 sm:p-4 lg:space-y-6 lg:p-6">
-      <section className="rounded-3xl border border-[#21264E]/10 bg-white p-5 shadow-sm md:p-6">
+    <div className="w-full min-w-0 max-w-full space-y-5 overflow-x-hidden p-3 sm:p-4 lg:space-y-6 lg:p-6">
+      <section className="min-w-0 rounded-3xl border border-[#21264E]/10 bg-white p-4 shadow-sm sm:p-5 md:p-6">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#245bc1]">Field IQ / Geography</p>
-            <h1 className="mt-2 text-2xl font-bold text-[#21264E]">Region & City Sales Analysis</h1>
+            <h1 className="mt-2 break-words text-xl font-bold text-[#21264E] sm:text-2xl">Region & City Sales Analysis</h1>
             <p className="mt-2 max-w-2xl text-sm text-slate-500">Explore activations, MNP activity, GARA and incentives by Italian region, province, city and postcode. Monthly averages use the selected year total divided by 12.</p>
           </div>
-          <label className="flex items-center gap-2 text-sm font-semibold text-[#21264E]">
+          <label className="flex w-full flex-col items-start gap-2 text-sm font-semibold text-[#21264E] sm:w-auto sm:flex-row sm:items-center">
             Analysis year
             <select
               value={selectedYear}
               onChange={(event) => setSelectedYear(event.target.value)}
               disabled={loading || loadingYears || availableYears.length === 0}
-              className="rounded-lg border border-gray-200 bg-white px-3 py-2 disabled:bg-gray-50"
+              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 disabled:bg-gray-50 sm:w-auto"
             >
               {availableYears.length === 0 && <option value="">No years</option>}
               {availableYears.map((year) => <option key={year} value={year}>{year}</option>)}
@@ -697,9 +697,9 @@ export default function RegionSalesAnalysis({ user, region, branch, zone }: Regi
             ))}
           </div>
 
-          <div className="grid min-w-0 gap-5 lg:grid-cols-2">
+          <div className="grid min-w-0 gap-4 lg:grid-cols-2 lg:gap-5">
             <section className="min-w-0 rounded-3xl border border-[#21264E]/10 bg-white p-5 shadow-sm">
-              <div className="mb-4 flex items-start justify-between gap-3">
+              <div className="mb-4 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-start">
                 <div>
                   <h2 className="text-lg font-semibold text-[#21264E]">Top 20 GA performing cities</h2>
                   <p className="text-sm text-slate-500">Top cities in the selected territory. Monthly average is annual GA divided by 12.</p>
@@ -735,12 +735,27 @@ export default function RegionSalesAnalysis({ user, region, branch, zone }: Regi
               )}
             </section>
 
-            <section className="min-w-0 rounded-3xl border border-[#21264E]/10 bg-white p-5 shadow-sm">
+            <section className="min-w-0 rounded-3xl border border-[#21264E]/10 bg-white p-4 shadow-sm sm:p-5">
               <div className="mb-4">
                 <h2 className="text-lg font-semibold text-[#21264E]">Regional performance</h2>
                 <p className="text-sm text-slate-500">Sales and MNP activity by administrative region.</p>
               </div>
-              <div className="max-h-[360px] overflow-auto">
+              <div className="space-y-2 sm:hidden">
+                {regionalPerformance.map((item) => (
+                  <article key={item.region} className="rounded-xl border border-slate-100 bg-slate-50/70 p-3">
+                    <h3 className="mb-2 font-semibold text-[#21264E]">{item.region}</h3>
+                    <dl className="grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
+                      <div><dt className="text-slate-500">GA</dt><dd className="font-semibold text-[#21264E]">{item.ga_cnt.toLocaleString()}</dd></div>
+                      <div><dt className="text-slate-500">Port-in</dt><dd className="font-semibold text-[#21264E]">{item.port_in.toLocaleString()}</dd></div>
+                      <div><dt className="text-slate-500">Port-out</dt><dd className="font-semibold text-[#21264E]">{item.port_out.toLocaleString()}</dd></div>
+                      <div><dt className="text-slate-500">GARA</dt><dd className="font-semibold text-[#21264E]">{item.add_gara.toLocaleString()}</dd></div>
+                      <div className="col-span-2"><dt className="text-slate-500">Incentive</dt><dd className="font-semibold text-[#21264E]">€{item.incentive.toLocaleString(undefined, { maximumFractionDigits: 0 })}</dd></div>
+                    </dl>
+                  </article>
+                ))}
+                {regionalPerformance.length === 0 && <p className="py-6 text-center text-sm text-slate-500">No regions have reported activity.</p>}
+              </div>
+              <div className="hidden max-h-[360px] overflow-auto sm:block">
                 <table className="w-full min-w-[600px] text-left text-sm">
                   <thead className="sticky top-0 bg-slate-50 text-xs uppercase text-slate-500">
                     <tr>
@@ -772,18 +787,18 @@ export default function RegionSalesAnalysis({ user, region, branch, zone }: Regi
             </section>
           </div>
 
-          <div className="grid min-w-0 gap-5 lg:grid-cols-2">
-            <section className="rounded-3xl border border-[#21264E]/10 bg-white p-5 shadow-sm">
+          <div className="grid min-w-0 gap-4 lg:grid-cols-2 lg:gap-5">
+            <section className="min-w-0 rounded-3xl border border-[#21264E]/10 bg-white p-4 shadow-sm sm:p-5">
               <div className="mb-4">
                 <h2 className="text-lg font-semibold text-[#21264E]">Leading {rankingsByCity ? 'cities' : 'provinces'} by GA</h2>
                 <p className="text-sm text-slate-500">Top 15 {rankingsByCity ? 'cities' : 'provinces'} for {selectedYear}.</p>
               </div>
-              <div className="h-[360px] min-w-0">
+              <div className="h-[300px] min-w-0 sm:h-[360px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={topGaAreas} layout="vertical" margin={{ top: 4, right: 12, left: 4, bottom: 4 }}>
                     <CartesianGrid stroke="#e5e7eb" strokeDasharray="3 3" />
                     <XAxis type="number" tick={{ fill: '#21264E', fontSize: 11 }} />
-                    <YAxis type="category" dataKey="label" tickFormatter={formatAreaTick} width={115} tick={{ fill: '#21264E', fontSize: 10 }} />
+                    <YAxis type="category" dataKey="label" tickFormatter={formatAreaTick} width={90} tick={{ fill: '#21264E', fontSize: 9 }} />
                     <Tooltip formatter={(value: number) => Number(value).toLocaleString()} />
                     <Bar dataKey="ga_cnt" name="GA" fill="#006AE0" radius={[0, 6, 6, 0]} />
                   </BarChart>
@@ -791,17 +806,17 @@ export default function RegionSalesAnalysis({ user, region, branch, zone }: Regi
               </div>
             </section>
 
-            <section className="rounded-3xl border border-[#21264E]/10 bg-white p-5 shadow-sm">
+            <section className="min-w-0 rounded-3xl border border-[#21264E]/10 bg-white p-4 shadow-sm sm:p-5">
               <div className="mb-4">
                 <h2 className="text-lg font-semibold text-[#21264E]">Leading {rankingsByCity ? 'cities' : 'provinces'} by Port-in</h2>
                 <p className="text-sm text-slate-500">Top 15 {rankingsByCity ? 'cities' : 'provinces'} for {selectedYear}.</p>
               </div>
-              <div className="h-[360px] min-w-0">
+              <div className="h-[300px] min-w-0 sm:h-[360px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={topPortInAreas} layout="vertical" margin={{ top: 4, right: 12, left: 4, bottom: 4 }}>
                     <CartesianGrid stroke="#e5e7eb" strokeDasharray="3 3" />
                     <XAxis type="number" tick={{ fill: '#21264E', fontSize: 11 }} />
-                    <YAxis type="category" dataKey="label" tickFormatter={formatAreaTick} width={115} tick={{ fill: '#21264E', fontSize: 10 }} />
+                    <YAxis type="category" dataKey="label" tickFormatter={formatAreaTick} width={90} tick={{ fill: '#21264E', fontSize: 9 }} />
                     <Tooltip formatter={(value: number) => Number(value).toLocaleString()} />
                     <Bar dataKey="port_in" name="Port-in" fill="#08DC7D" radius={[0, 6, 6, 0]} />
                   </BarChart>
@@ -809,17 +824,17 @@ export default function RegionSalesAnalysis({ user, region, branch, zone }: Regi
               </div>
             </section>
 
-            <section className="rounded-3xl border border-[#21264E]/10 bg-white p-5 shadow-sm lg:col-span-2">
+            <section className="min-w-0 rounded-3xl border border-[#21264E]/10 bg-white p-4 shadow-sm lg:col-span-2 sm:p-5">
               <div className="mb-4">
                 <h2 className="text-lg font-semibold text-[#21264E]">Net MNP balance by {rankingsByCity ? 'city' : 'province'}</h2>
                 <p className="text-sm text-slate-500">Top 15 by absolute activity. Positive values mean more port-ins; negative values mean more port-outs.</p>
               </div>
-              <div className="h-[360px] min-w-0">
+              <div className="h-[300px] min-w-0 sm:h-[360px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={netMnpAreas} layout="vertical" margin={{ top: 4, right: 12, left: 4, bottom: 4 }}>
                     <CartesianGrid stroke="#e5e7eb" strokeDasharray="3 3" />
                     <XAxis type="number" domain={['dataMin', 'dataMax']} tick={{ fill: '#21264E', fontSize: 11 }} />
-                    <YAxis type="category" dataKey="label" tickFormatter={formatAreaTick} width={115} tick={{ fill: '#21264E', fontSize: 10 }} />
+                    <YAxis type="category" dataKey="label" tickFormatter={formatAreaTick} width={90} tick={{ fill: '#21264E', fontSize: 9 }} />
                     <Tooltip formatter={(value: number) => Number(value).toLocaleString()} />
                     <Bar dataKey="net_mnp" name="Port-in minus Port-out" fill="#46286E" radius={[0, 6, 6, 0]} />
                   </BarChart>
@@ -828,7 +843,7 @@ export default function RegionSalesAnalysis({ user, region, branch, zone }: Regi
             </section>
           </div>
 
-          <section className="rounded-3xl border border-[#21264E]/10 bg-white p-5 shadow-sm">
+          <section className="min-w-0 rounded-3xl border border-[#21264E]/10 bg-white p-4 shadow-sm sm:p-5">
             <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <h2 className="text-lg font-semibold text-[#21264E]">MNP & sales activity heatmap</h2>
@@ -845,14 +860,14 @@ export default function RegionSalesAnalysis({ user, region, branch, zone }: Regi
             <p className="mt-2 text-xs text-slate-500">Current map metric: {metricLabel}. The map refits to the provinces in the selected territory.</p>
           </section>
 
-          <section className="overflow-hidden rounded-3xl border border-[#21264E]/10 bg-white shadow-sm">
-            <div className="flex flex-col gap-4 p-5 lg:flex-row lg:items-end lg:justify-between">
+          <section className="min-w-0 overflow-hidden rounded-3xl border border-[#21264E]/10 bg-white shadow-sm">
+            <div className="flex flex-col gap-4 p-4 sm:p-5 lg:flex-row lg:items-end lg:justify-between">
               <div>
                 <h2 className="text-lg font-semibold text-[#21264E]">Location detail</h2>
                 <p className="text-sm text-slate-500">Compare performance by province, city or postcode.</p>
               </div>
-              <div className="flex flex-col gap-2 sm:flex-row">
-                <label className="flex items-center gap-2 text-sm text-[#21264E]">
+              <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-end">
+                <label className="flex min-w-0 flex-col gap-1 text-sm text-[#21264E] sm:flex-row sm:items-center sm:gap-2">
                   Group by
                   <select
                     value={geographyLevel}
@@ -861,7 +876,7 @@ export default function RegionSalesAnalysis({ user, region, branch, zone }: Regi
                       setSelectedProvince('');
                       setSearch('');
                     }}
-                    className="rounded-lg border border-gray-200 bg-white px-3 py-2"
+                    className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 sm:w-auto"
                   >
                     <option value="province">Province</option>
                     <option value="city">City</option>
@@ -869,12 +884,12 @@ export default function RegionSalesAnalysis({ user, region, branch, zone }: Regi
                   </select>
                 </label>
                 {geographyLevel !== 'province' && (
-                  <label className="flex items-center gap-2 text-sm text-[#21264E]">
+                  <label className="flex min-w-0 flex-col gap-1 text-sm text-[#21264E] sm:flex-row sm:items-center sm:gap-2">
                     Province
                     <select
                       value={selectedProvince}
                       onChange={(event) => setSelectedProvince(event.target.value)}
-                      className="max-w-[220px] rounded-lg border border-gray-200 bg-white px-3 py-2"
+                      className="w-full max-w-full rounded-lg border border-gray-200 bg-white px-3 py-2 sm:max-w-[220px]"
                     >
                       <option value="">Select province</option>
                       {provinceOptions.map((code) => (
@@ -883,14 +898,14 @@ export default function RegionSalesAnalysis({ user, region, branch, zone }: Regi
                     </select>
                   </label>
                 )}
-                <label className="relative">
+                <label className="relative min-w-0">
                   <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                   <input
                     value={search}
                     onChange={(event) => setSearch(event.target.value)}
                     placeholder="Search location…"
                     disabled={geographyLevel !== 'province' && (!selectedProvince || loadingDetails)}
-                    className="w-full rounded-lg border border-gray-200 py-2 pl-9 pr-3 text-sm disabled:bg-slate-50 sm:w-56"
+                    className="w-full min-w-0 rounded-lg border border-gray-200 py-2 pl-9 pr-3 text-sm disabled:bg-slate-50 sm:w-56"
                   />
                 </label>
               </div>
